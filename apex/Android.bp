@@ -72,9 +72,6 @@ systemserverclasspath_fragment {
 override_apex {
     name: "com.android.devicelock-debug",
     base: "com.android.devicelock",
-    apps: [
-        "DeviceLockControllerDebug",
-    ],
 }
 
 apex {
@@ -88,9 +85,6 @@ apex {
     file_contexts: ":com.android.devicelock-file_contexts",
     key: "com.android.devicelock.key",
     certificate: ":com.android.devicelock.certificate",
-    apps: [
-        "DeviceLockController",
-    ],
     updatable: false,
     future_updatable: true,
 }
