@@ -8,3 +8,11 @@ flag {
     description: "Flag for API to clear device restrictions"
     bug: "349177010"
 }
+
+flag {
+    name: "get_enrollment_type"
+    is_exported: true
+    namespace: "growth_dlc"
+    description: "Flag for API to get the enrollment type for a device"
+    bug: "402302549"
+}

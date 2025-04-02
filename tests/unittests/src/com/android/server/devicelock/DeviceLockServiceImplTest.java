@@ -16,6 +16,7 @@
 
 package com.android.server.devicelock;
 
+import static android.Manifest.permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE;
 import static android.app.AppOpsManager.OPSTR_SYSTEM_EXEMPT_FROM_HIBERNATION;
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
@@ -52,7 +53,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.devicelock.DeviceLockManager;
 import android.devicelock.IGetDeviceIdCallback;
+import android.devicelock.IGetEnrollmentTypeCallback;
+import android.devicelock.ParcelableException;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Looper;
@@ -71,6 +75,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -125,6 +131,9 @@ public final class DeviceLockServiceImplTest {
     private IDeviceLockControllerService mDeviceLockControllerService;
     @Mock
     private PowerExemptionManager mPowerExemptionManager;
+
+    @Captor
+    private ArgumentCaptor<ParcelableException> mParcelableExceptionArgumentCaptor;
 
     private ShadowApplication mShadowApplication;
 
@@ -223,6 +232,102 @@ public final class DeviceLockServiceImplTest {
         // THEN the MEID id is received
         verify(mockCallback, timeout(ONE_SEC_MILLIS)).onDeviceIdReceived(
                 eq(DEVICE_ID_TYPE_MEID), eq(testMeid));
+    }
+
+    @Test
+    public void getEnrollmentType_withoutHoldingPermission_shouldReturnSecurityException()
+            throws Exception {
+        // GIVEN the app does NOT holds the GET_DEVICE_LOCK_ENROLLMENT_TYPE permission
+
+        // WHEN the enrollment type is requested
+        IGetEnrollmentTypeCallback mockCallback = mock(IGetEnrollmentTypeCallback.class);
+        mService.getEnrollmentType(mockCallback);
+
+        // THEN an exception is returned
+        verify(mockCallback, timeout(ONE_SEC_MILLIS)).onError(
+                mParcelableExceptionArgumentCaptor.capture());
+
+        // THEN the exception is a security exception
+        assertThat(mParcelableExceptionArgumentCaptor.getValue().getException())
+                .isInstanceOf(SecurityException.class);
+    }
+
+    @Test
+    public void getEnrollmentType_withDlcReportingNone_shouldReturnNone() throws Exception {
+        // GIVEN the app holds the GET_DEVICE_LOCK_ENROLLMENT_TYPE permission
+        mShadowApplication.grantPermissions(GET_DEVICE_LOCK_ENROLLMENT_TYPE);
+
+        // GIVEN a successful service call to DLC app
+        doAnswer((Answer<Void>) invocation -> {
+            RemoteCallback callback = invocation.getArgument(0);
+            Bundle bundle = new Bundle();
+            bundle.putInt(IDeviceLockControllerService.KEY_RESULT,
+                    DeviceLockManager.ENROLLMENT_TYPE_NONE);
+            callback.sendResult(bundle);
+            return null;
+        }).when(mDeviceLockControllerService).getEnrollmentType(any(RemoteCallback.class));
+
+        IGetEnrollmentTypeCallback mockCallback = mock(IGetEnrollmentTypeCallback.class);
+
+        // WHEN the enrollment type is requested
+        mService.getEnrollmentType(mockCallback);
+        waitUntilConnected();
+
+        // THEN the correct enrollment type is received
+        verify(mockCallback, timeout(ONE_SEC_MILLIS)).onEnrollmentTypeReceived(
+                eq(DeviceLockManager.ENROLLMENT_TYPE_NONE));
+    }
+
+    @Test
+    public void getEnrollmentType_withDlcReportingFinance_shouldReturnFinance() throws Exception {
+        // GIVEN the app holds the GET_DEVICE_LOCK_ENROLLMENT_TYPE permission
+        mShadowApplication.grantPermissions(GET_DEVICE_LOCK_ENROLLMENT_TYPE);
+
+        // GIVEN a successful service call to DLC app
+        doAnswer((Answer<Void>) invocation -> {
+            RemoteCallback callback = invocation.getArgument(0);
+            Bundle bundle = new Bundle();
+            bundle.putInt(IDeviceLockControllerService.KEY_RESULT,
+                    DeviceLockManager.ENROLLMENT_TYPE_FINANCE);
+            callback.sendResult(bundle);
+            return null;
+        }).when(mDeviceLockControllerService).getEnrollmentType(any(RemoteCallback.class));
+
+        IGetEnrollmentTypeCallback mockCallback = mock(IGetEnrollmentTypeCallback.class);
+
+        // WHEN the enrollment type is requested
+        mService.getEnrollmentType(mockCallback);
+        waitUntilConnected();
+
+        // THEN the correct enrollment type is received
+        verify(mockCallback, timeout(ONE_SEC_MILLIS)).onEnrollmentTypeReceived(
+                eq(DeviceLockManager.ENROLLMENT_TYPE_FINANCE));
+    }
+
+    @Test
+    public void getEnrollmentType_withDlcReportingSubsidy_shouldReturnSubsidy() throws Exception {
+        // GIVEN the app holds the GET_DEVICE_LOCK_ENROLLMENT_TYPE permission
+        mShadowApplication.grantPermissions(GET_DEVICE_LOCK_ENROLLMENT_TYPE);
+
+        // GIVEN a successful service call to DLC app
+        doAnswer((Answer<Void>) invocation -> {
+            RemoteCallback callback = invocation.getArgument(0);
+            Bundle bundle = new Bundle();
+            bundle.putInt(IDeviceLockControllerService.KEY_RESULT,
+                    DeviceLockManager.ENROLLMENT_TYPE_SUBSIDY);
+            callback.sendResult(bundle);
+            return null;
+        }).when(mDeviceLockControllerService).getEnrollmentType(any(RemoteCallback.class));
+
+        IGetEnrollmentTypeCallback mockCallback = mock(IGetEnrollmentTypeCallback.class);
+
+        // WHEN the enrollment type is requested
+        mService.getEnrollmentType(mockCallback);
+        waitUntilConnected();
+
+        // THEN the correct enrollment type is received
+        verify(mockCallback, timeout(ONE_SEC_MILLIS)).onEnrollmentTypeReceived(
+                eq(DeviceLockManager.ENROLLMENT_TYPE_SUBSIDY));
     }
 
     @Test

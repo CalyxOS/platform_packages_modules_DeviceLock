@@ -20,6 +20,8 @@ import static com.google.common.truth.Truth.assertThat;
 
 import static org.junit.Assert.assertThrows;
 
+import android.Manifest.permission;
+import android.app.UiAutomation;
 import android.content.Context;
 import android.devicelock.DeviceId;
 import android.devicelock.DeviceLockManager;
@@ -209,6 +211,26 @@ public final class DeviceLockManagerTest {
                 });
     }
 
+    private ListenableFuture</* EnrollmentType */ Integer> getEnrollmentTypeFuture() {
+        return CallbackToFutureAdapter.getFuture(
+                completer -> {
+                    mDeviceLockManager.getEnrollmentType(mExecutorService,
+                            new OutcomeReceiver<>() {
+                                @Override
+                                public void onResult(/* EnrollmentType */ Integer enrollmentType) {
+                                    completer.set(enrollmentType);
+                                }
+
+                                @Override
+                                public void onError(Exception error) {
+                                    completer.setException(error);
+                                }
+                            });
+                    // Used only for debugging.
+                    return "getEnrollmentType operation";
+                });
+    }
+
     @Test
     @ApiTest(apis = {"android.devicelock.DeviceLockManager#lockDevice"})
     public void lockDevicePermissionCheck() {
@@ -272,6 +294,21 @@ public final class DeviceLockManagerTest {
                         ExecutionException.class,
                         () -> deviceIdFuture.get(TIMEOUT, TimeUnit.SECONDS));
         assertThat(isDeviceLockedResponseException).hasCauseThat()
+                .isInstanceOf(SecurityException.class);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_GET_ENROLLMENT_TYPE)
+    @ApiTest(apis = {"android.devicelock.DeviceLockManager#getEnrollmentType"})
+    public void getEnrollmentTypePermissionCheck() {
+        ListenableFuture</* EnrollmentType */ Integer> getEnrollmentTypeFuture =
+                getEnrollmentTypeFuture();
+
+        Exception getEnrollmentTypeResponseException =
+                assertThrows(
+                        ExecutionException.class,
+                        () -> getEnrollmentTypeFuture.get(TIMEOUT, TimeUnit.SECONDS));
+        assertThat(getEnrollmentTypeResponseException).hasCauseThat()
                 .isInstanceOf(SecurityException.class);
     }
 
@@ -359,6 +396,24 @@ public final class DeviceLockManagerTest {
             getClearDeviceRestrictionsFuture().get(TIMEOUT, TimeUnit.SECONDS);
         } finally {
             removeFinancedDeviceKioskRole();
+        }
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_GET_ENROLLMENT_TYPE)
+    @ApiTest(apis = {"android.devicelock.DeviceLockManager#getEnrollmentType"})
+    public void getEnrollmentTypeShouldReturnNone()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        UiAutomation uiAutomation =
+                InstrumentationRegistry.getInstrumentation().getUiAutomation();
+        try {
+            uiAutomation.adoptShellPermissionIdentity(permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE);
+            /* EnrollmentType */
+            Integer enrollmentType =
+                    getEnrollmentTypeFuture().get(TIMEOUT, TimeUnit.SECONDS);
+            assertThat(enrollmentType).isEqualTo(DeviceLockManager.ENROLLMENT_TYPE_NONE);
+        } finally {
+            uiAutomation.dropShellPermissionIdentity();
         }
     }
 }

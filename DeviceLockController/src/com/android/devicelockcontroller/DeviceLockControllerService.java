@@ -19,6 +19,7 @@ package com.android.devicelockcontroller;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.devicelock.DeviceLockManager;
 import android.devicelock.ParcelableException;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -27,6 +28,7 @@ import android.os.RemoteCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.devicelockcontroller.common.DeviceLockConstants.ProvisioningType;
 import com.android.devicelockcontroller.policy.DevicePolicyController;
 import com.android.devicelockcontroller.policy.DeviceStateController;
 import com.android.devicelockcontroller.policy.FinalizationController;
@@ -106,6 +108,29 @@ public final class DeviceLockControllerService extends Service {
                                     unused -> mFinalizationController.notifyRestrictionsCleared(),
                                     MoreExecutors.directExecutor()),
                             remoteCallbackWrapper(remoteCallback),
+                            MoreExecutors.directExecutor());
+                }
+
+                @Override
+                public void getEnrollmentType(RemoteCallback remoteCallback) {
+                    logKioskAppRequest();
+
+                    Futures.addCallback(
+                            Futures.transform(
+                                    SetupParametersClient.getInstance().getProvisioningType(),
+                                    provisioningType -> {
+                                        switch (provisioningType) {
+                                            case ProvisioningType.TYPE_FINANCED:
+                                                return DeviceLockManager.ENROLLMENT_TYPE_FINANCE;
+                                            case ProvisioningType.TYPE_SUBSIDY:
+                                                return DeviceLockManager.ENROLLMENT_TYPE_SUBSIDY;
+                                            default:
+                                                // For the ProvisioningType.TYPE_UNDEFINED case.
+                                                return DeviceLockManager.ENROLLMENT_TYPE_NONE;
+                                        }
+                                    },
+                                    MoreExecutors.directExecutor()),
+                            remoteCallbackWrapper(remoteCallback, KEY_RESULT),
                             MoreExecutors.directExecutor());
                 }
 
@@ -203,6 +228,8 @@ public final class DeviceLockControllerService extends Service {
                 bundle.putBoolean(key, (Boolean) result);
             } else if (result instanceof String) {
                 bundle.putString(key, (String) result);
+            } else if (result instanceof Integer){
+                bundle.putInt(key, (Integer) result);
             }
         }
         remoteCallback.sendResult(bundle);
