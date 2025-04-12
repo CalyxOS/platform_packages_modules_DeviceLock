@@ -213,6 +213,20 @@ public final class DeviceLockControllerServiceTest {
     }
 
     @Test
+    public void getEnrollmentType_shouldLogKioskRequest()
+            throws RemoteException, TimeoutException {
+        Intent serviceIntent = new Intent(mTestApp, DeviceLockControllerService.class);
+        IBinder binder = mServiceRule.bindService(serviceIntent);
+
+        assertThat(binder).isNotNull();
+
+        IDeviceLockControllerService.Stub serviceStub = (IDeviceLockControllerService.Stub) binder;
+        serviceStub.getEnrollmentType(new RemoteCallback((result -> {})));
+
+        verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
+    }
+
+    @Test
     public void onUserSwitching_enforcePoliciesAndFinalizationState()
             throws RemoteException, TimeoutException {
         Intent serviceIntent = new Intent(mTestApp, DeviceLockControllerService.class);

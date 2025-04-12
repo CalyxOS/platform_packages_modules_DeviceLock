@@ -16,6 +16,8 @@
 
 package com.android.server.devicelock;
 
+import static android.devicelock.DeviceLockManager.EnrollmentType;
+
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.content.ComponentName;
@@ -397,6 +399,27 @@ final class DeviceLockControllerConnectorImpl implements DeviceLockControllerCon
             @SuppressWarnings("GuardedBy") // mLock already held in callControllerApi (error prone).
             public Void call() throws Exception {
                 mDeviceLockControllerService.clearDeviceRestrictions(remoteCallback);
+                return null;
+            }
+        }, callback);
+    }
+
+    @Override
+    public void getEnrollmentType(OutcomeReceiver<@EnrollmentType Integer, Exception> callback) {
+        RemoteCallback remoteCallback = new RemoteCallback(checkTimeout(callback, result -> {
+            if (maybeReportException(callback, result)) {
+                return;
+            }
+            final int enrollmentType =
+                    result.getInt(IDeviceLockControllerService.KEY_RESULT);
+            mHandler.post(() -> callback.onResult(enrollmentType));
+        }));
+
+        callControllerApi(new Callable<Void>() {
+            @Override
+            @SuppressWarnings("GuardedBy") // mLock already held in callControllerApi (error prone).
+            public Void call() throws Exception {
+                mDeviceLockControllerService.getEnrollmentType(remoteCallback);
                 return null;
             }
         }, callback);

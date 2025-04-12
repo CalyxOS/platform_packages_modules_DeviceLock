@@ -17,6 +17,7 @@
 package android.devicelock;
 
 import static com.android.devicelock.flags.Flags.FLAG_CLEAR_DEVICE_RESTRICTIONS;
+import static com.android.devicelock.flags.Flags.FLAG_GET_ENROLLMENT_TYPE;
 
 import android.Manifest.permission;
 import android.annotation.CallbackExecutor;
@@ -26,6 +27,7 @@ import android.annotation.NonNull;
 import android.annotation.RequiresFeature;
 import android.annotation.RequiresNoPermission;
 import android.annotation.RequiresPermission;
+import android.annotation.SystemApi;
 import android.annotation.SystemService;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -33,8 +35,10 @@ import android.os.OutcomeReceiver;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
@@ -70,6 +74,40 @@ public final class DeviceLockManager {
      * Constant representing a financed device role, returned by {@link #getKioskApps}.
      */
     public static final int DEVICE_LOCK_ROLE_FINANCING = 0;
+
+    /** @hide */
+    @Target(ElementType.TYPE_USE)
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(prefix = "ENROLLMENT_TYPE_", value = {
+            ENROLLMENT_TYPE_NONE,
+            ENROLLMENT_TYPE_FINANCE,
+            ENROLLMENT_TYPE_SUBSIDY,
+    })
+    public @interface EnrollmentType {}
+
+    /**
+     * Device not enrolled in any program.
+     * @hide
+     */
+    @SystemApi
+    @FlaggedApi(FLAG_GET_ENROLLMENT_TYPE)
+    public static final int ENROLLMENT_TYPE_NONE = 0;
+
+    /**
+     * Device enrolled in the finance program.
+     * @hide
+     */
+    @SystemApi
+    @FlaggedApi(FLAG_GET_ENROLLMENT_TYPE)
+    public static final int ENROLLMENT_TYPE_FINANCE = 1;
+
+    /**
+     * Device enrolled in the subsidy program.
+     * @hide
+     */
+    @SystemApi
+    @FlaggedApi(FLAG_GET_ENROLLMENT_TYPE)
+    public static final int ENROLLMENT_TYPE_SUBSIDY = 2;
 
     /**
      * @hide
@@ -301,6 +339,46 @@ public final class DeviceLockManager {
                         @Override
                         public void onKioskAppsReceived(Map kioskApps) {
                             executor.execute(() -> callback.onResult(kioskApps));
+                        }
+
+                        @Override
+                        public void onError(ParcelableException parcelableException) {
+                            callback.onError(parcelableException.getException());
+                        }
+                    }
+            );
+        } catch (RemoteException e) {
+            executor.execute(() -> callback.onError(new RuntimeException(e)));
+        }
+    }
+
+    /**
+     * Get the device lock solution enrollment type.
+     *
+     * <p>The enrollment type is returned asynchronously by the callback as an integer whose
+     * value can be one of {@link ENROLLMENT_TYPE_NONE}, {@link ENROLLMENT_TYPE_FINANCE},
+     * {@link ENROLLMENT_TYPE_SUBSIDY}.
+     *
+     * @param executor the {@link Executor} on which to invoke the callback.
+     * @param callback returns either the enrollment type or an exception.
+     *
+     * @hide
+     */
+    @SystemApi
+    @FlaggedApi(FLAG_GET_ENROLLMENT_TYPE)
+    @RequiresPermission(permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE)
+    public void getEnrollmentType(
+            @NonNull @CallbackExecutor Executor executor,
+            @NonNull OutcomeReceiver<@EnrollmentType Integer, Exception> callback) {
+        Objects.requireNonNull(executor);
+        Objects.requireNonNull(callback);
+
+        try {
+            mService.getEnrollmentType(
+                    new IGetEnrollmentTypeCallback.Stub() {
+                        @Override
+                        public void onEnrollmentTypeReceived(@EnrollmentType int enrollmentType) {
+                            executor.execute(() -> callback.onResult(enrollmentType));
                         }
 
                         @Override

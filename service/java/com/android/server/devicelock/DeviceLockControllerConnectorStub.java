@@ -16,7 +16,10 @@
 
 package com.android.server.devicelock;
 
+import static android.devicelock.DeviceLockManager.ENROLLMENT_TYPE_NONE;
+
 import android.annotation.IntDef;
+import android.devicelock.DeviceLockManager.EnrollmentType;
 import android.os.OutcomeReceiver;
 
 import com.android.devicelock.flags.Flags;
@@ -114,6 +117,11 @@ public class DeviceLockControllerConnectorStub implements DeviceLockControllerCo
             mPseudoState = DevicePseudoState.CLEARED;
         }
         callback.onResult(/* result= */ null);
+    }
+
+    @Override
+    public void getEnrollmentType(OutcomeReceiver<@EnrollmentType Integer, Exception> callback) {
+        callback.onResult(ENROLLMENT_TYPE_NONE);
     }
 
     @Override

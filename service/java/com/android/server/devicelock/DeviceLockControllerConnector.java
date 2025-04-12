@@ -49,6 +49,11 @@ public interface DeviceLockControllerConnector {
     void getDeviceId(OutcomeReceiver<String, Exception> callback);
 
     /**
+     * Gets the enrollment type.
+     */
+    void getEnrollmentType(OutcomeReceiver<Integer, Exception> callback);
+
+    /**
      * Clears the device restrictions
      */
     void clearDeviceRestrictions(OutcomeReceiver<Void, Exception> callback);

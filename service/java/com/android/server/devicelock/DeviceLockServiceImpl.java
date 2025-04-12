@@ -47,8 +47,10 @@ import android.content.pm.ServiceInfo;
 import android.database.ContentObserver;
 import android.devicelock.DeviceId.DeviceIdType;
 import android.devicelock.DeviceLockManager;
+import android.devicelock.DeviceLockManager.EnrollmentType;
 import android.devicelock.IDeviceLockService;
 import android.devicelock.IGetDeviceIdCallback;
+import android.devicelock.IGetEnrollmentTypeCallback;
 import android.devicelock.IGetKioskAppsCallback;
 import android.devicelock.IIsDeviceLockedCallback;
 import android.devicelock.IVoidResultCallback;
@@ -722,6 +724,41 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
+    }
+
+    @Override
+    public void getEnrollmentType(@NonNull IGetEnrollmentTypeCallback callback){
+        if (mContext.checkCallingOrSelfPermission(
+                Manifest.permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE) != PERMISSION_GRANTED) {
+            try {
+                callback.onError(new ParcelableException(new SecurityException()));
+            } catch (RemoteException e) {
+                Slog.e(TAG, "getEnrollmentType() - Unable to send error to the callback", e);
+            }
+            return;
+        }
+
+        getDeviceLockControllerConnector().getEnrollmentType(new OutcomeReceiver<>() {
+            @Override
+            public void onResult(@EnrollmentType Integer enrollmentType) {
+                Slog.i(TAG, "Get enrollment type: " + enrollmentType);
+                try {
+                    callback.onEnrollmentTypeReceived(enrollmentType);
+                } catch (RemoteException e) {
+                    Slog.e(TAG, "getEnrollmentType() - Unable to send result to the callback", e);
+                }
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                Slog.e(TAG, "getEnrollmentType exception: ", ex);
+                try {
+                    callback.onError(getParcelableException(ex));
+                } catch (RemoteException e) {
+                    Slog.e(TAG, "getEnrollmentType() - Unable to send error to the callback", e);
+                }
+            }
+        });
     }
 
     // For calls from Controller to System Service.

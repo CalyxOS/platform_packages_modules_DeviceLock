@@ -59,6 +59,11 @@ oneway interface IDeviceLockControllerService {
     void clearDeviceRestrictions(in RemoteCallback callback);
 
     /**
+     * Gets the enrollment type.
+     */
+    void getEnrollmentType(in RemoteCallback callback);
+
+    /**
      * Called when a user has just been switched to.
      *
      * Unlike the system service equivalent, this is NOT guaranteed to called in order with other

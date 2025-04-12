@@ -16,10 +16,13 @@
 
 package com.android.server.devicelock;
 
+import static android.devicelock.DeviceLockManager.ENROLLMENT_TYPE_NONE;
+
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.junit.Assert.assertThrows;
 
+import android.devicelock.DeviceLockManager.EnrollmentType;
 import android.os.OutcomeReceiver;
 import android.platform.test.annotations.DisableFlags;
 import android.platform.test.flag.junit.SetFlagsRule;
@@ -225,6 +228,14 @@ public final class DeviceLockControllerConnectorStubTest {
         assertThat(thrown).hasCauseThat().isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    public void getEnrollmentType_shouldReturnEnrollmentTypeNone()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        // The stub should always return "none" as enrollment type.
+        assertThat(getEnrollmentTypeAsync().get(TIMEOUT_SEC, TimeUnit.SECONDS)).isEqualTo(
+                ENROLLMENT_TYPE_NONE);
+    }
+
     private ListenableFuture<Void> lockDeviceAsync() {
         return CallbackToFutureAdapter.getFuture(
                 completer -> {
@@ -302,6 +313,26 @@ public final class DeviceLockControllerConnectorStubTest {
                             });
                     // Used only for debugging.
                     return "isDeviceLocked operation";
+                });
+    }
+
+    private ListenableFuture<Integer> getEnrollmentTypeAsync() {
+        return CallbackToFutureAdapter.getFuture(
+                completer -> {
+                    mDeviceLockControllerConnectorStub.getEnrollmentType(
+                            new OutcomeReceiver<>() {
+                                @Override
+                                public void onResult(@EnrollmentType Integer enrollmentType) {
+                                    completer.set(enrollmentType);
+                                }
+
+                                @Override
+                                public void onError(Exception error) {
+                                    completer.setException(error);
+                                }
+                            });
+                    // Used only for debugging.
+                    return "getEnrollmentType operation";
                 });
     }
 

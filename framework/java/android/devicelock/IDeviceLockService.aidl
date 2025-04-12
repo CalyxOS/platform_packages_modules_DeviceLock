@@ -18,6 +18,7 @@ package android.devicelock;
 
 import android.devicelock.IGetKioskAppsCallback;
 import android.devicelock.IGetDeviceIdCallback;
+import android.devicelock.IGetEnrollmentTypeCallback;
 import android.devicelock.IIsDeviceLockedCallback;
 import android.devicelock.IVoidResultCallback;
 
@@ -52,6 +53,11 @@ oneway interface IDeviceLockService {
      * Asynchronously retrieve the device identifier.
      */
     void getDeviceId(in IGetDeviceIdCallback callback);
+
+    /**
+     * Asynchronously retrieve the enrollment type.
+     */
+    void getEnrollmentType(in IGetEnrollmentTypeCallback callback);
 
     /**
      * Constant corresponding to a financed device role.
