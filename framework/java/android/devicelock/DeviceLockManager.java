@@ -17,6 +17,7 @@
 package android.devicelock;
 
 import static com.android.devicelock.flags.Flags.FLAG_CLEAR_DEVICE_RESTRICTIONS;
+import static com.android.devicelock.flags.Flags.FLAG_EXTRA_DEVICE_LOCK_VERSION;
 import static com.android.devicelock.flags.Flags.FLAG_GET_ENROLLMENT_TYPE;
 
 import android.Manifest.permission;
@@ -74,6 +75,21 @@ public final class DeviceLockManager {
      * Constant representing a financed device role, returned by {@link #getKioskApps}.
      */
     public static final int DEVICE_LOCK_ROLE_FINANCING = 0;
+
+    /**
+     * Extra passed to the kiosk setup activity containing the version of
+     * the Device Lock solution that started the activity.
+     *
+     * The kiosk setup activity can retrieve the version by calling
+     * getIntent().getIntExtra(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION, 1)
+     *
+     * This is meant to be used by kiosk apps sharing the same setup
+     * activity between the legacy Device Owner(DO) based DeviceLock
+     * solution (version 1) and successive versions.
+     */
+    @FlaggedApi(FLAG_EXTRA_DEVICE_LOCK_VERSION)
+    public static final String EXTRA_DEVICE_LOCK_VERSION =
+            "android.devicelock.extra.DEVICE_LOCK_VERSION";
 
     /** @hide */
     @Target(ElementType.TYPE_USE)

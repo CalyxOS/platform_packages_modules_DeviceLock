@@ -93,7 +93,8 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
     private final Executor mBgExecutor;
     static final String ACTION_DEVICE_LOCK_KIOSK_SETUP =
             "com.android.devicelock.action.KIOSK_SETUP";
-    private static final String DEVICE_LOCK_VERSION_EXTRA = "DEVICE_LOCK_VERSION";
+    private static final String DEVICE_LOCK_VERSION_EXTRA =
+            "android.devicelock.extra.DEVICE_LOCK_VERSION";
     private static final int DEVICE_LOCK_VERSION = 2;
     private final UserManager mUserManager;
 

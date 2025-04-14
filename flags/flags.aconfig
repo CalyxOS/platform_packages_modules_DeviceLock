@@ -10,6 +10,14 @@ flag {
 }
 
 flag {
+    name: "extra_device_lock_version"
+    is_exported: true
+    namespace: "growth_dlc"
+    description: "Flag for API to expose the EXTRA_DEVICE_LOCK_VERSION string constant"
+    bug: "402302552"
+}
+
+flag {
     name: "get_enrollment_type"
     is_exported: true
     namespace: "growth_dlc"

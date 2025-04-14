@@ -23,6 +23,7 @@ import static org.junit.Assert.assertThrows;
 import android.Manifest.permission;
 import android.app.UiAutomation;
 import android.content.Context;
+import android.content.Intent;
 import android.devicelock.DeviceId;
 import android.devicelock.DeviceLockManager;
 import android.os.Build;
@@ -397,6 +398,19 @@ public final class DeviceLockManagerTest {
         } finally {
             removeFinancedDeviceKioskRole();
         }
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_EXTRA_DEVICE_LOCK_VERSION)
+    @ApiTest(apis = {"android.devicelock.DeviceLockManager#EXTRA_DEVICE_LOCK_VERSION"})
+    public void extraDeviceLockVersionShouldHaveValidValue() {
+        assertThat(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION)
+                .isEqualTo("android.devicelock.extra.DEVICE_LOCK_VERSION");
+
+        final Intent intent = new Intent();
+        intent.putExtra(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION, 1);
+        assertThat(intent.hasExtra(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION)).isTrue();
+        assertThat(intent.getIntExtra(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION, 0)).isEqualTo(1);
     }
 
     @Test
