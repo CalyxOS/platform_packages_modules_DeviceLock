@@ -24,3 +24,11 @@ flag {
     description: "Flag for API to get the enrollment type for a device"
     bug: "402302549"
 }
+
+flag {
+    name: "device_id_type_serial"
+    is_exported: true
+    namespace: "growth_dlc"
+    description: "Flag for API to add the DEVICE_ID_TYPE_SERIAL to the Device ID types"
+    bug: "402292747"
+}

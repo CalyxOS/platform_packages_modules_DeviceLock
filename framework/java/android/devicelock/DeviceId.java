@@ -16,6 +16,9 @@
 
 package android.devicelock;
 
+import static com.android.devicelock.flags.Flags.FLAG_DEVICE_ID_TYPE_SERIAL;
+
+import android.annotation.FlaggedApi;
 import android.annotation.IntDef;
 import android.annotation.NonNull;
 
@@ -24,8 +27,9 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * The response returned from {@link DeviceLockManager#getDeviceId} on success.
- * A DeviceId represents a stable identifier (i.e. an identifier that is preserved after a factory
- * reset). At this moment, the only supported identifiers are IMEI and MEID.
+ * A DeviceId represents a stable identifier (i.e. an identifier that is
+ * preserved after a factory reset). At this moment, the only supported
+ * identifiers are IMEI, MEID and the Device Serial Number.
  */
 public final class DeviceId {
     /** @hide */
@@ -33,12 +37,16 @@ public final class DeviceId {
     @IntDef(prefix = "DEVICE_ID_TYPE_", value = {
         DEVICE_ID_TYPE_IMEI,
         DEVICE_ID_TYPE_MEID,
+        DEVICE_ID_TYPE_SERIAL_NUMBER,
     })
     public @interface DeviceIdType {}
     /** The device id is an IMEI */
     public static final int DEVICE_ID_TYPE_IMEI = 0;
     /** The device id is a MEID */
     public static final int DEVICE_ID_TYPE_MEID = 1;
+    /** The device id is a serial number */
+    @FlaggedApi(FLAG_DEVICE_ID_TYPE_SERIAL)
+    public static final int DEVICE_ID_TYPE_SERIAL_NUMBER = 2;
 
     private final @DeviceIdType int mType;
     private final String mId;

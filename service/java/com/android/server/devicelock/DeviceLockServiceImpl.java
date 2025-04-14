@@ -26,6 +26,7 @@ import static android.content.pm.PackageManager.DONT_KILL_APP;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.devicelock.DeviceId.DEVICE_ID_TYPE_IMEI;
 import static android.devicelock.DeviceId.DEVICE_ID_TYPE_MEID;
+import static android.devicelock.DeviceId.DEVICE_ID_TYPE_SERIAL_NUMBER;
 import static android.provider.Settings.Secure.USER_SETUP_COMPLETE;
 
 import android.Manifest;
@@ -58,6 +59,7 @@ import android.devicelock.ParcelableException;
 import android.net.NetworkPolicyManager;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -183,7 +185,7 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
     }
 
     // Last supported device id type
-    private static final @DeviceIdType int LAST_DEVICE_ID_TYPE = DEVICE_ID_TYPE_MEID;
+    private static final @DeviceIdType int LAST_DEVICE_ID_TYPE = DEVICE_ID_TYPE_SERIAL_NUMBER;
 
     @VisibleForTesting
     static final String MANAGE_DEVICE_LOCK_SERVICE_FROM_CONTROLLER =
@@ -639,6 +641,13 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
             }
         }
 
+        final StringBuilder deviceSerialNumber = new StringBuilder();
+        if((deviceIdTypeBitmap & (1 << DEVICE_ID_TYPE_SERIAL_NUMBER)) != 0){
+            if(Build.getSerial() != Build.UNKNOWN){
+                deviceSerialNumber.append(Build.getSerial());
+            }
+        }
+
         getDeviceLockControllerConnector().getDeviceId(new OutcomeReceiver<>() {
             @Override
             public void onResult(String deviceId) {
@@ -650,6 +659,12 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
                     }
                     if (imeiList.contains(deviceId)) {
                         callback.onDeviceIdReceived(DEVICE_ID_TYPE_IMEI, deviceId);
+                        return;
+                    }
+                    if(!deviceSerialNumber.isEmpty() &&
+                            deviceId.equals(deviceSerialNumber.toString())){
+                        callback.onDeviceIdReceived(DEVICE_ID_TYPE_SERIAL_NUMBER,
+                                deviceId.toString());
                         return;
                     }
                     // When a device ID is returned from DLC App, but none of the IDs got from

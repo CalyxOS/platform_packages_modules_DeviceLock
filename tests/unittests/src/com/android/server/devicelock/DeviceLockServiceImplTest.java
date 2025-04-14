@@ -22,6 +22,7 @@ import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
 import static android.devicelock.DeviceId.DEVICE_ID_TYPE_IMEI;
 import static android.devicelock.DeviceId.DEVICE_ID_TYPE_MEID;
+import static android.devicelock.DeviceId.DEVICE_ID_TYPE_SERIAL_NUMBER;
 import static android.devicelock.IDeviceLockService.KEY_REMOTE_CALLBACK_RESULT;
 import static android.os.UserHandle.USER_SYSTEM;
 
@@ -85,6 +86,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowAppOpsManager;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowBinder;
+import org.robolectric.shadows.ShadowBuild;
 import org.robolectric.shadows.ShadowPackageManager;
 import org.robolectric.shadows.ShadowTelephonyManager;
 import org.robolectric.shadows.ShadowUserManager;
@@ -124,6 +126,7 @@ public final class DeviceLockServiceImplTest {
     private ShadowPackageManager mShadowPackageManager;
     private PackageManager mPackageManager;
     private ShadowUserManager mShadowUserManager;
+    private ShadowBuild mShadowBuild;
     private UserHandle mSystemUser;
     private UserHandle mSecondaryUser;
 
@@ -232,6 +235,32 @@ public final class DeviceLockServiceImplTest {
         // THEN the MEID id is received
         verify(mockCallback, timeout(ONE_SEC_MILLIS)).onDeviceIdReceived(
                 eq(DEVICE_ID_TYPE_MEID), eq(testMeid));
+    }
+
+    @Test
+    public void getDeviceId_withSerialType_shouldReturnSerial() throws Exception {
+        // GIVEN a serial number registered in build
+        final String testSerial = "1234567890";
+        mShadowBuild.setSerial(testSerial);
+
+        // GIVEN a successful service call to DLC app
+        doAnswer((Answer<Void>) invocation -> {
+            RemoteCallback callback = invocation.getArgument(0);
+            Bundle bundle = new Bundle();
+            bundle.putString(IDeviceLockControllerService.KEY_RESULT, testSerial);
+            callback.sendResult(bundle);
+            return null;
+        }).when(mDeviceLockControllerService).getDeviceIdentifier(any(RemoteCallback.class));
+
+        IGetDeviceIdCallback mockCallback = mock(IGetDeviceIdCallback.class);
+
+        // WHEN the device id is requested with the serial device type
+        mService.getDeviceId(mockCallback, 1 << DEVICE_ID_TYPE_SERIAL_NUMBER);
+        waitUntilConnected();
+
+        // THEN the serial id is received
+        verify(mockCallback, timeout(ONE_SEC_MILLIS)).onDeviceIdReceived(
+                eq(DEVICE_ID_TYPE_SERIAL_NUMBER), eq(testSerial));
     }
 
     @Test
