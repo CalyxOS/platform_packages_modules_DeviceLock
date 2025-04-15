@@ -59,6 +59,11 @@ oneway interface IDeviceLockControllerService {
     void clearDeviceRestrictions(in RemoteCallback callback);
 
     /**
+     * Notifies the controller that the kiosk setup has finished.
+     */
+    void notifyKioskSetupFinished(in RemoteCallback callback);
+
+    /**
      * Gets the enrollment type.
      */
     void getEnrollmentType(in RemoteCallback callback);

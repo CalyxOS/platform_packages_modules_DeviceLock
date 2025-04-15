@@ -358,6 +358,26 @@ final class DeviceLockControllerConnectorImpl implements DeviceLockControllerCon
     }
 
     @Override
+    public void notifyKioskSetupFinished(OutcomeReceiver<Void, Exception> callback) {
+        RemoteCallback remoteCallback = new RemoteCallback(checkTimeout(callback, result -> {
+            if (maybeReportException(callback, result)) {
+                return;
+            }
+
+            mHandler.post(() -> callback.onResult(null));
+        }));
+
+        callControllerApi(new Callable<Void>() {
+            @Override
+            @SuppressWarnings("GuardedBy") // mLock already held in callControllerApi (error prone).
+            public Void call() throws Exception {
+                mDeviceLockControllerService.notifyKioskSetupFinished(remoteCallback);
+                return null;
+            }
+        }, callback);
+    }
+
+    @Override
     public void getDeviceId(OutcomeReceiver<String, Exception> callback) {
         RemoteCallback remoteCallback = new RemoteCallback(checkTimeout(callback, result -> {
             if (maybeReportException(callback, result)) {

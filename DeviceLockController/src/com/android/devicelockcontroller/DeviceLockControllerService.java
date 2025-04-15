@@ -135,6 +135,41 @@ public final class DeviceLockControllerService extends Service {
                 }
 
                 @Override
+                public void notifyKioskSetupFinished(RemoteCallback remoteCallback) {
+                    logKioskAppRequest();
+                    // Future to execute the lock/unlock device command.
+                    ListenableFuture<Void> lockUnlockDeviceFuture =
+                            Futures.transformAsync(mDeviceStateController.isLocked(),
+                                    isLocked -> {
+                                        if (isLocked) {
+                                            return mDeviceStateController.lockDevice();
+                                        }
+                                        return mDeviceStateController.unlockDevice();
+                                    },
+                                    MoreExecutors.directExecutor());
+                    Futures.addCallback(
+                            Futures.catchingAsync(lockUnlockDeviceFuture,
+                                    IllegalStateException.class,
+                                    unused -> mDeviceStateController.unlockDevice(),
+                                    MoreExecutors.directExecutor()),
+                            remoteCallbackWrapper(remoteCallback),
+                            MoreExecutors.directExecutor());
+
+                    // Execute the log callback after the device is locked or unlocked.
+                    try{
+                        ListenableFuture<Boolean> isLocked = mDeviceStateController.isLocked();
+                        Futures.addCallback(
+                                Futures.transform(isLocked,
+                                        unused -> null,
+                                        MoreExecutors.directExecutor()),
+                                logLockUnlockDeviceCallback(/* isLockDevice = */ isLocked.get()),
+                                MoreExecutors.directExecutor());
+                    } catch (Exception e) {
+                        LogUtil.e(TAG, "Failed to get device state", e);
+                    }
+                }
+
+                @Override
                 public void onUserSwitching(RemoteCallback remoteCallback) {
                     Futures.addCallback(
                             Futures.transformAsync(mPolicyController.enforceCurrentPolicies(),

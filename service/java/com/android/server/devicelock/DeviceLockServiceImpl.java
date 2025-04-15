@@ -602,6 +602,43 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
         });
     }
 
+    @Override
+    public void notifyKioskSetupFinished(@NonNull IVoidResultCallback callback) {
+        if (!checkCallerPermission()) {
+            try {
+                callback.onError(new ParcelableException(new SecurityException()));
+            } catch (RemoteException e) {
+                Slog.e(TAG, "notifyKioskSetupFinished() - Unable to send error to the callback", e);
+            }
+            return;
+        }
+
+        // Check the device status and call lock or unlock accordingly.
+        getDeviceLockControllerConnector().notifyKioskSetupFinished(new OutcomeReceiver<>() {
+            @Override
+            public void onResult(Void ignored) {
+                Slog.i(TAG, "Kiosk setup finished");
+                try {
+                    callback.onSuccess();
+                } catch (RemoteException e) {
+                    Slog.e(TAG, "notifyKioskSetupFinished() - Unable to send result to the "
+                            + "callback", e);
+                }
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                Slog.e(TAG, "notifyKioskSetupFinished exception: ", ex);
+                try {
+                    callback.onError(getParcelableException(ex));
+                } catch (RemoteException e) {
+                    Slog.e(TAG, "notifyKioskSetupFinished() - Unable to send error to the "
+                            + "callback", e);
+                }
+            }
+        });
+    }
+
     private boolean hasCdma() {
         return mContext.getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_TELEPHONY_CDMA);

@@ -26,6 +26,14 @@ flag {
 }
 
 flag {
+    name: "notify_kiosk_setup_finished"
+    is_exported: true
+    namespace: "growth_dlc"
+    description: "Flag for API to notify the controller that the kiosk setup has finished"
+    bug: "402292744"
+}
+
+flag {
     name: "device_id_type_serial"
     is_exported: true
     namespace: "growth_dlc"

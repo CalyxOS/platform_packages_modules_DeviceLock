@@ -165,6 +165,47 @@ public final class DeviceLockControllerServiceTest {
     }
 
     @Test
+    public void notifyKioskSetupFinished_deviceUnlocked_shouldLogKioskRequest_AndLogUnlockSuccess()
+            throws RemoteException, TimeoutException {
+        DeviceStateController deviceStateController = mTestApp.getDeviceStateController();
+        Intent serviceIntent = new Intent(mTestApp, DeviceLockControllerService.class);
+        IBinder binder = mServiceRule.bindService(serviceIntent);
+
+        when(mTestApp.getDeviceStateController().isLocked()).thenReturn(
+                Futures.immediateFuture(false));
+
+        when(deviceStateController.unlockDevice()).thenReturn(
+                Futures.immediateVoidFuture());
+
+        assertThat(binder).isNotNull();
+
+        IDeviceLockControllerService.Stub serviceStub = (IDeviceLockControllerService.Stub) binder;
+        serviceStub.notifyKioskSetupFinished(new RemoteCallback((result -> {})));
+
+        verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
+        verify(mStatsLogger).logSuccessfulUnlockingDevice();
+    }
+
+    @Test
+    public void notifyKioskSetupFinished_deviceLocked_shouldLogKioskRequest_andLogLockSuccess()
+            throws RemoteException, TimeoutException {
+        DeviceStateController deviceStateController = mTestApp.getDeviceStateController();
+        Intent serviceIntent = new Intent(mTestApp, DeviceLockControllerService.class);
+        IBinder binder = mServiceRule.bindService(serviceIntent);
+
+        when(deviceStateController.isLocked()).thenReturn(
+                Futures.immediateFuture(true));
+
+        assertThat(binder).isNotNull();
+
+        IDeviceLockControllerService.Stub serviceStub = (IDeviceLockControllerService.Stub) binder;
+        serviceStub.notifyKioskSetupFinished(new RemoteCallback((result -> {})));
+
+        verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
+        verify(mStatsLogger).logSuccessfulLockingDevice();
+    }
+
+    @Test
     public void isDeviceLocked_shouldLogKioskRequest() throws RemoteException, TimeoutException {
         Intent serviceIntent = new Intent(mTestApp, DeviceLockControllerService.class);
         IBinder binder = mServiceRule.bindService(serviceIntent);
