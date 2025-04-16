@@ -16,6 +16,7 @@
 
 package com.android.devicelockcontroller.storage;
 
+import static com.android.devicelockcontroller.policy.DevicePolicyController.LockTaskType.KIOSK_LOCK_ACTIVITY;
 import static com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState.FINALIZED;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -44,8 +45,8 @@ public final class GlobalParametersTest extends AbstractGlobalParametersTestBase
 
         GlobalParameters.setRegisteredDeviceId(mContext, REGISTERED_DEVICE_ID);
 
-        assertThat(GlobalParameters.getRegisteredDeviceId(mContext)).isEqualTo(
-                REGISTERED_DEVICE_ID);
+        assertThat(GlobalParameters.getRegisteredDeviceId(mContext))
+                .isEqualTo(REGISTERED_DEVICE_ID);
     }
 
     @Test
@@ -59,13 +60,13 @@ public final class GlobalParametersTest extends AbstractGlobalParametersTestBase
 
     @Test
     public void getLastReceivedProvisionState_shouldReturnExpectedResult() {
-        assertThat(GlobalParameters.getLastReceivedProvisionState(mContext)).isNotEqualTo(
-                LAST_RECEIVED_PROVISION_STATE);
+        assertThat(GlobalParameters.getLastReceivedProvisionState(mContext))
+                .isNotEqualTo(LAST_RECEIVED_PROVISION_STATE);
 
         GlobalParameters.setLastReceivedProvisionState(mContext, LAST_RECEIVED_PROVISION_STATE);
 
-        assertThat(GlobalParameters.getLastReceivedProvisionState(mContext)).isEqualTo(
-                LAST_RECEIVED_PROVISION_STATE);
+        assertThat(GlobalParameters.getLastReceivedProvisionState(mContext))
+                .isEqualTo(LAST_RECEIVED_PROVISION_STATE);
     }
 
     @Test
@@ -75,5 +76,14 @@ public final class GlobalParametersTest extends AbstractGlobalParametersTestBase
         GlobalParameters.setFinalizationState(mContext, FINALIZED);
 
         assertThat(GlobalParameters.getFinalizationState(mContext)).isEqualTo(FINALIZED);
+    }
+
+    @Test
+    public void getLockTaskType_shouldReturnExpectedResult() {
+        assertThat(GlobalParameters.getLockTaskType(mContext)).isNotEqualTo(KIOSK_LOCK_ACTIVITY);
+
+        GlobalParameters.setLockTaskType(mContext, KIOSK_LOCK_ACTIVITY);
+
+        assertThat(GlobalParameters.getLockTaskType(mContext)).isEqualTo(KIOSK_LOCK_ACTIVITY);
     }
 }

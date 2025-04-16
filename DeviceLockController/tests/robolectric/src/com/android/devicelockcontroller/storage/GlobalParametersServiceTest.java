@@ -16,6 +16,8 @@
 
 package com.android.devicelockcontroller.storage;
 
+import static com.android.devicelockcontroller.policy.DevicePolicyController.LockTaskType.KIOSK_LOCK_ACTIVITY;
+
 import static com.google.common.truth.Truth.assertThat;
 
 import android.content.Intent;
@@ -48,8 +50,8 @@ public class GlobalParametersServiceTest extends AbstractGlobalParametersTestBas
 
         mIGlobalParametersService.setRegisteredDeviceId(REGISTERED_DEVICE_ID);
 
-        assertThat(mIGlobalParametersService.getRegisteredDeviceId()).isEqualTo(
-                REGISTERED_DEVICE_ID);
+        assertThat(mIGlobalParametersService.getRegisteredDeviceId())
+                .isEqualTo(REGISTERED_DEVICE_ID);
     }
 
     @Test
@@ -63,12 +65,21 @@ public class GlobalParametersServiceTest extends AbstractGlobalParametersTestBas
 
     @Test
     public void getLastReceivedProvisionState_shouldReturnExpectedResult() throws RemoteException {
-        assertThat(mIGlobalParametersService.getLastReceivedProvisionState()).isNotEqualTo(
-                LAST_RECEIVED_PROVISION_STATE);
+        assertThat(mIGlobalParametersService.getLastReceivedProvisionState())
+                .isNotEqualTo(LAST_RECEIVED_PROVISION_STATE);
 
         mIGlobalParametersService.setLastReceivedProvisionState(LAST_RECEIVED_PROVISION_STATE);
 
-        assertThat(mIGlobalParametersService.getLastReceivedProvisionState()).isEqualTo(
-                LAST_RECEIVED_PROVISION_STATE);
+        assertThat(mIGlobalParametersService.getLastReceivedProvisionState())
+                .isEqualTo(LAST_RECEIVED_PROVISION_STATE);
+    }
+
+    @Test
+    public void getLockTaskType_shouldReturnExpectedResult() throws RemoteException {
+        assertThat(mIGlobalParametersService.getLockTaskType()).isNotEqualTo(KIOSK_LOCK_ACTIVITY);
+
+        mIGlobalParametersService.setLockTaskType(KIOSK_LOCK_ACTIVITY);
+
+        assertThat(mIGlobalParametersService.getLockTaskType()).isEqualTo(KIOSK_LOCK_ACTIVITY);
     }
 }
