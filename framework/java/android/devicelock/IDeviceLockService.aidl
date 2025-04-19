@@ -50,6 +50,11 @@ oneway interface IDeviceLockService {
     void clearDeviceRestrictions(in IVoidResultCallback callback);
 
     /**
+     * Asynchronously notify DLC that kiosk set-up has finished.
+     */
+    void notifyKioskSetupFinished(in IVoidResultCallback callback);
+
+    /**
      * Asynchronously retrieve the device identifier.
      */
     void getDeviceId(in IGetDeviceIdCallback callback);

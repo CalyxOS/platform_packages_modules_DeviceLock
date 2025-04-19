@@ -10,9 +10,33 @@ flag {
 }
 
 flag {
+    name: "extra_device_lock_version"
+    is_exported: true
+    namespace: "growth_dlc"
+    description: "Flag for API to expose the EXTRA_DEVICE_LOCK_VERSION string constant"
+    bug: "402302552"
+}
+
+flag {
     name: "get_enrollment_type"
     is_exported: true
     namespace: "growth_dlc"
     description: "Flag for API to get the enrollment type for a device"
     bug: "402302549"
+}
+
+flag {
+    name: "notify_kiosk_setup_finished"
+    is_exported: true
+    namespace: "growth_dlc"
+    description: "Flag for API to notify the controller that the kiosk setup has finished"
+    bug: "402292744"
+}
+
+flag {
+    name: "device_id_type_serial"
+    is_exported: true
+    namespace: "growth_dlc"
+    description: "Flag for API to add the DEVICE_ID_TYPE_SERIAL to the Device ID types"
+    bug: "402292747"
 }

@@ -45,6 +45,7 @@ public final class DeviceLockConstants {
             DeviceIdType.DEVICE_ID_TYPE_UNSPECIFIED,
             DeviceIdType.DEVICE_ID_TYPE_IMEI,
             DeviceIdType.DEVICE_ID_TYPE_MEID,
+            DeviceIdType.DEVICE_ID_TYPE_SERIAL_NUMBER,
     })
     public @interface DeviceIdType {
         // The device id type is unspecified
@@ -53,10 +54,12 @@ public final class DeviceLockConstants {
         int DEVICE_ID_TYPE_IMEI = 0;
         // The device id is a MEID
         int DEVICE_ID_TYPE_MEID = 1;
+        // The device id is a serial number
+        int DEVICE_ID_TYPE_SERIAL_NUMBER = 2;
     }
 
     @DeviceIdType
-    private static final int LAST_DEVICE_ID_TYPE = DeviceIdType.DEVICE_ID_TYPE_MEID;
+    private static final int LAST_DEVICE_ID_TYPE = DeviceIdType.DEVICE_ID_TYPE_SERIAL_NUMBER;
     public static final int TOTAL_DEVICE_ID_TYPES = LAST_DEVICE_ID_TYPE + 1;
 
     // Constants related to unique device identifiers.

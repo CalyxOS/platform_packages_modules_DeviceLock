@@ -17,7 +17,9 @@
 package android.devicelock;
 
 import static com.android.devicelock.flags.Flags.FLAG_CLEAR_DEVICE_RESTRICTIONS;
+import static com.android.devicelock.flags.Flags.FLAG_EXTRA_DEVICE_LOCK_VERSION;
 import static com.android.devicelock.flags.Flags.FLAG_GET_ENROLLMENT_TYPE;
+import static com.android.devicelock.flags.Flags.FLAG_NOTIFY_KIOSK_SETUP_FINISHED;
 
 import android.Manifest.permission;
 import android.annotation.CallbackExecutor;
@@ -74,6 +76,21 @@ public final class DeviceLockManager {
      * Constant representing a financed device role, returned by {@link #getKioskApps}.
      */
     public static final int DEVICE_LOCK_ROLE_FINANCING = 0;
+
+    /**
+     * Extra passed to the kiosk setup activity containing the version of
+     * the Device Lock solution that started the activity.
+     *
+     * The kiosk setup activity can retrieve the version by calling
+     * getIntent().getIntExtra(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION, 1)
+     *
+     * This is meant to be used by kiosk apps sharing the same setup
+     * activity between the legacy Device Owner(DO) based DeviceLock
+     * solution (version 1) and successive versions.
+     */
+    @FlaggedApi(FLAG_EXTRA_DEVICE_LOCK_VERSION)
+    public static final String EXTRA_DEVICE_LOCK_VERSION =
+            "android.devicelock.extra.DEVICE_LOCK_VERSION";
 
     /** @hide */
     @Target(ElementType.TYPE_USE)
@@ -227,7 +244,7 @@ public final class DeviceLockManager {
      *
      * <p>At this point, the device is "restricted" and the creditor kiosk app is able to lock
      * the device. For example, a creditor kiosk app in a financing use case may lock the device
-     * (using {@link #lockDevice}) if payments are missed and unlock (using {@link #unlockDevice})
+     * (using {@link #lockDevice}) if payments are missed and unlock (using {@link #unlockDevice}))
      * once they are resumed.
      *
      * <p>The Device Lock solution will also put in place some additional restrictions when a device
@@ -379,6 +396,47 @@ public final class DeviceLockManager {
                         @Override
                         public void onEnrollmentTypeReceived(@EnrollmentType int enrollmentType) {
                             executor.execute(() -> callback.onResult(enrollmentType));
+                        }
+
+                        @Override
+                        public void onError(ParcelableException parcelableException) {
+                            callback.onError(parcelableException.getException());
+                        }
+                    }
+            );
+        } catch (RemoteException e) {
+            executor.execute(() -> callback.onError(new RuntimeException(e)));
+        }
+    }
+
+    /**
+     * Notifies DLC that kiosk set-up has finished and we no longer need to
+     * lock to the set-up activity.
+     *
+     * This will close the set-up activity as specified through a callback and
+     * then respect the current device lock state. If the device has never been
+     * locked or unlocked by the kiosk, it will unlock the device. Invoking
+     * {@link #lockDevice} or {@link #unlockDevice} will also result in the
+     * device provision state moving from kiosk_provisioned to
+     * provision_success.
+     *
+     * @param executor the {@link Executor} on which to invoke the callback.
+     * @param callback this returns either success or an exception.
+     */
+    @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
+    @FlaggedApi(FLAG_NOTIFY_KIOSK_SETUP_FINISHED)
+    public void notifyKioskSetupFinished(
+            @NonNull @CallbackExecutor Executor executor,
+            @NonNull OutcomeReceiver<Void, Exception> callback){
+        Objects.requireNonNull(executor);
+        Objects.requireNonNull(callback);
+
+        try {
+            mService.notifyKioskSetupFinished(
+                    new IVoidResultCallback.Stub() {
+                        @Override
+                        public void onSuccess() {
+                            executor.execute(() -> callback.onResult(/* result= */ null));
                         }
 
                         @Override

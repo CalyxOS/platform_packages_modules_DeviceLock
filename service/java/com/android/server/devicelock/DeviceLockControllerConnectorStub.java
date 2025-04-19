@@ -120,6 +120,24 @@ public class DeviceLockControllerConnectorStub implements DeviceLockControllerCo
     }
 
     @Override
+    public void notifyKioskSetupFinished(OutcomeReceiver<Void, Exception> callback) {
+        synchronized (this) {
+            if (setExceptionIfDeviceIsCleared(callback)) {
+                return;
+            }
+            // If the device is in undefined state, we assume that the device is unlocked.
+            if (mPseudoState == DevicePseudoState.UNDEFINED) {
+                mPseudoState = DevicePseudoState.UNLOCKED;
+            }
+
+            // If the device is locked/unlocked already, we maintain the state as is and enforce
+            // the necessary policies.
+        }
+
+        callback.onResult(/* result= */ null);
+    }
+
+    @Override
     public void getEnrollmentType(OutcomeReceiver<@EnrollmentType Integer, Exception> callback) {
         callback.onResult(ENROLLMENT_TYPE_NONE);
     }

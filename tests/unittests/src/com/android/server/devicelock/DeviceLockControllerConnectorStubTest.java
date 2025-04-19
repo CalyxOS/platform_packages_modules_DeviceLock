@@ -186,6 +186,47 @@ public final class DeviceLockControllerConnectorStubTest {
     }
 
     @Test
+    public void notifyKioskSetupFinished_withLockedState_shouldLockDevice()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        // Given the device state is LOCKED
+        lockDeviceAsync().get(TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        // Notifying kiosk setup finished succeeds
+        notifyKioskSetupFinishedAsync().get(TIMEOUT_SEC, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void notifyKioskSetupFinished_withUnlockedState_shouldUnlockDevice()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        // Given the device state is UNLOCKED
+        unlockDeviceAsync().get(TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        // Notifying kiosk setup finished succeeds
+        notifyKioskSetupFinishedAsync().get(TIMEOUT_SEC, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void notifyKioskSetupFinished_withUndefinedState_shouldUnlockDevice()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        // Given the device state is UNDEFINED
+
+        // Notifying kiosk setup finished succeeds
+        notifyKioskSetupFinishedAsync().get(TIMEOUT_SEC, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void notifyKioskSetupFinished_withClearedState_shouldThrowException()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        // Given the device state is CLEARED
+        clearDeviceRestrictionsAsync().get(TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        // Notifying kiosk setup finished fails
+        ExecutionException thrown = assertThrows(ExecutionException.class,
+                () -> notifyKioskSetupFinishedAsync().get(TIMEOUT_SEC, TimeUnit.SECONDS));
+        assertThat(thrown).hasCauseThat().isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     public void isDeviceLocked_withUndefinedState_shouldThrownException() {
         // Given the device state is UNDEFINED
 
@@ -316,6 +357,26 @@ public final class DeviceLockControllerConnectorStubTest {
                 });
     }
 
+    private ListenableFuture<Void> notifyKioskSetupFinishedAsync(){
+        return CallbackToFutureAdapter.getFuture(
+                completer -> {
+                    mDeviceLockControllerConnectorStub.notifyKioskSetupFinished(
+                            new OutcomeReceiver<>() {
+                                @Override
+                                public void onResult(Void result) {
+                                    completer.set(null);
+                                }
+
+                                @Override
+                                public void onError(Exception error) {
+                                    completer.setException(error);
+                                }
+                            });
+                    // Used only for debugging.
+                    return "notifyKioskSetupFinished operation";
+                }
+        );
+    }
     private ListenableFuture<Integer> getEnrollmentTypeAsync() {
         return CallbackToFutureAdapter.getFuture(
                 completer -> {

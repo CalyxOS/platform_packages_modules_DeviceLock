@@ -59,6 +59,11 @@ public interface DeviceLockControllerConnector {
     void clearDeviceRestrictions(OutcomeReceiver<Void, Exception> callback);
 
     /**
+     * Notifies the controller that kiosk set-up has finished.
+     */
+    void notifyKioskSetupFinished(OutcomeReceiver<Void, Exception> callback);
+
+    /**
      * Called when the user has switched.
      */
     void onUserSwitching(OutcomeReceiver<Void, Exception> callback);

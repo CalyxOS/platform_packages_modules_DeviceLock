@@ -23,6 +23,7 @@ import static org.junit.Assert.assertThrows;
 import android.Manifest.permission;
 import android.app.UiAutomation;
 import android.content.Context;
+import android.content.Intent;
 import android.devicelock.DeviceId;
 import android.devicelock.DeviceLockManager;
 import android.os.Build;
@@ -211,6 +212,26 @@ public final class DeviceLockManagerTest {
                 });
     }
 
+    private ListenableFuture<Void> getNotifyKioskSetupFinishedFuture() {
+        return CallbackToFutureAdapter.getFuture(
+                completer -> {
+                    mDeviceLockManager.notifyKioskSetupFinished(mExecutorService,
+                            new OutcomeReceiver<>() {
+                                @Override
+                                public void onResult(Void result) {
+                                    completer.set(null);
+                                }
+
+                                @Override
+                                public void onError(Exception error) {
+                                    completer.setException(error);
+                                }
+                            });
+                    // Used only for debugging.
+                    return "notifyKioskSetupFinished operation";
+                });
+    }
+
     private ListenableFuture</* EnrollmentType */ Integer> getEnrollmentTypeFuture() {
         return CallbackToFutureAdapter.getFuture(
                 completer -> {
@@ -294,6 +315,20 @@ public final class DeviceLockManagerTest {
                         ExecutionException.class,
                         () -> deviceIdFuture.get(TIMEOUT, TimeUnit.SECONDS));
         assertThat(isDeviceLockedResponseException).hasCauseThat()
+                .isInstanceOf(SecurityException.class);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_NOTIFY_KIOSK_SETUP_FINISHED)
+    @ApiTest(apis = {"android.devicelock.DeviceLockManager#notifyKioskSetupFinished"})
+    public void notifyKioskSetupFinishedCheck(){
+        ListenableFuture<Void> notifyKioskSetupFinishedFuture = getNotifyKioskSetupFinishedFuture();
+
+        Exception notifyKioskSetupFinishedException =
+                assertThrows(
+                        ExecutionException.class,
+                        () -> notifyKioskSetupFinishedFuture.get(TIMEOUT, TimeUnit.SECONDS));
+        assertThat(notifyKioskSetupFinishedException).hasCauseThat()
                 .isInstanceOf(SecurityException.class);
     }
 
@@ -394,6 +429,93 @@ public final class DeviceLockManagerTest {
 
             // Clearing device restrictions should not throw an exception.
             getClearDeviceRestrictionsFuture().get(TIMEOUT, TimeUnit.SECONDS);
+        } finally {
+            removeFinancedDeviceKioskRole();
+        }
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_EXTRA_DEVICE_LOCK_VERSION)
+    @ApiTest(apis = {"android.devicelock.DeviceLockManager#EXTRA_DEVICE_LOCK_VERSION"})
+    public void extraDeviceLockVersionShouldHaveValidValue() {
+        assertThat(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION)
+                .isEqualTo("android.devicelock.extra.DEVICE_LOCK_VERSION");
+
+        final Intent intent = new Intent();
+        intent.putExtra(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION, 1);
+        assertThat(intent.hasExtra(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION)).isTrue();
+        assertThat(intent.getIntExtra(DeviceLockManager.EXTRA_DEVICE_LOCK_VERSION, 0)).isEqualTo(1);
+    }
+
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_NOTIFY_KIOSK_SETUP_FINISHED)
+    @ApiTest(
+            apis = {
+                    "andriod.devicelock.DeviceLockManager#notifyKioskSetupFinished",
+                    "android.devicelock.DeviceLockManager#isDeviceLocked"
+            })
+    public void notifyKioskSetupFinishedShouldSucceed_whenDeviceStateIsUndefined()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        try {
+            // Device state is currently undefined as device is not locked/unlocked.
+
+            addFinancedDeviceKioskRole();
+
+            getNotifyKioskSetupFinishedFuture().get(TIMEOUT, TimeUnit.SECONDS);
+
+            boolean locked = getIsDeviceLockedFuture().get(TIMEOUT, TimeUnit.SECONDS);
+            assertThat(locked).isFalse();
+        } finally {
+            removeFinancedDeviceKioskRole();
+        }
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_NOTIFY_KIOSK_SETUP_FINISHED)
+    @ApiTest(
+            apis = {
+                    "andriod.devicelock.DeviceLockManager#notifyKioskSetupFinished",
+                    "android.devicelock.DeviceLockManager#isDeviceLocked"
+            })
+    public void notifyKioskSetupFinishedShouldSucceed_whenDeviceStateIsLocked()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        try {
+            // Device state is currently undefined as device is not locked/unlocked.
+
+            addFinancedDeviceKioskRole();
+
+            getLockDeviceFuture().get(TIMEOUT, TimeUnit.SECONDS);
+
+            getNotifyKioskSetupFinishedFuture().get(TIMEOUT, TimeUnit.SECONDS);
+
+            boolean locked = getIsDeviceLockedFuture().get(TIMEOUT, TimeUnit.SECONDS);
+            assertThat(locked).isTrue();
+        } finally {
+            removeFinancedDeviceKioskRole();
+        }
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_NOTIFY_KIOSK_SETUP_FINISHED)
+    @ApiTest(
+            apis = {
+                    "andriod.devicelock.DeviceLockManager#notifyKioskSetupFinished",
+                    "android.devicelock.DeviceLockManager#isDeviceLocked"
+            })
+    public void notifyKioskSetupFinishedShouldSucceed_whenDeviceStateIsUnlocked()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        try {
+            // Device state is currently undefined as device is not locked/unlocked.
+
+            addFinancedDeviceKioskRole();
+
+            getUnlockDeviceFuture().get(TIMEOUT, TimeUnit.SECONDS);
+
+            getNotifyKioskSetupFinishedFuture().get(TIMEOUT, TimeUnit.SECONDS);
+
+            boolean locked = getIsDeviceLockedFuture().get(TIMEOUT, TimeUnit.SECONDS);
+            assertThat(locked).isFalse();
         } finally {
             removeFinancedDeviceKioskRole();
         }
