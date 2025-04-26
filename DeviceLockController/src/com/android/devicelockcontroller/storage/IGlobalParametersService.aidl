@@ -35,4 +35,6 @@ interface IGlobalParametersService {
     void setFinalizationState(int state);
     int getLastReceivedProvisionState();
     void setLastReceivedProvisionState(int provisionState);
+    int getLockTaskType();
+    void setLockTaskType(int lockTaskType);
 }

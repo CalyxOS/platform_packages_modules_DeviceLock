@@ -22,13 +22,12 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState;
+import com.android.devicelockcontroller.policy.DevicePolicyController.LockTaskType;
 import com.android.devicelockcontroller.policy.DeviceStateController.DeviceState;
 import com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState;
 import com.android.devicelockcontroller.util.LogUtil;
 
-/**
- * A class exposing Global Parameters as a service.
- */
+/** A class exposing Global Parameters as a service. */
 public final class GlobalParametersService extends Service {
     private static final String TAG = "GlobalParametersService";
 
@@ -106,6 +105,17 @@ public final class GlobalParametersService extends Service {
                 public void setLastReceivedProvisionState(
                         @DeviceProvisionState int provisionState) {
                     GlobalParameters.setLastReceivedProvisionState(mContext, provisionState);
+                }
+
+                @Override
+                @LockTaskType
+                public int getLockTaskType() {
+                    return GlobalParameters.getLockTaskType(mContext);
+                }
+
+                @Override
+                public void setLockTaskType(@LockTaskType int lockTaskType) {
+                    GlobalParameters.setLockTaskType(mContext, lockTaskType);
                 }
             };
 

@@ -23,6 +23,7 @@ import android.os.Build;
 import androidx.annotation.Nullable;
 
 import com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState;
+import com.android.devicelockcontroller.policy.DevicePolicyController.LockTaskType;
 import com.android.devicelockcontroller.policy.DeviceStateController.DeviceState;
 import com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState;
 import com.android.devicelockcontroller.util.LogUtil;
@@ -31,10 +32,10 @@ import java.util.Locale;
 
 /**
  * Stores global parameters.
- * <p>
- * Note that, these parameter values are common across all users which means any users can read or
- * write them. Due to this reason, unlike {@link UserParameters}, they must be accessed all the time
- * via the {@link GlobalParametersClient}.
+ *
+ * <p>Note that, these parameter values are common across all users which means any users can read
+ * or write them. Due to this reason, unlike {@link UserParameters}, they must be accessed all the
+ * time via the {@link GlobalParametersClient}.
  */
 final class GlobalParameters {
     private static final String FILENAME = "global-params";
@@ -44,11 +45,10 @@ final class GlobalParameters {
     private static final String TAG = "GlobalParameters";
     private static final String KEY_DEVICE_STATE = "device_state";
     private static final String KEY_FINALIZATION_STATE = "finalization_state";
+    private static final String KEY_LOCK_TASK_TYPE = "lock-task-type";
     public static final String KEY_IS_PROVISION_READY = "key-is-provision-ready";
 
-
-    private GlobalParameters() {
-    }
+    private GlobalParameters() {}
 
     private static SharedPreferences getSharedPreferences(Context context) {
         final Context deviceContext = context.createDeviceProtectedStorageContext();
@@ -61,8 +61,10 @@ final class GlobalParameters {
     }
 
     static void setProvisionReady(Context context, boolean isProvisionReady) {
-        getSharedPreferences(context).edit().putBoolean(KEY_IS_PROVISION_READY,
-                isProvisionReady).apply();
+        getSharedPreferences(context)
+                .edit()
+                .putBoolean(KEY_IS_PROVISION_READY, isProvisionReady)
+                .apply();
     }
 
     /**
@@ -70,7 +72,7 @@ final class GlobalParameters {
      *
      * @param context Context used to get the shared preferences.
      * @return The registered device unique identifier; null if device has never checked in with
-     * backed server.
+     *     backed server.
      */
     @Nullable
     static String getRegisteredDeviceId(Context context) {
@@ -81,7 +83,7 @@ final class GlobalParameters {
     /**
      * Set the unique identifier that is registered to DeviceLock backend server.
      *
-     * @param context            Context used to get the shared preferences.
+     * @param context Context used to get the shared preferences.
      * @param registeredDeviceId The registered device unique identifier.
      */
     static void setRegisteredDeviceId(Context context, String registeredDeviceId) {
@@ -101,33 +103,25 @@ final class GlobalParameters {
         return getSharedPreferences(context).getBoolean(KEY_FORCED_PROVISION, false);
     }
 
-    /**
-     * Gets the current device state.
-     */
+    /** Gets the current device state. */
     @DeviceState
     static int getDeviceState(Context context) {
         return getSharedPreferences(context).getInt(KEY_DEVICE_STATE, DeviceState.UNDEFINED);
     }
 
-    /**
-     * Sets the current device state.
-     */
+    /** Sets the current device state. */
     static void setDeviceState(Context context, @DeviceState int state) {
         getSharedPreferences(context).edit().putInt(KEY_DEVICE_STATE, state).apply();
     }
 
-    /**
-     * Gets the current {@link FinalizationState}.
-     */
+    /** Gets the current {@link FinalizationState}. */
     @FinalizationState
     static int getFinalizationState(Context context) {
-        return getSharedPreferences(context).getInt(
-                KEY_FINALIZATION_STATE, FinalizationState.UNFINALIZED);
+        return getSharedPreferences(context)
+                .getInt(KEY_FINALIZATION_STATE, FinalizationState.UNFINALIZED);
     }
 
-    /**
-     * Sets the current {@link FinalizationState}.
-     */
+    /** Sets the current {@link FinalizationState}. */
     static void setFinalizationState(Context context, @FinalizationState int state) {
         getSharedPreferences(context).edit().putInt(KEY_FINALIZATION_STATE, state).apply();
     }
@@ -135,28 +129,48 @@ final class GlobalParameters {
     /**
      * Set provision is forced
      *
-     * @param context  Context used to get the shared preferences.
+     * @param context Context used to get the shared preferences.
      * @param isForced The new value of the forced provision flag.
      */
     static void setProvisionForced(Context context, boolean isForced) {
-        getSharedPreferences(context)
-                .edit()
-                .putBoolean(KEY_FORCED_PROVISION, isForced)
-                .apply();
+        getSharedPreferences(context).edit().putBoolean(KEY_FORCED_PROVISION, isForced).apply();
     }
 
     @DeviceProvisionState
     static int getLastReceivedProvisionState(Context context) {
-        return getSharedPreferences(context).getInt(KEY_LAST_RECEIVED_PROVISION_STATE,
-                DeviceProvisionState.PROVISION_STATE_UNSPECIFIED);
+        return getSharedPreferences(context)
+                .getInt(
+                        KEY_LAST_RECEIVED_PROVISION_STATE,
+                        DeviceProvisionState.PROVISION_STATE_UNSPECIFIED);
     }
 
-    static void setLastReceivedProvisionState(Context context,
-            @DeviceProvisionState int provisionState) {
+    static void setLastReceivedProvisionState(
+            Context context, @DeviceProvisionState int provisionState) {
         getSharedPreferences(context)
                 .edit()
                 .putInt(KEY_LAST_RECEIVED_PROVISION_STATE, provisionState)
                 .apply();
+    }
+
+    /**
+     * Get the current lock task type
+     *
+     * @param context Context used to get the shared preferences.
+     * @return The current lock task type
+     */
+    @LockTaskType
+    static int getLockTaskType(Context context) {
+        return getSharedPreferences(context).getInt(KEY_LOCK_TASK_TYPE, LockTaskType.UNDEFINED);
+    }
+
+    /**
+     * Set the current lock task type
+     *
+     * @param context Context used get the shared preferences.
+     * @param lockTaskType The new value of the lock task type
+     */
+    static void setLockTaskType(Context context, @LockTaskType Integer lockTaskType) {
+        getSharedPreferences(context).edit().putInt(KEY_LOCK_TASK_TYPE, lockTaskType).apply();
     }
 
     static void clear(Context context) {
@@ -167,18 +181,28 @@ final class GlobalParameters {
     }
 
     static void dump(Context context) {
-        LogUtil.d(TAG, String.format(Locale.US,
-                "Dumping GlobalParameters ...\n"
-                        + "%s: %s\n"    // registered_device_id:
-                        + "%s: %s\n"    // forced_provision:
-                        + "%s: %s\n"    // last-received-provision-state:
-                        + "%s: %s\n"    // device_state:
-                        + "%s: %s\n",    // is-provision-ready:
-                KEY_REGISTERED_DEVICE_ID, getRegisteredDeviceId(context),
-                KEY_FORCED_PROVISION, isProvisionForced(context),
-                KEY_LAST_RECEIVED_PROVISION_STATE, getLastReceivedProvisionState(context),
-                KEY_DEVICE_STATE, getDeviceState(context),
-                KEY_IS_PROVISION_READY, isProvisionReady(context)
-        ));
+        LogUtil.d(
+                TAG,
+                String.format(
+                        Locale.US,
+                        "Dumping GlobalParameters ...\n"
+                                + "%s: %s\n" // registered_device_id:
+                                + "%s: %s\n" // forced_provision:
+                                + "%s: %s\n" // last-received-provision-state:
+                                + "%s: %s\n" // device_state:
+                                + "%s: %s\n" // is-provision-ready:
+                                + "%s: %s\n", // lock-task-type:
+                        KEY_REGISTERED_DEVICE_ID,
+                        getRegisteredDeviceId(context),
+                        KEY_FORCED_PROVISION,
+                        isProvisionForced(context),
+                        KEY_LAST_RECEIVED_PROVISION_STATE,
+                        getLastReceivedProvisionState(context),
+                        KEY_DEVICE_STATE,
+                        getDeviceState(context),
+                        KEY_IS_PROVISION_READY,
+                        isProvisionReady(context),
+                        KEY_LOCK_TASK_TYPE,
+                        getLockTaskType(context)));
     }
 }

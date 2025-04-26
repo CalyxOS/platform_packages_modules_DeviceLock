@@ -29,6 +29,7 @@ import androidx.annotation.VisibleForTesting;
 
 import com.android.devicelockcontroller.DeviceLockControllerApplication;
 import com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState;
+import com.android.devicelockcontroller.policy.DevicePolicyController.LockTaskType;
 import com.android.devicelockcontroller.policy.DeviceStateController.DeviceState;
 import com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState;
 
@@ -38,9 +39,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.concurrent.Executors;
 
-/**
- * A class used to access Global Parameters from any user.
- */
+/** A class used to access Global Parameters from any user. */
 public final class GlobalParametersClient extends DlcClient {
 
     private static final Object sInstanceLock = new Object();
@@ -49,40 +48,36 @@ public final class GlobalParametersClient extends DlcClient {
     @GuardedBy("sInstanceLock")
     private static GlobalParametersClient sClient;
 
-    private GlobalParametersClient(@NonNull Context context,
-            ListeningExecutorService executorService) {
+    private GlobalParametersClient(
+            @NonNull Context context, ListeningExecutorService executorService) {
         super(context, new ComponentName(context, GlobalParametersService.class), executorService);
     }
 
-    /**
-     * Get the GlobalParametersClient singleton instance.
-     */
+    /** Get the GlobalParametersClient singleton instance. */
     public static GlobalParametersClient getInstance() {
-        return getInstance(DeviceLockControllerApplication.getAppContext(),
-                /* executorService= */ null);
+        return getInstance(
+                DeviceLockControllerApplication.getAppContext(), /* executorService= */ null);
     }
 
-    /**
-     * Get the GlobalParametersClient singleton instance.
-     */
+    /** Get the GlobalParametersClient singleton instance. */
     @VisibleForTesting
-    public static GlobalParametersClient getInstance(Context appContext,
-            @Nullable ListeningExecutorService executorService) {
+    public static GlobalParametersClient getInstance(
+            Context appContext, @Nullable ListeningExecutorService executorService) {
         synchronized (sInstanceLock) {
             if (sClient == null) {
-                sClient = new GlobalParametersClient(
-                        appContext,
-                        executorService == null
-                                ? MoreExecutors.listeningDecorator(Executors.newCachedThreadPool())
-                                : executorService);
+                sClient =
+                        new GlobalParametersClient(
+                                appContext,
+                                executorService == null
+                                        ? MoreExecutors.listeningDecorator(
+                                                Executors.newCachedThreadPool())
+                                        : executorService);
             }
             return sClient;
         }
     }
 
-    /**
-     * Reset the Client singleton instance
-     */
+    /** Reset the Client singleton instance */
     @VisibleForTesting
     public static void reset() {
         synchronized (sInstanceLock) {
@@ -94,26 +89,26 @@ public final class GlobalParametersClient extends DlcClient {
     }
 
     /**
-     * Clear any existing global parameters.
-     * Note that this API can only be called in debuggable build for debugging purpose.
+     * Clear any existing global parameters. Note that this API can only be called in debuggable
+     * build for debugging purpose.
      */
     @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
     public ListenableFuture<Void> clear() {
-        return call(() -> {
-            asInterface(getService()).clear();
-            return null;
-        });
+        return call(
+                () -> {
+                    asInterface(getService()).clear();
+                    return null;
+                });
     }
 
-    /**
-     * Dump current values of SetupParameters to logcat.
-     */
+    /** Dump current values of SetupParameters to logcat. */
     @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
     public ListenableFuture<Void> dump() {
-        return call(() -> {
-            asInterface(getService()).dump();
-            return null;
-        });
+        return call(
+                () -> {
+                    asInterface(getService()).dump();
+                    return null;
+                });
     }
 
     /**
@@ -133,17 +128,18 @@ public final class GlobalParametersClient extends DlcClient {
      */
     @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
     public ListenableFuture<Void> setProvisionReady(boolean isProvisionReady) {
-        return call(() -> {
-            asInterface(getService()).setProvisionReady(isProvisionReady);
-            return null;
-        });
+        return call(
+                () -> {
+                    asInterface(getService()).setProvisionReady(isProvisionReady);
+                    return null;
+                });
     }
 
     /**
      * Gets the unique identifier that is registered to DeviceLock backend server.
      *
      * @return The registered device unique identifier; null if device has never checked in with
-     * backed server.
+     *     backed server.
      */
     @Nullable
     @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
@@ -158,10 +154,11 @@ public final class GlobalParametersClient extends DlcClient {
      */
     @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
     public ListenableFuture<Void> setRegisteredDeviceId(String registeredDeviceId) {
-        return call(() -> {
-            asInterface(getService()).setRegisteredDeviceId(registeredDeviceId);
-            return null;
-        });
+        return call(
+                () -> {
+                    asInterface(getService()).setRegisteredDeviceId(registeredDeviceId);
+                    return null;
+                });
     }
 
     /**
@@ -181,10 +178,11 @@ public final class GlobalParametersClient extends DlcClient {
      */
     @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
     public ListenableFuture<Void> setProvisionForced(boolean isForced) {
-        return call(() -> {
-            asInterface(getService()).setProvisionForced(isForced);
-            return null;
-        });
+        return call(
+                () -> {
+                    asInterface(getService()).setProvisionForced(isForced);
+                    return null;
+                });
     }
 
     /**
@@ -204,10 +202,11 @@ public final class GlobalParametersClient extends DlcClient {
      */
     @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
     public ListenableFuture<Void> setDeviceState(@DeviceState int state) {
-        return call(() -> {
-            asInterface(getService()).setDeviceState(state);
-            return null;
-        });
+        return call(
+                () -> {
+                    asInterface(getService()).setDeviceState(state);
+                    return null;
+                });
     }
 
     /**
@@ -227,10 +226,11 @@ public final class GlobalParametersClient extends DlcClient {
      */
     @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
     public ListenableFuture<Void> setFinalizationState(@FinalizationState int state) {
-        return call(() -> {
-            asInterface(getService()).setFinalizationState(state);
-            return null;
-        });
+        return call(
+                () -> {
+                    asInterface(getService()).setFinalizationState(state);
+                    return null;
+                });
     }
 
     /**
@@ -249,9 +249,36 @@ public final class GlobalParametersClient extends DlcClient {
      */
     public ListenableFuture<Void> setLastReceivedProvisionState(
             @DeviceProvisionState int provisionState) {
-        return call(() -> {
-            asInterface(getService()).setLastReceivedProvisionState(provisionState);
-            return null;
-        });
+        return call(
+                () -> {
+                    asInterface(getService()).setLastReceivedProvisionState(provisionState);
+                    return null;
+                });
+    }
+
+    /**
+     * Get the current lock task type.
+     *
+     * @return one of {@link LockTaskType}.
+     */
+    @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
+    public ListenableFuture<Integer> getLockTaskType() {
+        return call(() -> asInterface(getService()).getLockTaskType());
+    }
+
+    /**
+     * Set the lock task type for the current provision/device state after enforcement of policies
+     * is complete.
+     *
+     * @param lockTaskType the new lock task type
+     * @return void.
+     */
+    @SuppressWarnings("GuardedBy") // mLock already held in "call" (error prone).
+    public ListenableFuture<Void> setLockTaskType(@LockTaskType Integer lockTaskType) {
+        return call(
+                () -> {
+                    asInterface(getService()).setLockTaskType(lockTaskType);
+                    return null;
+                });
     }
 }

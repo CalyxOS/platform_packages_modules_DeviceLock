@@ -64,6 +64,7 @@ import com.android.devicelockcontroller.SystemDeviceLockManager;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.activities.LandingActivity;
 import com.android.devicelockcontroller.activities.ProvisioningActivity;
+import com.android.devicelockcontroller.policy.DevicePolicyController.LockTaskType;
 import com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState;
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
 import com.android.devicelockcontroller.storage.SetupParametersClient;
@@ -184,6 +185,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeNotStarted();
+        assertLockTaskType(LockTaskType.NOT_IN_LOCK_TASK);
     }
 
     @Test
@@ -201,6 +203,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeStarted();
+        assertLockTaskType(LockTaskType.LANDING_ACTIVITY);
     }
 
     @Test
@@ -219,6 +222,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeStarted();
+        assertLockTaskType(LockTaskType.KIOSK_SETUP_ACTIVITY);
     }
 
     @Test
@@ -234,6 +238,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeNotStarted();
+        assertLockTaskType(LockTaskType.NOT_IN_LOCK_TASK);
     }
 
     @Test
@@ -250,6 +255,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeNotStarted();
+        assertLockTaskType(LockTaskType.NOT_IN_LOCK_TASK);
     }
 
     @Test
@@ -265,6 +271,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeNotStarted();
+        assertLockTaskType(LockTaskType.NOT_IN_LOCK_TASK);
     }
 
     @Test
@@ -280,6 +287,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeNotStarted();
+        assertLockTaskType(LockTaskType.NOT_IN_LOCK_TASK);
     }
 
     @Test
@@ -297,6 +305,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeStarted();
+        assertLockTaskType(LockTaskType.KIOSK_LOCK_ACTIVITY);
     }
 
     @Test
@@ -314,6 +323,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeNotStarted();
+        assertLockTaskType(LockTaskType.NOT_IN_LOCK_TASK);
     }
 
     @Test
@@ -335,6 +345,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeNotStarted();
+        assertLockTaskType(LockTaskType.NOT_IN_LOCK_TASK);
     }
 
     @Test
@@ -356,6 +367,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeNotStarted();
+        assertLockTaskType(LockTaskType.NOT_IN_LOCK_TASK);
     }
 
     @Test
@@ -374,6 +386,7 @@ public final class DevicePolicyControllerImplTest {
 
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskModeStarted();
+        assertLockTaskType(LockTaskType.KIOSK_LOCK_ACTIVITY);
     }
 
     @Test
@@ -1151,6 +1164,12 @@ public final class DevicePolicyControllerImplTest {
                 ProvisioningActivity.class.getName());
         assertThat(intent.getExtras().getBoolean(
                 EXTRA_SHOW_CRITICAL_PROVISION_FAILED_UI_ON_START)).isTrue();
+    }
+
+    private static void assertLockTaskType(@LockTaskType int lockTaskType)
+            throws ExecutionException, InterruptedException {
+        assertThat(GlobalParametersClient.getInstance().getLockTaskType().get())
+                .isEqualTo(lockTaskType);
     }
 
     private void installKioskAppWithoutCategoryHomeIntentFilter() {
