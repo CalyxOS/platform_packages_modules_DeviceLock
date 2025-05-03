@@ -23,18 +23,19 @@ android_test {
     defaults: ["cts_defaults"],
     srcs: [
         "src/**/*.java",
-        ":framework-devicelock-sources-shared-with-tests",
     ],
+    libs: ["framework-annotations-lib"],
     static_libs: [
         "androidx.test.rules",
         "truth",
         "androidx.test.core",
         "compatibility-device-util-axt",
-        "devicelock-exported-aconfig-flags-lib",
+        "devicelock-aconfig-flags-lib",
     ],
     test_suites: [
         "general-tests",
         "cts",
     ],
-    platform_apis: true,
+
+    sdk_version: "test_current",
 }
