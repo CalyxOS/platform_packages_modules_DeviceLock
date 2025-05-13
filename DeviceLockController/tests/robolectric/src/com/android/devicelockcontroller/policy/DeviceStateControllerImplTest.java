@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import android.platform.test.annotations.DisableFlags;
 import android.platform.test.annotations.EnableFlags;
 import android.platform.test.flag.junit.SetFlagsRule;
 
@@ -281,6 +282,7 @@ public final class DeviceStateControllerImplTest {
     }
 
     @Test
+    @DisableFlags(Flags.FLAG_CLEAR_DEVICE_RESTRICTIONS)
     public void clearDevice_withUnprovisionedState_shouldThrowException()
             throws ExecutionException, InterruptedException {
         when(mMockProvisionStateController.getState()).thenReturn(
