@@ -83,6 +83,11 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
             "com.android.devicelock.action.KIOSK_SETUP";
     private static final String DEVICE_LOCK_VERSION_EXTRA =
             "android.devicelock.extra.DEVICE_LOCK_VERSION";
+    // Added for support to existing implementations before the
+    // DEVICE_LOCK_VERSION_EXTRA is merged to 25Q4
+    // TODO: b/417696889 - deprecate this.
+    private static final String OLD_DEVICE_LOCK_VERSION_EXTRA =
+            "DEVICE_LOCK_VERSION";
     private static final String TAG = "DevicePolicyControllerImpl";
     private static final int DEVICE_LOCK_VERSION = 2;
     private final List<PolicyHandler> mPolicyList = new ArrayList<>();
@@ -438,6 +443,10 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
                                 "Failed to get setup activity intent for kiosk app!");
                     }
                     kioskSetupIntent.putExtra(DEVICE_LOCK_VERSION_EXTRA, DEVICE_LOCK_VERSION);
+                    // Added for support to existing implementations before the
+                    // DEVICE_LOCK_VERSION_EXTRA is merged to 25Q4
+                    // TODO: b/417696889 - deprecate this.
+                    kioskSetupIntent.putExtra(OLD_DEVICE_LOCK_VERSION_EXTRA, DEVICE_LOCK_VERSION);
                     return kioskSetupIntent.setComponent(
                             new ComponentName(kioskPackageName, resolveInfo.activityInfo.name));
                 },
