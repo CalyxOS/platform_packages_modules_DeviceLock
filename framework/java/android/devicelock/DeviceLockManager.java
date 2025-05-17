@@ -171,7 +171,7 @@ public final class DeviceLockManager {
                         }
                     });
         } catch (RemoteException e) {
-            executor.execute(() -> callback.onError(new RuntimeException(e)));
+            throw e.rethrowFromSystemServer();
         }
     }
 
@@ -201,7 +201,7 @@ public final class DeviceLockManager {
                         }
                     });
         } catch (RemoteException e) {
-            executor.execute(() -> callback.onError(new RuntimeException(e)));
+            throw e.rethrowFromSystemServer();
         }
     }
 
@@ -232,7 +232,7 @@ public final class DeviceLockManager {
                         }
                     });
         } catch (RemoteException e) {
-            executor.execute(() -> callback.onError(new RuntimeException(e)));
+            throw e.rethrowFromSystemServer();
         }
     }
 
@@ -291,7 +291,7 @@ public final class DeviceLockManager {
                     }
             );
         } catch (RemoteException e) {
-            executor.execute(() -> callback.onError(new RuntimeException(e)));
+            throw e.rethrowFromSystemServer();
         }
     }
 
@@ -330,7 +330,7 @@ public final class DeviceLockManager {
                     }
             );
         } catch (RemoteException e) {
-            executor.execute(() -> callback.onError(new RuntimeException(e)));
+            throw e.rethrowFromSystemServer();
         }
     }
 
@@ -365,7 +365,7 @@ public final class DeviceLockManager {
                     }
             );
         } catch (RemoteException e) {
-            executor.execute(() -> callback.onError(new RuntimeException(e)));
+            throw e.rethrowFromSystemServer();
         }
     }
 
@@ -405,7 +405,7 @@ public final class DeviceLockManager {
                     }
             );
         } catch (RemoteException e) {
-            executor.execute(() -> callback.onError(new RuntimeException(e)));
+            throw e.rethrowFromSystemServer();
         }
     }
 
@@ -446,7 +446,7 @@ public final class DeviceLockManager {
                     }
             );
         } catch (RemoteException e) {
-            executor.execute(() -> callback.onError(new RuntimeException(e)));
+            throw e.rethrowFromSystemServer();
         }
     }
 }
