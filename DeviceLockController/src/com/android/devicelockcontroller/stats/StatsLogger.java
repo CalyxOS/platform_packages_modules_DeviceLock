@@ -74,17 +74,6 @@ public interface StatsLogger {
     void logDeviceReset(boolean isProvisioningMandatory);
 
     /**
-     * Logs the analytics event of successfully handling a check in response received from the
-     * server.
-     */
-    void logSuccessfulCheckIn();
-
-    /**
-     * Logs the analytics event of successfully completing the provisioning.
-     */
-    void logSuccessfulProvisioning();
-
-    /**
      * Logs the analytics event of retrying a check in request.
      *
      * @param reason The reason of the retry, the enum corresponds to the RetryReason in
@@ -183,4 +172,14 @@ public interface StatsLogger {
      * Logs the analytics event of failing to install the kiosk app.
      */
     void logKioskAppInstallationFailed();
+
+    /**
+     * Logs the analytics event of a device state event occurring on the device.
+     */
+    void logDeviceStateEvent(int event);
+
+    /**
+     * Logs the analytics event of a provision state event occurring on the device.
+     */
+    void logProvisionStateEvent(int event);
 }

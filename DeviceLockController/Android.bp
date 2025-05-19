@@ -102,6 +102,7 @@ java_library {
     libs: [
         "devicelockcontroller-proto-lite",
         "framework-connectivity.stubs.module_lib",
+        "devicelockcontroller-stats",
     ],
     visibility: [
         "//packages/modules/DeviceLock:__subpackages__",
