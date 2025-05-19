@@ -95,7 +95,7 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
             "com.android.devicelock.action.KEEPALIVE";
 
     // Workaround for timeout while adding the kiosk app as role holder for financing.
-    private static final int MAX_ADD_ROLE_HOLDER_TRIES = 4;
+    private static final int MAX_ADD_ROLE_HOLDER_TRIES = 12;
 
     private final Context mContext;
     private final ExecutorService mExecutorService;
@@ -765,6 +765,16 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
                     if (accepted || remainingTries == 1) {
                         reportResult(accepted, identity, remoteCallback);
                     } else {
+                        // Check if the role is already added.
+                        if (mRoleManager.getRoleHoldersAsUser(
+                                RoleManager.ROLE_FINANCED_DEVICE_KIOSK, userHandle).
+                                contains(packageName)) {
+                            Slog.w(TAG, "Role (" +
+                                RoleManager.ROLE_FINANCED_DEVICE_KIOSK + ") already added for "
+                                + packageName);
+                            return;
+                        }
+
                         final int retryNumber = MAX_ADD_ROLE_HOLDER_TRIES - remainingTries + 1;
                         Slog.w(TAG, "Retrying adding financed device role to kiosk app (retry "
                                 + retryNumber + ")");
