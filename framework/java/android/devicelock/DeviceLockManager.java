@@ -415,8 +415,19 @@ public final class DeviceLockManager {
      * value can be one of {@link ENROLLMENT_TYPE_NONE}, {@link ENROLLMENT_TYPE_FINANCE},
      * {@link ENROLLMENT_TYPE_SUBSIDY}.
      *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE} permission.
+     *     <li>{@link java.util.concurrent.TimeoutException} if the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
+     *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback returns either the enrollment type or an exception.
+     * @throws RuntimeException if there are binder communications errors
      *
      * @hide
      */
