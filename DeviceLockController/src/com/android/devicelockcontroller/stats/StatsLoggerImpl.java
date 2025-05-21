@@ -25,6 +25,7 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CH
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__PAUSE_DEVICE_PROVISIONING;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__REPORT_DEVICE_PROVISION_STATE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_RETRY_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_REQUEST_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LOCK_UNLOCK_DEVICE_FAILURE_REPORTED;
@@ -210,16 +211,6 @@ public final class StatsLoggerImpl implements StatsLogger{
     }
 
     @Override
-    public void logSuccessfulLockingDevice() {
-        Counter.logIncrement(TEX_ID_SUCCESSFUL_LOCKING_COUNT);
-    }
-
-    @Override
-    public void logSuccessfulUnlockingDevice() {
-        Counter.logIncrement(TEX_ID_SUCCESSFUL_UNLOCKING_COUNT);
-    }
-
-    @Override
     public void logKioskAppInstallationFailed() {
         DevicelockStatsLog.write(DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED,
                 getDeviceLockApexVersion());
@@ -233,7 +224,8 @@ public final class StatsLoggerImpl implements StatsLogger{
 
     @Override
     public void logDeviceStateEvent(int event) {
-
+        DevicelockStatsLog.write(
+                DEVICE_LOCK_DEVICE_STATE_EVENT, event, getDeviceLockApexVersion());
     }
 
     private long getDeviceLockApexVersion() {
