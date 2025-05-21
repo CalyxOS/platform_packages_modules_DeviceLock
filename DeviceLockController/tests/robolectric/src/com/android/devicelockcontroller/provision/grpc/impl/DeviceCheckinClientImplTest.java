@@ -100,6 +100,7 @@ public final  class DeviceCheckinClientImplTest {
     private static final int NON_VPN_NET_ID = 10;
     private static final String TEST_DEVICE_LOCALE = "en-US";
     private static final long TEST_DEVICE_LOCK_APEX_VERSION = 1234567890;
+    // Checkstyle complains line too long when using original constant.
     private static final int UNSUCCESSFUL_CHECKIN =
             DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_UNSUCCESSFUL_CHECKIN_REQUEST;
     private StatsLogger mStatsLogger;

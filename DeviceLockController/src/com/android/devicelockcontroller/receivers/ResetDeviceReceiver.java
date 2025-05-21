@@ -16,6 +16,8 @@
 
 package com.android.devicelockcontroller.receivers;
 
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_DEVICE_RESET;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -55,15 +57,19 @@ public final class ResetDeviceReceiver extends BroadcastReceiver {
         if (!ResetDeviceReceiver.class.getName().equals(intent.getComponent().getClassName())) {
             throw new IllegalArgumentException("Can not handle implicit intent!");
         }
-        Futures.addCallback(SetupParametersClient.getInstance().isProvisionMandatory(),
-                new FutureCallback<Boolean>() {
+        Futures.addCallback(
+                SetupParametersClient.getInstance().isProvisionMandatory(),
+                new FutureCallback() {
                     @Override
-                    public void onSuccess(Boolean isProvisionMandatory) {
-                        StatsLogger logger = ((StatsLoggerProvider) context.getApplicationContext())
-                                .getStatsLogger();
-                        logger.logDeviceReset(isProvisionMandatory);
+                    public void onSuccess(Object unused) {
+                        StatsLogger logger =
+                                ((StatsLoggerProvider) context.getApplicationContext())
+                                        .getStatsLogger();
+                        logger.logProvisionStateEvent(
+                                DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_DEVICE_RESET);
                         ((PolicyObjectsProvider) context.getApplicationContext())
-                                .getPolicyController().wipeDevice();
+                                .getPolicyController()
+                                .wipeDevice();
                     }
 
                     @Override
@@ -72,8 +78,10 @@ public final class ResetDeviceReceiver extends BroadcastReceiver {
                         // we just log the error here and proceed.
                         LogUtil.e(TAG, "Error querying isProvisionMandatory", t);
                         ((PolicyObjectsProvider) context.getApplicationContext())
-                                .getPolicyController().wipeDevice();
+                                .getPolicyController()
+                                .wipeDevice();
                     }
-                }, mExecutor);
+                },
+                mExecutor);
     }
 }
