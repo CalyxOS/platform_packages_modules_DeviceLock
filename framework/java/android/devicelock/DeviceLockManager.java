@@ -219,10 +219,23 @@ public final class DeviceLockManager {
     }
 
     /**
-     * Check if the device is locked or not.
+     * Checks if the device is locked or not.
+     *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.MANAGE_DEVICE_LOCK_STATE} permission.
+     *     <li>{@link IllegalStateException} if called before setting the locked state of the device
+     *     through {@link #lockDevice} or {@link #unlockDevice}.
+     *     <li>{@link java.util.concurrent.TimeoutException} if the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
      *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback this returns either the lock status or an exception.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
     public void isDeviceLocked(@NonNull @CallbackExecutor Executor executor,
