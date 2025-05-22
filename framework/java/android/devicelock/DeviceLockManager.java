@@ -189,10 +189,23 @@ public final class DeviceLockManager {
     }
 
     /**
-     * Unlock the device.
+     * Unlocks the device.
+     *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.MANAGE_DEVICE_LOCK_STATE} permission.
+     *     <li>{@link IllegalStateException} if the device has already been cleared or if
+     *     policies could not be enforced for the unlock state.
+     *     <li>{@link java.util.concurrent.TimeoutException} If the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
      *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback this returns either success or an exception.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
     public void unlockDevice(@NonNull @CallbackExecutor Executor executor,
