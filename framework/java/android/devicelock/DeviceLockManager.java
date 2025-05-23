@@ -393,8 +393,9 @@ public final class DeviceLockManager {
      * @param callback this returns either a {@link Map} of device roles/package names,
      *                 or an exception. The Integer in the map represent the device lock role
      *                 (at this moment, the only supported role is
-     *                 {@value #DEVICE_LOCK_ROLE_FINANCING}. The String represents tha package
+     *                 {@value #DEVICE_LOCK_ROLE_FINANCING}. The String represents the package
      *                 name of the kiosk app for that role.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresNoPermission
     public void getKioskApps(@NonNull @CallbackExecutor Executor executor,
