@@ -146,10 +146,23 @@ public final class DeviceLockManager {
     }
 
     /**
-     * Lock the device.
+     * Locks the device.
+     *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.MANAGE_DEVICE_LOCK_STATE} permission.
+     *     <li>{@link IllegalStateException} if the device has already been cleared or if
+     *     policies could not be enforced for the lock state.
+     *     <li>{@link java.util.concurrent.TimeoutException} if the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
      *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback this returns either success or an exception.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
     public void lockDevice(@NonNull @CallbackExecutor Executor executor,
@@ -176,10 +189,23 @@ public final class DeviceLockManager {
     }
 
     /**
-     * Unlock the device.
+     * Unlocks the device.
+     *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.MANAGE_DEVICE_LOCK_STATE} permission.
+     *     <li>{@link IllegalStateException} if the device has already been cleared or if
+     *     policies could not be enforced for the unlock state.
+     *     <li>{@link java.util.concurrent.TimeoutException} If the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
      *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback this returns either success or an exception.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
     public void unlockDevice(@NonNull @CallbackExecutor Executor executor,
@@ -206,10 +232,23 @@ public final class DeviceLockManager {
     }
 
     /**
-     * Check if the device is locked or not.
+     * Checks if the device is locked or not.
+     *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.MANAGE_DEVICE_LOCK_STATE} permission.
+     *     <li>{@link IllegalStateException} if called before setting the locked state of the device
+     *     through {@link #lockDevice} or {@link #unlockDevice}.
+     *     <li>{@link java.util.concurrent.TimeoutException} if the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
      *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback this returns either the lock status or an exception.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
     public void isDeviceLocked(@NonNull @CallbackExecutor Executor executor,
@@ -266,8 +305,21 @@ public final class DeviceLockManager {
      *
      * <p>At this point, the kiosk app has relinquished its ability to lock the device.
      *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.MANAGE_DEVICE_LOCK_STATE} permission.
+     *     <li>{@link IllegalStateException} if the device has already been cleared or if
+     *     policies could not be enforced for the clear state.
+     *     <li>{@link java.util.concurrent.TimeoutException} if the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
+     *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback this returns either success or an exception.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
     @FlaggedApi(FLAG_CLEAR_DEVICE_RESTRICTIONS)
@@ -296,10 +348,22 @@ public final class DeviceLockManager {
     }
 
     /**
-     * Get the device id.
+     * Gets the device id.
+     *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.MANAGE_DEVICE_LOCK_STATE} permission.
+     *     <li>{@link IllegalStateException} if no registered Device ID is found.
+     *     <li>{@link java.util.concurrent.TimeoutException} if the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
      *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback this returns either the {@link DeviceId} or an exception.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
     public void getDeviceId(@NonNull @CallbackExecutor Executor executor,
@@ -341,8 +405,9 @@ public final class DeviceLockManager {
      * @param callback this returns either a {@link Map} of device roles/package names,
      *                 or an exception. The Integer in the map represent the device lock role
      *                 (at this moment, the only supported role is
-     *                 {@value #DEVICE_LOCK_ROLE_FINANCING}. The String represents tha package
+     *                 {@value #DEVICE_LOCK_ROLE_FINANCING}. The String represents the package
      *                 name of the kiosk app for that role.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresNoPermission
     public void getKioskApps(@NonNull @CallbackExecutor Executor executor,
@@ -376,8 +441,19 @@ public final class DeviceLockManager {
      * value can be one of {@link ENROLLMENT_TYPE_NONE}, {@link ENROLLMENT_TYPE_FINANCE},
      * {@link ENROLLMENT_TYPE_SUBSIDY}.
      *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE} permission.
+     *     <li>{@link java.util.concurrent.TimeoutException} if the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
+     *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback returns either the enrollment type or an exception.
+     * @throws RuntimeException if there are binder communications errors
      *
      * @hide
      */
@@ -420,8 +496,21 @@ public final class DeviceLockManager {
      * device provision state moving from kiosk_provisioned to
      * provision_success.
      *
+     * <p>Exceptions that can be returned through the ParcelableException on the callback's
+     * {@code onError} method:
+     * <ul>
+     *     <li>{@link SecurityException} if the caller is missing the
+     *     {@link android.android.Manifest.permission.MANAGE_DEVICE_LOCK_STATE} permission.
+     *     <li>{@link IllegalStateException} if the device has already been cleared or if
+     *     policies could not be enforced for the lock or unlock state.
+     *     <li>{@link java.util.concurrent.TimeoutException} if the response from the
+     *     underlying binder call is not received within the specified duration
+     *     (10 seconds).
+     * </ul>
+     *
      * @param executor the {@link Executor} on which to invoke the callback.
      * @param callback this returns either success or an exception.
+     * @throws RuntimeException if there are binder communications errors
      */
     @RequiresPermission(permission.MANAGE_DEVICE_LOCK_STATE)
     @FlaggedApi(FLAG_NOTIFY_KIOSK_SETUP_FINISHED)

@@ -178,4 +178,9 @@ public interface StatsLogger {
      * Logs the analytics event of successfully unlocking the device.
      */
     void logSuccessfulUnlockingDevice();
+
+    /**
+     * Logs the analytics event of failing to install the kiosk app.
+     */
+    void logKioskAppInstallationFailed();
 }

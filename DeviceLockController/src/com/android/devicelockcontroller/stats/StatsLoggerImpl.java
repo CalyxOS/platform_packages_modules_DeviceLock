@@ -25,6 +25,7 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CH
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__PAUSE_DEVICE_PROVISIONING;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__REPORT_DEVICE_PROVISION_STATE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_RETRY_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_REQUEST_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LOCK_UNLOCK_DEVICE_FAILURE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISIONING_COMPLETE_REPORTED;
@@ -50,12 +51,17 @@ import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailur
 import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailureReasonStats.POLICY_ENFORCEMENT_FAILED;
 import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailureReasonStats.UNKNOWN;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+
 import com.android.devicelockcontroller.DevicelockStatsLog;
+import com.android.devicelockcontroller.util.LogUtil;
 import com.android.modules.expresslog.Counter;
 
 import java.util.concurrent.TimeUnit;
 
 public final class StatsLoggerImpl implements StatsLogger{
+
     // The Telemetry Express metric ID for the counter of device reset due to failure of mandatory
     // provisioning. As defined in
     // platform/frameworks/proto_logging/stats/express/catalog/device_lock.cfg
@@ -83,7 +89,11 @@ public final class StatsLoggerImpl implements StatsLogger{
     static final String TEX_ID_SUCCESSFUL_UNLOCKING_COUNT =
             "device_lock.value_successful_unlocking_count";
     private static final String TAG = "StatsLogger";
+    private final Context mContext;
 
+    public StatsLoggerImpl(Context context) {
+        mContext = context;
+    }
     @Override
     public void logGetDeviceCheckInStatus() {
         DevicelockStatsLog.write(DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED,
@@ -216,5 +226,23 @@ public final class StatsLoggerImpl implements StatsLogger{
     @Override
     public void logSuccessfulUnlockingDevice() {
         Counter.logIncrement(TEX_ID_SUCCESSFUL_UNLOCKING_COUNT);
+    }
+
+    @Override
+    public void logKioskAppInstallationFailed() {
+        DevicelockStatsLog.write(DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED,
+                getDeviceLockApexVersion());
+    }
+
+    private long getDeviceLockApexVersion() {
+        try {
+            return mContext
+                    .getPackageManager()
+                    .getPackageInfo(mContext.getPackageName(), PackageManager.MATCH_APEX)
+                    .getLongVersionCode();
+        } catch (PackageManager.NameNotFoundException e) {
+            LogUtil.e(TAG, "Failed to get device lock apex version", e);
+        }
+        return 0;
     }
 }

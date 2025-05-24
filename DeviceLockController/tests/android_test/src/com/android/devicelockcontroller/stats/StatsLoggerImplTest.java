@@ -25,6 +25,7 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CH
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__PAUSE_DEVICE_PROVISIONING;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__REPORT_DEVICE_PROVISION_STATE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_RETRY_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_REQUEST_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LOCK_UNLOCK_DEVICE_FAILURE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISIONING_COMPLETE_REPORTED;
@@ -51,19 +52,32 @@ import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_SUCC
 import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_SUCCESSFUL_UNLOCKING_COUNT;
 import static com.android.dx.mockito.inline.extended.ExtendedMockito.verify;
 
+import static org.mockito.Mockito.when;
+
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+
+import androidx.test.core.app.ApplicationProvider;
+
 import com.android.devicelockcontroller.DevicelockStatsLog;
 import com.android.modules.expresslog.Counter;
 import com.android.modules.utils.testing.ExtendedMockitoRule;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.concurrent.TimeUnit;
 
 public final class StatsLoggerImplTest {
     private static final int UID = 123;
     private static final long PROVISIONING_TIME_MILLIS = 2000;
-    private final StatsLogger mStatsLogger = new StatsLoggerImpl();
+    private final StatsLogger mStatsLogger =
+            new StatsLoggerImpl(ApplicationProvider.getApplicationContext());
 
     @Rule
     public final ExtendedMockitoRule mExtendedMockitoRule =
@@ -71,6 +85,24 @@ public final class StatsLoggerImplTest {
                     .mockStatic(DevicelockStatsLog.class)
                     .mockStatic(Counter.class)
                     .build();
+
+    @Mock private Context mMockContext;
+    @Mock private PackageManager mMockPackageManager;
+    @Mock private PackageInfo mMockPackageInfo;
+
+    private AutoCloseable mCloseable;
+
+    @Before
+    public void setUp() {
+        mCloseable = MockitoAnnotations.openMocks(this);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        if (mCloseable != null) {
+            mCloseable.close();
+        }
+    }
 
     @Test
     public void logGetDeviceCheckInStatus_shouldWriteCorrectLog() {
@@ -256,5 +288,25 @@ public final class StatsLoggerImplTest {
         mStatsLogger.logSuccessfulUnlockingDevice();
 
         verify(() -> Counter.logIncrement(TEX_ID_SUCCESSFUL_UNLOCKING_COUNT));
+    }
+
+    @Test
+    public void logKioskAppInstallationFailed_writesCorrectLog()
+            throws PackageManager.NameNotFoundException {
+        long apexVersion = 10L;
+        when(mMockContext.getPackageName()).thenReturn("com.android.devicelockcontroller");
+        when(mMockContext.getPackageManager()).thenReturn(mMockPackageManager);
+        when(mMockPackageManager.getPackageInfo(
+                        mMockContext.getPackageName(), PackageManager.MATCH_APEX))
+                .thenReturn(mMockPackageInfo);
+        when(mMockPackageInfo.getLongVersionCode()).thenReturn(apexVersion);
+        StatsLoggerImpl mStatsLoggerWithMockedContext = new StatsLoggerImpl(mMockContext);
+
+        mStatsLoggerWithMockedContext.logKioskAppInstallationFailed();
+
+        verify(
+                () ->
+                        DevicelockStatsLog.write(
+                                DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED, apexVersion));
     }
 }

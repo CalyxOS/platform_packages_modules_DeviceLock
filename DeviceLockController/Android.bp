@@ -119,6 +119,7 @@ java_test_helper_library {
     libs: [
         "framework-statsd.stubs.module_lib",
         "modules-utils-expresslog",
+        "devicelockcontroller-common-lib",
     ],
     static_libs: [
         "androidx.annotation_annotation",

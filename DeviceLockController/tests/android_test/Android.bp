@@ -27,6 +27,8 @@ android_test {
     static_libs: [
         "devicelockcontroller-stats",
         "statsdprotolite",
+        "androidx.test.core",
+        "androidx.test.runner",
     ],
     srcs: [
         "src/**/*.java",

@@ -119,7 +119,7 @@ public class DeviceLockControllerApplication extends Application implements
     @Override
     public synchronized StatsLogger getStatsLogger() {
         if (null == mStatsLogger) {
-            mStatsLogger = new StatsLoggerImpl();
+            mStatsLogger = new StatsLoggerImpl(this);
         }
         return mStatsLogger;
     }
