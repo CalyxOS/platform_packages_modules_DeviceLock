@@ -34,6 +34,7 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LO
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISIONING_COMPLETE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_FAILURE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_FCM_MESSAGE_RECEIVED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_DEVICE_RESET;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE;
@@ -328,7 +329,7 @@ public final class StatsLoggerImplTest {
     }
 
     @Test
-    public void logProvisionStateEvent_UnsuccessfulCheckIn_writesCorrectLog() {
+    public void logProvisionStateEvent_unsuccessfulCheckIn_writesCorrectLog() {
         mStatsLoggerWithMockedContext.logProvisionStateEvent(
                 UNSUCCESSFUL_CHECKIN_REQUEST);
 
@@ -341,7 +342,7 @@ public final class StatsLoggerImplTest {
     }
 
     @Test
-    public void logProvisionStateEvent_SuccessfulProvisioning_writesCorrectLog() {
+    public void logProvisionStateEvent_successfulProvisioning_writesCorrectLog() {
         mStatsLoggerWithMockedContext.logProvisionStateEvent(
                 DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING);
 
@@ -355,7 +356,7 @@ public final class StatsLoggerImplTest {
     }
 
     @Test
-    public void logProvisionStateEvent_DeviceReset_writesCorrectLog() {
+    public void logProvisionStateEvent_deviceReset_writesCorrectLog() {
         mStatsLoggerWithMockedContext.logProvisionStateEvent(
                 DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_DEVICE_RESET);
 
@@ -368,7 +369,7 @@ public final class StatsLoggerImplTest {
     }
 
     @Test
-    public void logProvisionStateEvent_SuccessfulFinalization_writesCorrectLog() {
+    public void logProvisionStateEvent_successfulFinalization_writesCorrectLog() {
         mStatsLoggerWithMockedContext.logProvisionStateEvent(
                 DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION);
 
@@ -381,7 +382,7 @@ public final class StatsLoggerImplTest {
     }
 
     @Test
-    public void logProvisionStateEvent_FinalizationFailure_writesCorrectLog() {
+    public void logProvisionStateEvent_finalizationFailure_writesCorrectLog() {
         mStatsLoggerWithMockedContext.logProvisionStateEvent(
                 DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE);
 
@@ -391,5 +392,12 @@ public final class StatsLoggerImplTest {
                                 DEVICE_LOCK_PROVISION_STATE_EVENT,
                                 FINALIZATION_FAILURE,
                                 APEX_VERSION));
+    }
+
+    @Test
+    public void logFcmMessageReceived_writesCorrectLog() {
+        mStatsLoggerWithMockedContext.logFcmMessageReceived();
+
+        verify(() -> DevicelockStatsLog.write(DEVICE_LOCK_FCM_MESSAGE_RECEIVED, APEX_VERSION));
     }
 }

@@ -172,4 +172,9 @@ public interface StatsLogger {
      * Logs the analytics event of a provision state event occurring on the device.
      */
     void logProvisionStateEvent(int event);
+
+    /**
+     * Logs the analytics event of a device receiving an FCM message from the server.
+     */
+    void logFcmMessageReceived();
 }

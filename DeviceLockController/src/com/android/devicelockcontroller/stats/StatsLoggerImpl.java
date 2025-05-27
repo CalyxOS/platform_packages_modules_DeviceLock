@@ -26,6 +26,7 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CH
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__REPORT_DEVICE_PROVISION_STATE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_RETRY_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_FCM_MESSAGE_RECEIVED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_REQUEST_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LOCK_UNLOCK_DEVICE_FAILURE_REPORTED;
@@ -226,6 +227,11 @@ public final class StatsLoggerImpl implements StatsLogger{
     public void logDeviceStateEvent(int event) {
         DevicelockStatsLog.write(
                 DEVICE_LOCK_DEVICE_STATE_EVENT, event, getDeviceLockApexVersion());
+    }
+
+    @Override
+    public void logFcmMessageReceived() {
+        DevicelockStatsLog.write(DEVICE_LOCK_FCM_MESSAGE_RECEIVED, getDeviceLockApexVersion());
     }
 
     private long getDeviceLockApexVersion() {
