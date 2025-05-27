@@ -25,6 +25,9 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CH
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__PAUSE_DEVICE_PROVISIONING;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__REPORT_DEVICE_PROVISION_STATE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_RETRY_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_REQUEST_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LOCK_UNLOCK_DEVICE_FAILURE_REPORTED;
@@ -52,8 +55,6 @@ import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailur
 import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailureReasonStats.UNKNOWN;
 import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_DEVICE_RESET_PROVISION_DEFERRED;
 import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_DEVICE_RESET_PROVISION_MANDATORY;
-import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_SUCCESSFUL_LOCKING_COUNT;
-import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_SUCCESSFUL_UNLOCKING_COUNT;
 import static com.android.dx.mockito.inline.extended.ExtendedMockito.verify;
 
 import static org.mockito.Mockito.when;
@@ -290,16 +291,30 @@ public final class StatsLoggerImplTest {
 
     @Test
     public void logSuccessfulLockingDevice_shouldWriteCorrectLog() {
-        mStatsLogger.logSuccessfulLockingDevice();
+        mStatsLoggerWithMockedContext.logDeviceStateEvent(
+                DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK);
 
-        verify(() -> Counter.logIncrement(TEX_ID_SUCCESSFUL_LOCKING_COUNT));
+        verify(
+                () -> DevicelockStatsLog.write(
+                        DEVICE_LOCK_DEVICE_STATE_EVENT,
+                        DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK,
+                        APEX_VERSION
+                )
+        );
     }
 
     @Test
     public void logSuccessfulUnlockingDevice_shouldWriteCorrectLog() {
-        mStatsLogger.logSuccessfulUnlockingDevice();
+        mStatsLoggerWithMockedContext.logDeviceStateEvent(
+                DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK);
 
-        verify(() -> Counter.logIncrement(TEX_ID_SUCCESSFUL_UNLOCKING_COUNT));
+        verify(
+                () -> DevicelockStatsLog.write(
+                        DEVICE_LOCK_DEVICE_STATE_EVENT,
+                        DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK,
+                        APEX_VERSION
+                )
+        );
     }
 
     @Test

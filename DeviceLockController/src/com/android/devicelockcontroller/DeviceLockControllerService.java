@@ -16,6 +16,8 @@
 
 package com.android.devicelockcontroller;
 
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE;
 
@@ -62,9 +64,12 @@ public final class DeviceLockControllerService extends Service {
     private static final int FINALIZATION =
             DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION;
     // Checkstyle results in line too long when using original constant.
-
     private static final int FINALIZATION_FAILURE =
             DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE;
+    // Checkstyle results in line too long when using original constant.
+    private static final int LOCK = DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK;
+    // Checkstyle results in line too long when using original constant.
+    private static final int UNLOCK = DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK;
     private final IDeviceLockControllerService.Stub mBinder =
             new IDeviceLockControllerService.Stub() {
                 @Override
@@ -322,15 +327,16 @@ public final class DeviceLockControllerService extends Service {
             @Override
             public void onSuccess(Void result) {
                 if (isLockDevice) {
-                    mStatsLogger.logSuccessfulLockingDevice();
+                    mStatsLogger.logDeviceStateEvent(LOCK);
                 } else {
-                    mStatsLogger.logSuccessfulUnlockingDevice();
+                    mStatsLogger.logDeviceStateEvent(UNLOCK);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-                Futures.addCallback(mDeviceStateController.getDeviceState(),
+                Futures.addCallback(
+                        mDeviceStateController.getDeviceState(),
                         new FutureCallback<Integer>() {
                             @Override
                             public void onSuccess(Integer result) {
@@ -348,8 +354,9 @@ public final class DeviceLockControllerService extends Service {
                                     case DeviceStateController.DeviceState.UNDEFINED ->
                                             deviceStatePostCommand =
                                                     StatsLogger.DeviceStateStats.UNDEFINED;
-                                    default -> deviceStatePostCommand =
-                                            StatsLogger.DeviceStateStats.UNDEFINED;
+                                    default ->
+                                            deviceStatePostCommand =
+                                                    StatsLogger.DeviceStateStats.UNDEFINED;
                                 }
                                 if (isLockDevice) {
                                     mStatsLogger.logLockDeviceFailure(deviceStatePostCommand);
@@ -364,7 +371,8 @@ public final class DeviceLockControllerService extends Service {
                                 LogUtil.e(TAG, "Failed to get device State", t);
                                 throw new RuntimeException(t);
                             }
-                        }, MoreExecutors.directExecutor());
+                        },
+                        MoreExecutors.directExecutor());
             }
         };
     }

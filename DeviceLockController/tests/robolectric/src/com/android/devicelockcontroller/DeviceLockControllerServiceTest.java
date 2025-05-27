@@ -16,6 +16,8 @@
 
 package com.android.devicelockcontroller;
 
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_KIOSK_PACKAGE;
@@ -115,7 +117,7 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.lockDevice(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
-        verify(mStatsLogger).logSuccessfulLockingDevice();
+        verify(mStatsLogger).logDeviceStateEvent(DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK);
     }
 
     @Test
@@ -151,7 +153,8 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.unlockDevice(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
-        verify(mStatsLogger).logSuccessfulUnlockingDevice();
+        verify(mStatsLogger)
+                .logDeviceStateEvent(DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK);
     }
 
     @Test
@@ -192,7 +195,8 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.notifyKioskSetupFinished(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
-        verify(mStatsLogger).logSuccessfulUnlockingDevice();
+        verify(mStatsLogger)
+                .logDeviceStateEvent(DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK);
     }
 
     @Test
@@ -211,7 +215,7 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.notifyKioskSetupFinished(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
-        verify(mStatsLogger).logSuccessfulLockingDevice();
+        verify(mStatsLogger).logDeviceStateEvent(DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK);
     }
 
     @Test
