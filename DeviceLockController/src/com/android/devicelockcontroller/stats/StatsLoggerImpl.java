@@ -30,6 +30,7 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KI
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LOCK_UNLOCK_DEVICE_FAILURE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISIONING_COMPLETE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_FAILURE_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT;
 import static com.android.devicelockcontroller.DevicelockStatsLog.LOCK_UNLOCK_DEVICE_FAILURE_REPORTED__STATE_POST_COMMAND__CLEARED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.LOCK_UNLOCK_DEVICE_FAILURE_REPORTED__STATE_POST_COMMAND__LOCKED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.LOCK_UNLOCK_DEVICE_FAILURE_REPORTED__STATE_POST_COMMAND__UNDEFINED;
@@ -139,16 +140,6 @@ public final class StatsLoggerImpl implements StatsLogger{
     }
 
     @Override
-    public void logSuccessfulCheckIn() {
-        Counter.logIncrement(TEX_ID_SUCCESSFUL_CHECK_IN_RESPONSE_COUNT);
-    }
-
-    @Override
-    public void logSuccessfulProvisioning() {
-        Counter.logIncrement(TEX_ID_SUCCESSFUL_PROVISIONING_COUNT);
-    }
-
-    @Override
     public void logCheckInRetry(@CheckInRetryReason int reason) {
         int checkInRetryReason;
         switch (reason) {
@@ -232,6 +223,17 @@ public final class StatsLoggerImpl implements StatsLogger{
     public void logKioskAppInstallationFailed() {
         DevicelockStatsLog.write(DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED,
                 getDeviceLockApexVersion());
+    }
+
+    @Override
+    public void logProvisionStateEvent(int event) {
+        DevicelockStatsLog.write(
+                DEVICE_LOCK_PROVISION_STATE_EVENT, event, getDeviceLockApexVersion());
+    }
+
+    @Override
+    public void logDeviceStateEvent(int event) {
+
     }
 
     private long getDeviceLockApexVersion() {

@@ -121,7 +121,7 @@ public abstract class DeviceCheckInClient {
                                 (DeviceCheckInClient) clazz.getDeclaredConstructor().newInstance();
                     } else {
                         sClient = new DeviceCheckInClientImpl(clientInterceptor,
-                                context.getSystemService(ConnectivityManager.class));
+                                context.getSystemService(ConnectivityManager.class), context);
                     }
                 }
             } catch (Exception e) {

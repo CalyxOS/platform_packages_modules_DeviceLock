@@ -16,6 +16,8 @@
 
 package com.android.devicelockcontroller.policy;
 
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING;
+
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.junit.Assert.assertThrows;
@@ -71,6 +73,9 @@ public final class ProvisionStateControllerImplTest {
     private TestDeviceLockControllerApplication mTestApp;
     private ProvisionStateController mProvisionStateController;
     private StatsLogger mStatsLogger;
+    // Checkstyle complains line too long when using original constant.
+    private static final int SUCCESSFUL_PROVISIONING =
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING;
 
     @Before
     public void setUp() {
@@ -158,7 +163,7 @@ public final class ProvisionStateControllerImplTest {
 
         mProvisionStateController.setNextStateForEvent(ProvisionEvent.PROVISION_SUCCESS).get();
 
-        verify(mStatsLogger).logSuccessfulProvisioning();
+        verify(mStatsLogger).logProvisionStateEvent(SUCCESSFUL_PROVISIONING);
     }
 
     @Test

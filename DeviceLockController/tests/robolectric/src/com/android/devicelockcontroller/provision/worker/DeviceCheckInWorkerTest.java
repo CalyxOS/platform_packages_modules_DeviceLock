@@ -137,7 +137,6 @@ public class DeviceCheckInWorkerTest {
         assertThat(result).isEqualTo(Result.success());
         // THEN check in request was logged
         verify(mStatsLogger).logGetDeviceCheckInStatus();
-        verify(mStatsLogger).logSuccessfulCheckIn();
     }
 
     @Test
@@ -156,9 +155,8 @@ public class DeviceCheckInWorkerTest {
 
         // THEN work succeeded
         assertThat(result).isEqualTo(Result.retry());
-        // THEN check in request was logged, but successful check in is NOT
+        // THEN check in request was logged
         verify(mStatsLogger).logGetDeviceCheckInStatus();
-        verify(mStatsLogger, never()).logSuccessfulCheckIn();
     }
 
     @Test
@@ -177,9 +175,8 @@ public class DeviceCheckInWorkerTest {
 
         // THEN work succeeded
         assertThat(result).isEqualTo(Result.retry());
-        // THEN attempt of check in request WAS logged, but the successful check in was NOT logged.
+        // THEN attempt of check in request was logged
         verify(mStatsLogger).logGetDeviceCheckInStatus();
-        verify(mStatsLogger, never()).logSuccessfulCheckIn();
     }
 
     @Test
@@ -204,9 +201,8 @@ public class DeviceCheckInWorkerTest {
                 ((TestDeviceLockControllerApplication) ApplicationProvider.getApplicationContext())
                         .getDeviceLockControllerScheduler();
         verify(scheduler).scheduleRetryCheckInWork(eq(RETRY_ON_FAILURE_DELAY));
-        // THEN attempt of check in request WAS logged, but the successful check in was NOT logged.
+        // THEN attempt of check in request was logged
         verify(mStatsLogger).logGetDeviceCheckInStatus();
-        verify(mStatsLogger, never()).logSuccessfulCheckIn();
     }
 
     @Test
@@ -277,7 +273,6 @@ public class DeviceCheckInWorkerTest {
         assertThat(result).isEqualTo(Result.success());
         // THEN check in request was logged
         verify(mStatsLogger).logGetDeviceCheckInStatus();
-        verify(mStatsLogger).logSuccessfulCheckIn();
     }
 
     @Test
