@@ -16,6 +16,7 @@
 
 package com.android.devicelockcontroller.provision.grpc.impl;
 
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_UNSUCCESSFUL_CHECKIN_REQUEST;
 import static com.android.devicelockcontroller.proto.ClientProvisionFailureReason.PROVISION_FAILURE_REASON_COUNTRY_INFO_UNAVAILABLE;
 import static com.android.devicelockcontroller.proto.ClientProvisionFailureReason.PROVISION_FAILURE_REASON_DEADLINE_PASSED;
 import static com.android.devicelockcontroller.proto.ClientProvisionFailureReason.PROVISION_FAILURE_REASON_NOT_IN_ELIGIBLE_COUNTRY;
@@ -24,6 +25,7 @@ import static com.android.devicelockcontroller.proto.ClientProvisionFailureReaso
 import static com.android.devicelockcontroller.proto.ClientProvisionFailureReason.PROVISION_FAILURE_REASON_POLICY_ENFORCEMENT_FAILED;
 import static com.android.devicelockcontroller.proto.ClientProvisionFailureReason.PROVISION_FAILURE_REASON_UNSPECIFIED;
 
+import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.NetworkCallback;
 import android.net.Network;
@@ -61,6 +63,8 @@ import com.android.devicelockcontroller.provision.grpc.IsDeviceInApprovedCountry
 import com.android.devicelockcontroller.provision.grpc.PauseDeviceProvisioningGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.ReportDeviceProvisionStateGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.UpdateFcmTokenGrpcResponse;
+import com.android.devicelockcontroller.stats.StatsLogger;
+import com.android.devicelockcontroller.stats.StatsLoggerProvider;
 import com.android.devicelockcontroller.util.LogUtil;
 import com.android.devicelockcontroller.util.ThreadAsserts;
 
@@ -140,24 +144,34 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
     @GuardedBy("this")
     private DeviceLockCheckinServiceBlockingStub mNonVpnBlockingStub;
 
-    public DeviceCheckInClientImpl(ClientInterceptor clientInterceptor,
-            ConnectivityManager connectivityManager) {
-        this(clientInterceptor, connectivityManager,
-                (host, port, socketFactory) -> OkHttpChannelBuilder
-                        .forAddress(host, port)
-                        .socketFactory(socketFactory)
-                        .build());
+    private final StatsLogger mStatsLogger;
+
+    public DeviceCheckInClientImpl(
+            ClientInterceptor clientInterceptor,
+            ConnectivityManager connectivityManager,
+            Context context) {
+        this(
+                clientInterceptor,
+                connectivityManager,
+                (host, port, socketFactory) ->
+                        OkHttpChannelBuilder.forAddress(host, port)
+                                .socketFactory(socketFactory)
+                                .build(),
+                context);
     }
 
-    DeviceCheckInClientImpl(ClientInterceptor clientInterceptor,
+    DeviceCheckInClientImpl(
+            ClientInterceptor clientInterceptor,
             ConnectivityManager connectivityManager,
-            ChannelFactory channelFactory) {
+            ChannelFactory channelFactory,
+            Context context) {
         mClientInterceptor = clientInterceptor;
         mConnectivityManager = connectivityManager;
         mChannelFactory = channelFactory;
         mDefaultChannel = mChannelFactory.buildChannel(sHostName, sPortNumber);
-        mDefaultBlockingStub = DeviceLockCheckinServiceGrpc.newBlockingStub(mDefaultChannel)
-                .withInterceptors(clientInterceptor);
+        mDefaultBlockingStub =
+                DeviceLockCheckinServiceGrpc.newBlockingStub(mDefaultChannel)
+                        .withInterceptors(clientInterceptor);
         HandlerThread handlerThread = new HandlerThread("NetworkCallbackThread");
         handlerThread.start();
         Handler handler = new Handler(handlerThread.getLooper());
@@ -174,6 +188,9 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
                         .build(),
                 mNetworkCallback,
                 handler);
+
+        StatsLoggerProvider loggerProvider = (StatsLoggerProvider) context.getApplicationContext();
+        mStatsLogger = loggerProvider.getStatsLogger();
     }
 
     @Override
@@ -230,6 +247,8 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
                                             deviceLockApexVersion,
                                             fcmRegistrationToken)));
         } catch (StatusRuntimeException e) {
+            mStatsLogger.logProvisionStateEvent(
+                    DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_UNSUCCESSFUL_CHECKIN_REQUEST);
             return new GetDeviceCheckInStatusGrpcResponseWrapper(e.getStatus());
         }
     }

@@ -25,11 +25,14 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CH
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__PAUSE_DEVICE_PROVISIONING;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__REPORT_DEVICE_PROVISION_STATE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_RETRY_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_FCM_MESSAGE_RECEIVED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_REQUEST_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LOCK_UNLOCK_DEVICE_FAILURE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISIONING_COMPLETE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_FAILURE_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT;
 import static com.android.devicelockcontroller.DevicelockStatsLog.LOCK_UNLOCK_DEVICE_FAILURE_REPORTED__STATE_POST_COMMAND__CLEARED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.LOCK_UNLOCK_DEVICE_FAILURE_REPORTED__STATE_POST_COMMAND__LOCKED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.LOCK_UNLOCK_DEVICE_FAILURE_REPORTED__STATE_POST_COMMAND__UNDEFINED;
@@ -139,16 +142,6 @@ public final class StatsLoggerImpl implements StatsLogger{
     }
 
     @Override
-    public void logSuccessfulCheckIn() {
-        Counter.logIncrement(TEX_ID_SUCCESSFUL_CHECK_IN_RESPONSE_COUNT);
-    }
-
-    @Override
-    public void logSuccessfulProvisioning() {
-        Counter.logIncrement(TEX_ID_SUCCESSFUL_PROVISIONING_COUNT);
-    }
-
-    @Override
     public void logCheckInRetry(@CheckInRetryReason int reason) {
         int checkInRetryReason;
         switch (reason) {
@@ -219,19 +212,26 @@ public final class StatsLoggerImpl implements StatsLogger{
     }
 
     @Override
-    public void logSuccessfulLockingDevice() {
-        Counter.logIncrement(TEX_ID_SUCCESSFUL_LOCKING_COUNT);
-    }
-
-    @Override
-    public void logSuccessfulUnlockingDevice() {
-        Counter.logIncrement(TEX_ID_SUCCESSFUL_UNLOCKING_COUNT);
-    }
-
-    @Override
     public void logKioskAppInstallationFailed() {
         DevicelockStatsLog.write(DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED,
                 getDeviceLockApexVersion());
+    }
+
+    @Override
+    public void logProvisionStateEvent(int event) {
+        DevicelockStatsLog.write(
+                DEVICE_LOCK_PROVISION_STATE_EVENT, event, getDeviceLockApexVersion());
+    }
+
+    @Override
+    public void logDeviceStateEvent(int event) {
+        DevicelockStatsLog.write(
+                DEVICE_LOCK_DEVICE_STATE_EVENT, event, getDeviceLockApexVersion());
+    }
+
+    @Override
+    public void logFcmMessageReceived() {
+        DevicelockStatsLog.write(DEVICE_LOCK_FCM_MESSAGE_RECEIVED, getDeviceLockApexVersion());
     }
 
     private long getDeviceLockApexVersion() {

@@ -16,6 +16,10 @@
 
 package com.android.devicelockcontroller;
 
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_KIOSK_PACKAGE;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -67,6 +71,13 @@ public final class DeviceLockControllerServiceTest {
 
     private static final String KIOSK_APP_PACKAGE_NAME = "TEST_PACKAGE";
 
+    // Checkstyle results in line too long when using original constant.
+    private static final int FINALIZATION =
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION;
+
+    // Checkstyle results in line too long when using original constant.
+    private static final int FINALIZATION_FAILURE =
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE;
     private StatsLogger mStatsLogger;
     private TestDeviceLockControllerApplication mTestApp;
 
@@ -106,7 +117,7 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.lockDevice(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
-        verify(mStatsLogger).logSuccessfulLockingDevice();
+        verify(mStatsLogger).logDeviceStateEvent(DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK);
     }
 
     @Test
@@ -142,7 +153,8 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.unlockDevice(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
-        verify(mStatsLogger).logSuccessfulUnlockingDevice();
+        verify(mStatsLogger)
+                .logDeviceStateEvent(DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK);
     }
 
     @Test
@@ -183,7 +195,8 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.notifyKioskSetupFinished(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
-        verify(mStatsLogger).logSuccessfulUnlockingDevice();
+        verify(mStatsLogger)
+                .logDeviceStateEvent(DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK);
     }
 
     @Test
@@ -202,7 +215,7 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.notifyKioskSetupFinished(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
-        verify(mStatsLogger).logSuccessfulLockingDevice();
+        verify(mStatsLogger).logDeviceStateEvent(DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK);
     }
 
     @Test
@@ -251,6 +264,44 @@ public final class DeviceLockControllerServiceTest {
         serviceStub.clearDeviceRestrictions(new RemoteCallback((result -> {})));
 
         verify(mStatsLogger).logKioskAppRequest(eq(KIOSK_APP_UID));
+    }
+
+    @Test
+    public void clearDeviceRestrictions_success_shouldLogFinalizationSuccess()
+            throws TimeoutException, RemoteException {
+        Intent serviceIntent = new Intent(mTestApp, DeviceLockControllerService.class);
+        IBinder binder = mServiceRule.bindService(serviceIntent);
+        DeviceStateController deviceStateController = mTestApp.getDeviceStateController();
+        when(deviceStateController.clearDevice()).thenReturn(Futures.immediateVoidFuture());
+        FinalizationController finalizationController = mTestApp.getFinalizationController();
+        when(finalizationController.notifyRestrictionsCleared())
+                .thenReturn(Futures.immediateVoidFuture());
+
+        assertThat(binder).isNotNull();
+
+        IDeviceLockControllerService.Stub serviceStub = (IDeviceLockControllerService.Stub) binder;
+        serviceStub.clearDeviceRestrictions(new RemoteCallback((result -> {})));
+
+        verify(mStatsLogger).logProvisionStateEvent(FINALIZATION);
+    }
+
+    @Test
+    public void clearDeviceRestrictions_failure_shouldLogFinalizationFailure()
+            throws TimeoutException, RemoteException {
+        Intent serviceIntent = new Intent(mTestApp, DeviceLockControllerService.class);
+        IBinder binder = mServiceRule.bindService(serviceIntent);
+        DeviceStateController deviceStateController = mTestApp.getDeviceStateController();
+        when(deviceStateController.clearDevice()).thenReturn(Futures.immediateVoidFuture());
+        FinalizationController finalizationController = mTestApp.getFinalizationController();
+        when(finalizationController.notifyRestrictionsCleared())
+                .thenReturn(Futures.immediateFailedFuture(new RuntimeException("Test Exception")));
+
+        assertThat(binder).isNotNull();
+
+        IDeviceLockControllerService.Stub serviceStub = (IDeviceLockControllerService.Stub) binder;
+        serviceStub.clearDeviceRestrictions(new RemoteCallback((result -> {})));
+
+        verify(mStatsLogger).logProvisionStateEvent(FINALIZATION_FAILURE);
     }
 
     @Test

@@ -18,11 +18,14 @@ package com.android.devicelockcontroller.provision.grpc.impl;
 
 import static android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED;
 
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_UNSUCCESSFUL_CHECKIN_REQUEST;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_UNSPECIFIED;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisionFailureReason.UNKNOWN_REASON;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.USER_DEFERRED_DEVICE_PROVISIONING;
 
 import static com.google.common.truth.Truth.assertThat;
+
+import static org.mockito.Mockito.verify;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -49,6 +52,8 @@ import com.android.devicelockcontroller.provision.grpc.IsDeviceInApprovedCountry
 import com.android.devicelockcontroller.provision.grpc.PauseDeviceProvisioningGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.ReportDeviceProvisionStateGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.UpdateFcmTokenGrpcResponse;
+import com.android.devicelockcontroller.stats.StatsLogger;
+import com.android.devicelockcontroller.stats.StatsLoggerProvider;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -95,6 +100,10 @@ public final  class DeviceCheckinClientImplTest {
     private static final int NON_VPN_NET_ID = 10;
     private static final String TEST_DEVICE_LOCALE = "en-US";
     private static final long TEST_DEVICE_LOCK_APEX_VERSION = 1234567890;
+    // Checkstyle complains line too long when using original constant.
+    private static final int UNSUCCESSFUL_CHECKIN =
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_UNSUCCESSFUL_CHECKIN_REQUEST;
+    private StatsLogger mStatsLogger;
 
     @Rule
     public MockitoRule mMockitoRule = MockitoJUnit.rule();
@@ -151,7 +160,10 @@ public final  class DeviceCheckinClientImplTest {
                             InProcessChannelBuilder.forName(serverName).directExecutor().build();
                     mCreatedChannels.add(newChannel);
                     return mGrpcCleanup.register(newChannel);
-                });
+                }, mContext);
+
+        StatsLoggerProvider loggerProvider = (StatsLoggerProvider) mContext;
+        mStatsLogger = loggerProvider.getStatsLogger();
     }
 
     @Test
@@ -392,6 +404,39 @@ public final  class DeviceCheckinClientImplTest {
         // THEN the response is unsuccessful
         assertThat(response.get().isSuccessful()).isFalse();
         assertThat(response.get().hasRecoverableError()).isTrue();
+    }
+
+    @Test
+    public void getCheckInStatus_noConnectivityOrNonVpnNetwork_logsUnsuccessfulCheckin()
+            throws Exception {
+        // GIVEN non-VPN network connects and then loses connectivity
+        Set<ConnectivityManager.NetworkCallback> networkCallbacks =
+                mShadowConnectivityManager.getNetworkCallbacks();
+        for (ConnectivityManager.NetworkCallback callback : networkCallbacks) {
+            callback.onUnavailable();
+        }
+
+        // GIVEN the service fails through the default network
+        mGrpcCleanup.register(InProcessServerBuilder
+                .forName(mDefaultNetworkServerName)
+                .directExecutor()
+                .addService(makeFailingService())
+                .build()
+                .start());
+
+        // WHEN we ask for the check in status
+        AtomicReference<GetDeviceCheckInStatusGrpcResponse> response = new AtomicReference<>();
+        mBgExecutor.submit(() -> response.set(
+                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
+                                new ArraySet<>(),
+                                TEST_CARRIER_INFO,
+                                TEST_DEVICE_LOCALE,
+                                TEST_DEVICE_LOCK_APEX_VERSION,
+                                TEST_FCM_TOKEN)))
+                .get();
+
+        // THEN the unsuccessful checkin is logged
+        verify(mStatsLogger).logProvisionStateEvent(UNSUCCESSFUL_CHECKIN);
     }
 
     @Test

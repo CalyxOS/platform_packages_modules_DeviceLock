@@ -25,11 +25,21 @@ import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CH
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__PAUSE_DEVICE_PROVISIONING;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED__TYPE__REPORT_DEVICE_PROVISION_STATE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_RETRY_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_KIOSK_APP_REQUEST_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_LOCK_UNLOCK_DEVICE_FAILURE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISIONING_COMPLETE_REPORTED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_FAILURE_REPORTED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_FCM_MESSAGE_RECEIVED;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_DEVICE_RESET;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING;
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_UNSUCCESSFUL_CHECKIN_REQUEST;
 import static com.android.devicelockcontroller.DevicelockStatsLog.LOCK_UNLOCK_DEVICE_FAILURE_REPORTED__STATE_POST_COMMAND__LOCKED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.LOCK_UNLOCK_DEVICE_FAILURE_REPORTED__STATE_POST_COMMAND__UNLOCKED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.PROVISION_FAILURE_REPORTED__REASON__COUNTRY_INFO_UNAVAILABLE;
@@ -46,10 +56,6 @@ import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailur
 import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailureReasonStats.UNKNOWN;
 import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_DEVICE_RESET_PROVISION_DEFERRED;
 import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_DEVICE_RESET_PROVISION_MANDATORY;
-import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_SUCCESSFUL_CHECK_IN_RESPONSE_COUNT;
-import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_SUCCESSFUL_LOCKING_COUNT;
-import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_SUCCESSFUL_PROVISIONING_COUNT;
-import static com.android.devicelockcontroller.stats.StatsLoggerImpl.TEX_ID_SUCCESSFUL_UNLOCKING_COUNT;
 import static com.android.dx.mockito.inline.extended.ExtendedMockito.verify;
 
 import static org.mockito.Mockito.when;
@@ -76,8 +82,21 @@ import java.util.concurrent.TimeUnit;
 public final class StatsLoggerImplTest {
     private static final int UID = 123;
     private static final long PROVISIONING_TIME_MILLIS = 2000;
+    private static final long APEX_VERSION = 10L;
+    // Checkstyle results in line too long when using original constant.
+    private static final int UNSUCCESSFUL_CHECKIN_REQUEST =
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_UNSUCCESSFUL_CHECKIN_REQUEST;
+    // Checkstyle results in line too long when using original constant.
+    private static final int SUCCESSFUL_PROVISIONING =
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING;
+    // Checkstyle results in line too long when using original constant.
+    private static final int FINALIZATION_FAILURE =
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE;
+
     private final StatsLogger mStatsLogger =
             new StatsLoggerImpl(ApplicationProvider.getApplicationContext());
+
+    private StatsLoggerImpl mStatsLoggerWithMockedContext;
 
     @Rule
     public final ExtendedMockitoRule mExtendedMockitoRule =
@@ -90,11 +109,20 @@ public final class StatsLoggerImplTest {
     @Mock private PackageManager mMockPackageManager;
     @Mock private PackageInfo mMockPackageInfo;
 
+
     private AutoCloseable mCloseable;
 
     @Before
-    public void setUp() {
+    public void setUp() throws PackageManager.NameNotFoundException {
         mCloseable = MockitoAnnotations.openMocks(this);
+
+        when(mMockContext.getPackageName()).thenReturn("com.google.android.devicelockcontroller");
+        when(mMockContext.getPackageManager()).thenReturn(mMockPackageManager);
+        when(mMockPackageManager.getPackageInfo(
+                mMockContext.getPackageName(), PackageManager.MATCH_APEX))
+                .thenReturn(mMockPackageInfo);
+        when(mMockPackageInfo.getLongVersionCode()).thenReturn(APEX_VERSION);
+        mStatsLoggerWithMockedContext = new StatsLoggerImpl(mMockContext);
     }
 
     @After
@@ -162,20 +190,6 @@ public final class StatsLoggerImplTest {
         mStatsLogger.logDeviceReset(/* isProvisionMandatory */false);
 
         verify(() -> Counter.logIncrement(TEX_ID_DEVICE_RESET_PROVISION_DEFERRED));
-    }
-
-    @Test
-    public void logSuccessfulCheckIn_shouldLogToTelemetryExpress() {
-        mStatsLogger.logSuccessfulCheckIn();
-
-        verify(() -> Counter.logIncrement(TEX_ID_SUCCESSFUL_CHECK_IN_RESPONSE_COUNT));
-    }
-
-    @Test
-    public void logSuccessfulProvisioning_shouldLogToTelemetryExpress() {
-        mStatsLogger.logSuccessfulProvisioning();
-
-        verify(() -> Counter.logIncrement(TEX_ID_SUCCESSFUL_PROVISIONING_COUNT));
     }
 
     @Test
@@ -278,35 +292,112 @@ public final class StatsLoggerImplTest {
 
     @Test
     public void logSuccessfulLockingDevice_shouldWriteCorrectLog() {
-        mStatsLogger.logSuccessfulLockingDevice();
+        mStatsLoggerWithMockedContext.logDeviceStateEvent(
+                DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK);
 
-        verify(() -> Counter.logIncrement(TEX_ID_SUCCESSFUL_LOCKING_COUNT));
+        verify(
+                () -> DevicelockStatsLog.write(
+                        DEVICE_LOCK_DEVICE_STATE_EVENT,
+                        DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_LOCK,
+                        APEX_VERSION
+                )
+        );
     }
 
     @Test
     public void logSuccessfulUnlockingDevice_shouldWriteCorrectLog() {
-        mStatsLogger.logSuccessfulUnlockingDevice();
+        mStatsLoggerWithMockedContext.logDeviceStateEvent(
+                DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK);
 
-        verify(() -> Counter.logIncrement(TEX_ID_SUCCESSFUL_UNLOCKING_COUNT));
+        verify(
+                () -> DevicelockStatsLog.write(
+                        DEVICE_LOCK_DEVICE_STATE_EVENT,
+                        DEVICE_LOCK_DEVICE_STATE_EVENT__EVENT__EVENT_UNLOCK,
+                        APEX_VERSION
+                )
+        );
     }
 
     @Test
-    public void logKioskAppInstallationFailed_writesCorrectLog()
-            throws PackageManager.NameNotFoundException {
-        long apexVersion = 10L;
-        when(mMockContext.getPackageName()).thenReturn("com.android.devicelockcontroller");
-        when(mMockContext.getPackageManager()).thenReturn(mMockPackageManager);
-        when(mMockPackageManager.getPackageInfo(
-                        mMockContext.getPackageName(), PackageManager.MATCH_APEX))
-                .thenReturn(mMockPackageInfo);
-        when(mMockPackageInfo.getLongVersionCode()).thenReturn(apexVersion);
-        StatsLoggerImpl mStatsLoggerWithMockedContext = new StatsLoggerImpl(mMockContext);
-
+    public void logKioskAppInstallationFailed_writesCorrectLog() {
         mStatsLoggerWithMockedContext.logKioskAppInstallationFailed();
 
         verify(
                 () ->
                         DevicelockStatsLog.write(
-                                DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED, apexVersion));
+                                DEVICE_LOCK_KIOSK_APP_INSTALLATION_FAILED, APEX_VERSION));
+    }
+
+    @Test
+    public void logProvisionStateEvent_unsuccessfulCheckIn_writesCorrectLog() {
+        mStatsLoggerWithMockedContext.logProvisionStateEvent(
+                UNSUCCESSFUL_CHECKIN_REQUEST);
+
+        verify(
+                () ->
+                        DevicelockStatsLog.write(
+                                DEVICE_LOCK_PROVISION_STATE_EVENT,
+                                UNSUCCESSFUL_CHECKIN_REQUEST,
+                                APEX_VERSION));
+    }
+
+    @Test
+    public void logProvisionStateEvent_successfulProvisioning_writesCorrectLog() {
+        mStatsLoggerWithMockedContext.logProvisionStateEvent(
+                DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING);
+
+        verify(
+                () ->
+                        DevicelockStatsLog.write(
+                                DEVICE_LOCK_PROVISION_STATE_EVENT,
+                                // CHECKSTYLE_OFF: LineLength
+                                SUCCESSFUL_PROVISIONING,
+                                APEX_VERSION));
+    }
+
+    @Test
+    public void logProvisionStateEvent_deviceReset_writesCorrectLog() {
+        mStatsLoggerWithMockedContext.logProvisionStateEvent(
+                DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_DEVICE_RESET);
+
+        verify(
+                () ->
+                        DevicelockStatsLog.write(
+                                DEVICE_LOCK_PROVISION_STATE_EVENT,
+                                DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_DEVICE_RESET,
+                                APEX_VERSION));
+    }
+
+    @Test
+    public void logProvisionStateEvent_successfulFinalization_writesCorrectLog() {
+        mStatsLoggerWithMockedContext.logProvisionStateEvent(
+                DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION);
+
+        verify(
+                () ->
+                        DevicelockStatsLog.write(
+                                DEVICE_LOCK_PROVISION_STATE_EVENT,
+                                DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION,
+                                APEX_VERSION));
+    }
+
+    @Test
+    public void logProvisionStateEvent_finalizationFailure_writesCorrectLog() {
+        mStatsLoggerWithMockedContext.logProvisionStateEvent(
+                DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_FINALIZATION_FAILURE);
+
+        verify(
+                () ->
+                        DevicelockStatsLog.write(
+                                DEVICE_LOCK_PROVISION_STATE_EVENT,
+                                FINALIZATION_FAILURE,
+                                APEX_VERSION));
+    }
+
+    @Test
+    public void logFcmMessageReceived_writesCorrectLog() {
+        mStatsLoggerWithMockedContext.logFcmMessageReceived();
+
+        verify(() -> DevicelockStatsLog.write(DEVICE_LOCK_FCM_MESSAGE_RECEIVED, APEX_VERSION));
     }
 }

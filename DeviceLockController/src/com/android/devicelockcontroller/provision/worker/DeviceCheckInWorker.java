@@ -118,9 +118,6 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                             boolean isResponseHandlingSuccessful = mCheckInHelper
                                     .handleGetDeviceCheckInStatusResponse(response, scheduler,
                                             fcmToken);
-                            if (isResponseHandlingSuccessful) {
-                                mStatsLogger.logSuccessfulCheckIn();
-                            }
                             return isResponseHandlingSuccessful ? Result.success() : Result.retry();
                         }
 

@@ -271,12 +271,12 @@ public final class FinalizationControllerImpl implements FinalizationController 
     /**
      * Disables the entire device lock controller application.
      *
-     * This will remove any work, alarms, receivers, etc., and this application should never run
+     * <p>This will remove any work, alarms, receivers, etc., and this application should never run
      * on the device again after this point.
      *
-     * This method returns a future but it is a bit of an odd case as the application itself
-     * may end up disabled before/after the future is handled depending on when package manager
-     * enforces the application is disabled.
+     * <p>This method returns a future but it is a bit of an odd case as the application itself may
+     * end up disabled before/after the future is handled depending on when package manager enforces
+     * the application is disabled.
      *
      * @return future for when this is done
      */
@@ -286,25 +286,30 @@ public final class FinalizationControllerImpl implements FinalizationController 
         AlarmManager alarmManager = mContext.getSystemService(AlarmManager.class);
         alarmManager.cancelAll();
         // This kills and disables the app
-        ListenableFuture<Void> disableApplicationFuture = CallbackToFutureAdapter.getFuture(
-                completer -> {
-                        mSystemDeviceLockManager.setDeviceFinalized(true, mBgExecutor,
-                                new OutcomeReceiver<>() {
-                                    @Override
-                                    public void onResult(Void result) {
-                                        completer.set(null);
-                                    }
+        ListenableFuture<Void> disableApplicationFuture =
+                CallbackToFutureAdapter.getFuture(
+                        completer -> {
+                            mSystemDeviceLockManager.setDeviceFinalized(
+                                    true,
+                                    mBgExecutor,
+                                    new OutcomeReceiver<>() {
+                                        @Override
+                                        public void onResult(Void result) {
+                                            completer.set(null);
+                                        }
 
-                                    @Override
-                                    public void onError(@NonNull Exception error) {
-                                        LogUtil.e(TAG, "Failed to set device finalized in"
-                                                + "system service.", error);
-                                        completer.setException(error);
-                                    }
-                                });
-                    return "Disable application future";
-                }
-        );
+                                        @Override
+                                        public void onError(@NonNull Exception error) {
+                                            LogUtil.e(
+                                                    TAG,
+                                                    "Failed to set device finalized in"
+                                                            + "system service.",
+                                                    error);
+                                            completer.setException(error);
+                                        }
+                                    });
+                            return "Disable application future";
+                        });
         return disableApplicationFuture;
     }
 }

@@ -16,6 +16,7 @@
 
 package com.android.devicelockcontroller.policy;
 
+import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_FAILURE;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_KIOSK;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_PAUSE;
@@ -70,6 +71,9 @@ import java.util.concurrent.Executors;
 public final class ProvisionStateControllerImpl implements ProvisionStateController {
 
     public static final String TAG = "ProvisionStateControllerImpl";
+    // Checkstyle complains line too long when using original constant.
+    private static final int SUCCESSFUL_PROVISIONING =
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING;
     private final Context mContext;
     private final DevicePolicyController mPolicyController;
     private final DeviceStateController mDeviceStateController;
@@ -137,18 +141,20 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
                                 // We treat when the event is PROVISION_READY as the start of the
                                 // provisioning time.
                                 if (PROVISION_READY == event) {
-                                    UserParameters.setProvisioningStartTimeMillis(mContext,
-                                            SystemClock.elapsedRealtime());
+                                    UserParameters.setProvisioningStartTimeMillis(
+                                            mContext, SystemClock.elapsedRealtime());
                                     ReviewDeviceProvisionStateWorker.scheduleDailyReview(
                                             WorkManager.getInstance(mContext));
                                 }
 
                                 if (PROVISION_SUCCESS == event) {
                                     ((StatsLoggerProvider) mContext.getApplicationContext())
-                                            .getStatsLogger().logSuccessfulProvisioning();
+                                            .getStatsLogger()
+                                            .logProvisionStateEvent(SUCCESSFUL_PROVISIONING);
                                 }
                                 return newState;
-                            }, mBgExecutor);
+                            },
+                            mBgExecutor);
             // To prevent exception propagate to future state transitions, catch any exceptions
             // that might happen during the execution and fallback to previous state if exception
             // happens.
