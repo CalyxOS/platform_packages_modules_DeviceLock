@@ -44,6 +44,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.NetworkRequest;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.os.SystemClock;
 import android.os.UserHandle;
 import android.telephony.TelephonyManager;
@@ -97,11 +98,6 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
         mStatsLogger = ((StatsLoggerProvider) mAppContext).getStatsLogger();
     }
 
-    private boolean hasGsm() {
-        return mAppContext.getPackageManager().hasSystemFeature(
-                PackageManager.FEATURE_TELEPHONY_GSM);
-    }
-
     private boolean hasCdma() {
         return mAppContext.getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_TELEPHONY_CDMA);
@@ -128,7 +124,7 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
         if (maximumIdCount == 0) return deviceIds;
 
         for (int i = 0; i < totalSlotCount; i++) {
-            if (hasGsm() && (deviceIdTypeBitmap & (1 << DEVICE_ID_TYPE_IMEI)) != 0) {
+            if ((deviceIdTypeBitmap & (1 << DEVICE_ID_TYPE_IMEI)) != 0) {
                 final String imei = mTelephonyManager.getImei(i);
 
                 if (imei != null) {
@@ -262,5 +258,23 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
                 new Intent(mAppContext, ProvisionReadyReceiver.class),
                 UserHandle.ALL);
         return true;
+    }
+
+    @Override
+    String getDeviceLocale() {
+        return LocaleList.getAdjustedDefault().get(0).toLanguageTag();
+    }
+
+    @Override
+    long getDeviceLockApexVersion(String packageName) {
+        try {
+            return mAppContext
+                    .getPackageManager()
+                    .getPackageInfo(packageName, PackageManager.MATCH_APEX)
+                    .getLongVersionCode();
+        } catch (PackageManager.NameNotFoundException e) {
+            LogUtil.e(TAG, "Failed to get device lock apex version", e);
+        }
+        return 0;
     }
 }
