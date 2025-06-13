@@ -20,7 +20,11 @@ import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.mockito.Mockito.when;
+
 import android.content.Intent;
+import android.graphics.Insets;
+import android.view.View;
 import android.view.WindowInsets;
 
 import androidx.fragment.app.Fragment;
@@ -28,34 +32,130 @@ import androidx.fragment.app.FragmentContainerView;
 
 import com.android.devicelockcontroller.R;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadows.ShadowLooper;
 
 @RunWith(RobolectricTestRunner.class)
 public final class LandingActivityTest {
+    @Rule public final MockitoRule mockito = MockitoJUnit.rule();
+    @Mock private WindowInsets mWindowInsetsMock;
 
     @Test
     public void landingActivity_setsProvisionInfoFragment() {
         Intent intent = new Intent();
         intent.setAction(ACTION_START_DEVICE_FINANCING_PROVISIONING);
-        LandingActivity activity = Robolectric.buildActivity(LandingActivity.class,
-                intent).setup().get();
-        FragmentContainerView fragmentContainerView = activity.findViewById(
-                R.id.fragment_container);
+        LandingActivity activity =
+                Robolectric.buildActivity(LandingActivity.class, intent).setup().get();
+        FragmentContainerView fragmentContainerView =
+                activity.findViewById(R.id.fragment_container);
 
-        assertThat((Fragment) fragmentContainerView.getFragment()).isInstanceOf(
-                ProvisionInfoFragment.class);
+        assertThat((Fragment) fragmentContainerView.getFragment())
+                .isInstanceOf(ProvisionInfoFragment.class);
     }
 
     @Test
     public void landingActivity_hideSystemBar() {
         Intent intent = new Intent();
         intent.setAction(ACTION_START_DEVICE_FINANCING_PROVISIONING);
-        LandingActivity activity = Robolectric.buildActivity(LandingActivity.class,
-                intent).setup().get();
-        assertThat(activity.getWindow().getDecorView().getRootWindowInsets().isVisible(
-                WindowInsets.Type.systemBars())).isFalse();
+        LandingActivity activity =
+                Robolectric.buildActivity(LandingActivity.class, intent).setup().get();
+        assertThat(
+                        activity.getWindow()
+                                .getDecorView()
+                                .getRootWindowInsets()
+                                .isVisible(WindowInsets.Type.systemBars()))
+                .isFalse();
+    }
+
+    @Test
+    public void withZeroTopAndBottomInsets_paddingIsNotApplied() {
+        Intent intent = new Intent();
+        intent.setAction(ACTION_START_DEVICE_FINANCING_PROVISIONING);
+        LandingActivity activity =
+                Robolectric.buildActivity(LandingActivity.class, intent).setup().get();
+        View fragmentContainer = activity.findViewById(R.id.fragment_container);
+        int originalPaddingLeft = fragmentContainer.getPaddingLeft();
+        int originalPaddingTop = fragmentContainer.getPaddingTop();
+        int originalPaddingRight = fragmentContainer.getPaddingRight();
+        int originalPaddingBottom = fragmentContainer.getPaddingBottom();
+        setupMocksForWindowInsets(0, 0, 0, 0);
+
+        fragmentContainer.dispatchApplyWindowInsets(mWindowInsetsMock);
+        ShadowLooper.idleMainLooper();
+
+        assertThat(fragmentContainer.getPaddingLeft()).isEqualTo(originalPaddingLeft);
+        assertThat(fragmentContainer.getPaddingTop()).isEqualTo(originalPaddingTop);
+        assertThat(fragmentContainer.getPaddingRight()).isEqualTo(originalPaddingRight);
+        assertThat(fragmentContainer.getPaddingBottom()).isEqualTo(originalPaddingBottom);
+    }
+
+    @Test
+    public void withOnlyNonZeroLeftAndRightInsets_paddingIsNotApplied() {
+        Intent intent = new Intent();
+        intent.setAction(ACTION_START_DEVICE_FINANCING_PROVISIONING);
+        LandingActivity activity =
+                Robolectric.buildActivity(LandingActivity.class, intent).setup().get();
+        View fragmentContainer = activity.findViewById(R.id.fragment_container);
+        int originalPaddingLeft = fragmentContainer.getPaddingLeft();
+        int originalPaddingTop = fragmentContainer.getPaddingTop();
+        int originalPaddingRight = fragmentContainer.getPaddingRight();
+        int originalPaddingBottom = fragmentContainer.getPaddingBottom();
+        setupMocksForWindowInsets(33, 0, 35, 0);
+
+        fragmentContainer.dispatchApplyWindowInsets(mWindowInsetsMock);
+        ShadowLooper.idleMainLooper();
+
+        assertThat(fragmentContainer.getPaddingLeft()).isEqualTo(originalPaddingLeft);
+        assertThat(fragmentContainer.getPaddingTop()).isEqualTo(originalPaddingTop);
+        assertThat(fragmentContainer.getPaddingRight()).isEqualTo(originalPaddingRight);
+        assertThat(fragmentContainer.getPaddingBottom()).isEqualTo(originalPaddingBottom);
+    }
+
+    @Test
+    public void withNonZeroTopInsets_paddingIsApplied() {
+        Intent intent = new Intent();
+        intent.setAction(ACTION_START_DEVICE_FINANCING_PROVISIONING);
+        LandingActivity activity =
+                Robolectric.buildActivity(LandingActivity.class, intent).setup().get();
+        View fragmentContainer = activity.findViewById(R.id.fragment_container);
+        setupMocksForWindowInsets(0, 21, 0, 0);
+
+        fragmentContainer.dispatchApplyWindowInsets(mWindowInsetsMock);
+        ShadowLooper.idleMainLooper();
+
+        assertThat(fragmentContainer.getPaddingLeft()).isEqualTo(0);
+        assertThat(fragmentContainer.getPaddingTop()).isEqualTo(21);
+        assertThat(fragmentContainer.getPaddingRight()).isEqualTo(0);
+        assertThat(fragmentContainer.getPaddingBottom()).isEqualTo(0);
+    }
+
+    @Test
+    public void withNonZeroBottomInsets_paddingIsApplied() {
+        Intent intent = new Intent();
+        intent.setAction(ACTION_START_DEVICE_FINANCING_PROVISIONING);
+        LandingActivity activity =
+                Robolectric.buildActivity(LandingActivity.class, intent).setup().get();
+        View fragmentContainer = activity.findViewById(R.id.fragment_container);
+        setupMocksForWindowInsets(0, 0, 0, 20);
+
+        fragmentContainer.dispatchApplyWindowInsets(mWindowInsetsMock);
+        ShadowLooper.idleMainLooper();
+
+        assertThat(fragmentContainer.getPaddingLeft()).isEqualTo(0);
+        assertThat(fragmentContainer.getPaddingTop()).isEqualTo(0);
+        assertThat(fragmentContainer.getPaddingRight()).isEqualTo(0);
+        assertThat(fragmentContainer.getPaddingBottom()).isEqualTo(20);
+    }
+
+    private void setupMocksForWindowInsets(int left, int top, int right, int bottom) {
+        when(mWindowInsetsMock.getInsets(WindowInsets.Type.systemBars()))
+                .thenReturn(Insets.of(left, top, right, bottom));
     }
 }
