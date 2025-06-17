@@ -69,6 +69,7 @@ import com.android.devicelockcontroller.util.LogUtil;
 import com.android.devicelockcontroller.util.ThreadAsserts;
 
 import com.google.common.base.Strings;
+import com.google.protobuf.ByteString;
 
 import io.grpc.ClientInterceptor;
 import io.grpc.ManagedChannel;
@@ -199,7 +200,8 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
             String carrierInfo,
             String deviceLocale,
             long deviceLockApexVersion,
-            @Nullable String fcmRegistrationToken) {
+            @Nullable String fcmRegistrationToken,
+            @Nullable byte[] keyAttestationLeafCertificate) {
         ThreadAsserts.assertWorkerThread("getDeviceCheckInStatus");
         GetDeviceCheckInStatusGrpcResponse response =
                 getDeviceCheckInStatus(
@@ -208,6 +210,7 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
                         deviceLocale,
                         deviceLockApexVersion,
                         fcmRegistrationToken,
+                        keyAttestationLeafCertificate,
                         mDefaultBlockingStub);
         if (response.hasRecoverableError()) {
             DeviceLockCheckinServiceBlockingStub stub;
@@ -224,6 +227,7 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
                     deviceLocale,
                     deviceLockApexVersion,
                     fcmRegistrationToken,
+                    keyAttestationLeafCertificate,
                     stub);
         }
         return response;
@@ -235,6 +239,7 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
             String deviceLocale,
             long deviceLockApexVersion,
             @Nullable String fcmRegistrationToken,
+            @Nullable byte[] keyAttestationLeafCertificate,
             @NonNull DeviceLockCheckinServiceBlockingStub stub) {
         try {
             return new GetDeviceCheckInStatusGrpcResponseWrapper(
@@ -245,7 +250,8 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
                                             carrierInfo,
                                             deviceLocale,
                                             deviceLockApexVersion,
-                                            fcmRegistrationToken)));
+                                            fcmRegistrationToken,
+                                            keyAttestationLeafCertificate)));
         } catch (StatusRuntimeException e) {
             mStatsLogger.logProvisionStateEvent(
                     DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_UNSUCCESSFUL_CHECKIN_REQUEST);
@@ -432,7 +438,8 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
             String carrierInfo,
             String deviceLocale,
             long deviceLockApexVersion,
-            @Nullable String fcmRegistrationToken) {
+            @Nullable String fcmRegistrationToken,
+            @Nullable byte[] keyAttestationLeafCertificate) {
         GetDeviceCheckinStatusRequest.Builder builder = GetDeviceCheckinStatusRequest.newBuilder();
         for (DeviceId deviceId : deviceIds) {
             builder.addClientDeviceIdentifiers(
@@ -450,6 +457,10 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
         }
         builder.setDeviceLocale(deviceLocale);
         builder.setApexVersion(deviceLockApexVersion);
+
+        if (keyAttestationLeafCertificate != null) {
+            builder.setLeafCertificate(ByteString.copyFrom(keyAttestationLeafCertificate));
+        }
         return builder.build();
     }
 

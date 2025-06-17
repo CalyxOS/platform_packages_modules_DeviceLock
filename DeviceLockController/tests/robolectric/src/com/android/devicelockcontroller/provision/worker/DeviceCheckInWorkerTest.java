@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,14 +43,17 @@ import androidx.work.WorkerParameters;
 import androidx.work.testing.TestListenableWorkerBuilder;
 
 import com.android.devicelockcontroller.FcmRegistrationTokenProvider;
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.common.DeviceId;
 import com.android.devicelockcontroller.policy.FinalizationController;
 import com.android.devicelockcontroller.provision.grpc.DeviceCheckInClient;
 import com.android.devicelockcontroller.provision.grpc.GetDeviceCheckInStatusGrpcResponse;
 import com.android.devicelockcontroller.schedule.DeviceLockControllerScheduler;
+import com.android.devicelockcontroller.shadows.FakeAndroidKeystore;
 import com.android.devicelockcontroller.stats.StatsLogger;
 import com.android.devicelockcontroller.stats.StatsLoggerProvider;
+import com.android.devicelockcontroller.util.TestCertificateProviderUtil;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.testing.TestingExecutors;
@@ -62,6 +66,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
+
+import java.security.Security;
 
 @RunWith(RobolectricTestRunner.class)
 public class DeviceCheckInWorkerTest {
@@ -79,6 +85,9 @@ public class DeviceCheckInWorkerTest {
     private AbstractDeviceCheckInHelper mHelper;
     @Mock
     private FcmRegistrationTokenProvider mFcmRegistrationTokenProvider;
+
+    @Mock
+    private FeatureFlagProvider mFeatureFlagProvider;
     @Mock
     private DeviceCheckInClient mClient;
     @Mock
@@ -89,13 +98,15 @@ public class DeviceCheckInWorkerTest {
             ApplicationProvider.getApplicationContext();
     private FinalizationController mFinalizationController;
 
+
     @Before
     public void setUp() throws Exception {
         mFinalizationController = mContext.getFinalizationController();
         when(mFcmRegistrationTokenProvider.getFcmRegistrationToken()).thenReturn(
                 mContext.getFcmRegistrationToken());
         when(mClient.getDeviceCheckInStatus(
-                        eq(TEST_DEVICE_IDS), anyString(), anyString(), anyLong(), any()))
+                eq(TEST_DEVICE_IDS), anyString(), anyString(), anyLong(), any(),
+                nullable(byte[].class)))
                 .thenReturn(mResponse);
         mWorker = TestListenableWorkerBuilder.from(
                         mContext, DeviceCheckInWorker.class)
@@ -109,15 +120,18 @@ public class DeviceCheckInWorkerTest {
                                         ? new DeviceCheckInWorker(
                                         context, workerParameters, mHelper,
                                         mFcmRegistrationTokenProvider, mClient,
-                                        TestingExecutors.sameThreadScheduledExecutor())
+                                        TestingExecutors.sameThreadScheduledExecutor(),
+                                        mFeatureFlagProvider)
                                         : null;
                             }
                         }).build();
         StatsLoggerProvider loggerProvider =
                 (StatsLoggerProvider) mContext.getApplicationContext();
         mStatsLogger = loggerProvider.getStatsLogger();
+        Security.addProvider(new FakeAndroidKeystore.FakeSecurityProvider());
+        FakeAndroidKeystore.SingletonKeystore.certs.put("DLCKeyAttestation",
+                TestCertificateProviderUtil.getTestCertificates());
     }
-
 
     @Test
     public void checkIn_allInfoAvailable_checkInResponseSuccessfulAndHandleable_successAndLogged() {
@@ -126,6 +140,7 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ true);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ false);
 
         // GIVEN check-in response is successful
         setUpSuccessfulCheckInResponse(/* isHandleable= */ true);
@@ -146,6 +161,7 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ true);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ false);
 
         // GIVEN check-in response is successful
         setUpSuccessfulCheckInResponse(/* isHandleable= */ false);
@@ -166,6 +182,7 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ true);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ false);
 
         // GIVEN check-in response has recoverable failure.
         setUpFailedCheckInResponse(/* isRecoverable= */ true);
@@ -186,6 +203,7 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ true);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ false);
 
         // GIVEN check-in response has non-recoverable failure.
         setUpFailedCheckInResponse(/* isRecoverable= */ false);
@@ -212,6 +230,7 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ false);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ false);
 
         // WHEN work runs
         Futures.getUnchecked(mWorker.startWork());
@@ -223,7 +242,8 @@ public class DeviceCheckInWorkerTest {
                         eq(EMPTY_CARRIER_INFO),
                         eq(TEST_DEVICE_LOCALE),
                         eq(TEST_DEVICE_LOCK_APEX_VERSION),
-                        eq(TEST_FCM_TOKEN));
+                        eq(TEST_FCM_TOKEN),
+                        nullable(byte[].class));
     }
 
     @Test
@@ -236,6 +256,7 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ false);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ false);
 
         // WHEN work runs
         Futures.getUnchecked(mWorker.startWork());
@@ -247,7 +268,8 @@ public class DeviceCheckInWorkerTest {
                         eq(EMPTY_CARRIER_INFO),
                         eq(TEST_DEVICE_LOCALE),
                         eq(TEST_DEVICE_LOCK_APEX_VERSION),
-                        eq(TEST_FCM_TOKEN));
+                        eq(TEST_FCM_TOKEN),
+                        nullable(byte[].class));
 
         // THEN non enrolled device should be finalized
         verify(mFinalizationController).finalizeNotEnrolledDevice();
@@ -282,6 +304,7 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ true);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ false);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ false);
 
         // WHEN work runs
         Futures.getUnchecked(mWorker.startWork());
@@ -293,7 +316,8 @@ public class DeviceCheckInWorkerTest {
                         eq(TEST_CARRIER_INFO),
                         eq(TEST_DEVICE_LOCALE),
                         eq(0L),
-                        eq(TEST_FCM_TOKEN));
+                        eq(TEST_FCM_TOKEN),
+                        nullable(byte[].class));
     }
 
     @Test
@@ -303,6 +327,7 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ true);
         setDeviceLocaleAvailability(/* isAvailable= */ false);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ false);
 
         // WHEN work runs
         Futures.getUnchecked(mWorker.startWork());
@@ -314,7 +339,60 @@ public class DeviceCheckInWorkerTest {
                         eq(TEST_CARRIER_INFO),
                         eq(EMPTY_DEVICE_LOCALE),
                         eq(TEST_DEVICE_LOCK_APEX_VERSION),
-                        eq(TEST_FCM_TOKEN));
+                        eq(TEST_FCM_TOKEN),
+                        nullable(byte[].class));
+    }
+
+    @Test
+    public void
+    checkIn_allInfoAvailable_imeiHardeningRegEnabled_checkInSuccessful_successAndLogged() {
+        // GIVEN all device info available
+        setDeviceIdAvailability(/* isAvailable= */ true);
+        setCarrierInfoAvailability(/* isAvailable= */ true);
+        setDeviceLocaleAvailability(/* isAvailable= */ true);
+        setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ true);
+
+        // GIVEN check-in response is successful
+        setUpSuccessfulCheckInResponse(/* isHandleable= */ true);
+
+        // WHEN work runs
+        final Result result = Futures.getUnchecked(mWorker.startWork());
+
+        // THEN work succeeded
+        assertThat(result).isEqualTo(Result.success());
+        // THEN check in request was logged
+        verify(mStatsLogger).logGetDeviceCheckInStatus();
+    }
+
+    @Test
+    public void checkIn_imeiHardeningRegEnabled_keyAttestationFetchFails_jobReturnsRetry() {
+        // GIVEN all device info available
+        setDeviceIdAvailability(/* isAvailable= */ true);
+        setCarrierInfoAvailability(/* isAvailable= */ true);
+        setDeviceLocaleAvailability(/* isAvailable= */ true);
+        setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ true);
+        Security.removeProvider("AndroidKeyStore");
+
+        final Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isEqualTo(Result.retry());
+    }
+
+    @Test
+    public void checkIn_imeiHardeningRegEnabled_keyAttestationFetchReturnsNull_jobReturnsRetry() {
+        // GIVEN all device info available
+        setDeviceIdAvailability(/* isAvailable= */ true);
+        setCarrierInfoAvailability(/* isAvailable= */ true);
+        setDeviceLocaleAvailability(/* isAvailable= */ true);
+        setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ true);
+        FakeAndroidKeystore.SingletonKeystore.certs.clear();;
+
+        final Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isEqualTo(Result.retry());
     }
 
     private void setDeviceIdAvailability(boolean isAvailable) {
@@ -347,5 +425,9 @@ public class DeviceCheckInWorkerTest {
     private void setUpFailedCheckInResponse(boolean isRecoverable) {
         when(mResponse.hasRecoverableError()).thenReturn(isRecoverable);
         when(mResponse.isSuccessful()).thenReturn(false);
+    }
+
+    private void setImeiHardeningRegistrationEnabled(boolean isEnabled) {
+        when(mFeatureFlagProvider.isImeiHardeningRegistrationEnabled()).thenReturn(isEnabled);
     }
 }

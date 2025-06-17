@@ -52,8 +52,10 @@ import com.android.devicelockcontroller.provision.grpc.IsDeviceInApprovedCountry
 import com.android.devicelockcontroller.provision.grpc.PauseDeviceProvisioningGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.ReportDeviceProvisionStateGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.UpdateFcmTokenGrpcResponse;
+import com.android.devicelockcontroller.shadows.FakeAndroidKeystore;
 import com.android.devicelockcontroller.stats.StatsLogger;
 import com.android.devicelockcontroller.stats.StatsLoggerProvider;
+import com.android.devicelockcontroller.util.TestCertificateProviderUtil;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -79,6 +81,8 @@ import org.robolectric.Shadows;
 import org.robolectric.shadows.ShadowConnectivityManager;
 import org.robolectric.shadows.ShadowNetwork;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -90,13 +94,15 @@ import java.util.concurrent.atomic.AtomicReference;
  * Tests for {@link DeviceCheckInClientImpl}.
  */
 @RunWith(RobolectricTestRunner.class)
-public final  class DeviceCheckinClientImplTest {
+public final class DeviceCheckinClientImplTest {
 
     private static final String TEST_CARRIER_INFO = "1234567890";
     private static final String TEST_HOST_NAME = "test.host.name";
     private static final int TEST_PORT_NUMBER = 7777;
     private static final String TEST_REGISTERED_ID = "1234567890";
     private static final String TEST_FCM_TOKEN = "token";
+    private static final byte[] TEST_KEY_ATTESTATION_LEAF_CERTIFICATE =
+            "LeafCertificate".getBytes(StandardCharsets.UTF_8);
     private static final int NON_VPN_NET_ID = 10;
     private static final String TEST_DEVICE_LOCALE = "en-US";
     private static final long TEST_DEVICE_LOCK_APEX_VERSION = 1234567890;
@@ -124,6 +130,8 @@ public final  class DeviceCheckinClientImplTest {
     private String mReceivedFcmToken;
     private String mReceivedDeviceLocale;
     private long mReceivedDeviceLockApexVersion;
+
+    private byte[] mReceivedLeafCertificate;
 
     @Before
     public void setUp() throws Exception {
@@ -179,12 +187,12 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we ask for the check in status
         AtomicReference<GetDeviceCheckInStatusGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() -> response.set(
-                                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
-                                                new ArraySet<>(),
-                                                TEST_CARRIER_INFO,
-                                                TEST_DEVICE_LOCALE,
-                                                TEST_DEVICE_LOCK_APEX_VERSION,
-                                                TEST_FCM_TOKEN)))
+                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
+                                new ArraySet<>(),
+                                TEST_CARRIER_INFO,
+                                TEST_DEVICE_LOCALE,
+                                TEST_DEVICE_LOCK_APEX_VERSION,
+                                TEST_FCM_TOKEN, /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is successful
@@ -205,12 +213,13 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we ask for the check in status without an FCM token
         AtomicReference<GetDeviceCheckInStatusGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() -> response.set(
-                                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
-                                                new ArraySet<>(),
-                                                TEST_CARRIER_INFO,
-                                                TEST_DEVICE_LOCALE,
-                                                TEST_DEVICE_LOCK_APEX_VERSION,
-                                                /* fcmRegistrationToken= */ null)))
+                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
+                                new ArraySet<>(),
+                                TEST_CARRIER_INFO,
+                                TEST_DEVICE_LOCALE,
+                                TEST_DEVICE_LOCK_APEX_VERSION,
+                                /* fcmRegistrationToken= */ null,
+                                /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is successful
@@ -231,12 +240,13 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we ask for the check in status with an empty FCM token
         AtomicReference<GetDeviceCheckInStatusGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() -> response.set(
-                                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
-                                                new ArraySet<>(),
-                                                TEST_CARRIER_INFO,
-                                                TEST_DEVICE_LOCALE,
-                                                TEST_DEVICE_LOCK_APEX_VERSION,
-                                                "")))
+                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
+                                new ArraySet<>(),
+                                TEST_CARRIER_INFO,
+                                TEST_DEVICE_LOCALE,
+                                TEST_DEVICE_LOCK_APEX_VERSION,
+                                "",
+                                /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is successful
@@ -265,7 +275,8 @@ public final  class DeviceCheckinClientImplTest {
                                                 TEST_CARRIER_INFO,
                                                 TEST_DEVICE_LOCALE,
                                                 TEST_DEVICE_LOCK_APEX_VERSION,
-                                                "   ")))
+                                                "   ",
+                                                /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is successful
@@ -294,7 +305,8 @@ public final  class DeviceCheckinClientImplTest {
                                                 TEST_CARRIER_INFO,
                                                 "",
                                                 TEST_DEVICE_LOCK_APEX_VERSION,
-                                                TEST_FCM_TOKEN)))
+                                                TEST_FCM_TOKEN,
+                                                /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is successful
@@ -323,7 +335,8 @@ public final  class DeviceCheckinClientImplTest {
                                                 TEST_CARRIER_INFO,
                                                 TEST_DEVICE_LOCALE,
                                                 0L,
-                                                TEST_FCM_TOKEN)))
+                                                TEST_FCM_TOKEN,
+                                                /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is successful
@@ -361,12 +374,13 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we ask for the check in status
         AtomicReference<GetDeviceCheckInStatusGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() -> response.set(
-                                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
-                                                new ArraySet<>(),
-                                                TEST_CARRIER_INFO,
-                                                TEST_DEVICE_LOCALE,
-                                                TEST_DEVICE_LOCK_APEX_VERSION,
-                                                TEST_FCM_TOKEN)))
+                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
+                                new ArraySet<>(),
+                                TEST_CARRIER_INFO,
+                                TEST_DEVICE_LOCALE,
+                                TEST_DEVICE_LOCK_APEX_VERSION,
+                                TEST_FCM_TOKEN,
+                                /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is successful
@@ -393,12 +407,13 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we ask for the check in status
         AtomicReference<GetDeviceCheckInStatusGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() -> response.set(
-                                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
-                                                new ArraySet<>(),
-                                                TEST_CARRIER_INFO,
-                                                TEST_DEVICE_LOCALE,
-                                                TEST_DEVICE_LOCK_APEX_VERSION,
-                                                TEST_FCM_TOKEN)))
+                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
+                                new ArraySet<>(),
+                                TEST_CARRIER_INFO,
+                                TEST_DEVICE_LOCALE,
+                                TEST_DEVICE_LOCK_APEX_VERSION,
+                                TEST_FCM_TOKEN,
+                                /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is unsuccessful
@@ -432,7 +447,8 @@ public final  class DeviceCheckinClientImplTest {
                                 TEST_CARRIER_INFO,
                                 TEST_DEVICE_LOCALE,
                                 TEST_DEVICE_LOCK_APEX_VERSION,
-                                TEST_FCM_TOKEN)))
+                                TEST_FCM_TOKEN,
+                                /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the unsuccessful checkin is logged
@@ -464,18 +480,49 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we ask for the check in status
         AtomicReference<GetDeviceCheckInStatusGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() ->
-                                response.set(
-                                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
-                                                new ArraySet<>(),
-                                                TEST_CARRIER_INFO,
-                                                TEST_DEVICE_LOCALE,
-                                                TEST_DEVICE_LOCK_APEX_VERSION,
-                                                TEST_FCM_TOKEN)))
+                        response.set(
+                                mDeviceCheckInClientImpl.getDeviceCheckInStatus(
+                                        new ArraySet<>(),
+                                        TEST_CARRIER_INFO,
+                                        TEST_DEVICE_LOCALE,
+                                        TEST_DEVICE_LOCK_APEX_VERSION,
+                                        TEST_FCM_TOKEN,
+                                        /* keyAttestationLeafCertificate */ null)))
                 .get();
 
         // THEN the response is unsuccessful
         assertThat(response.get().isSuccessful()).isFalse();
         assertThat(response.get().hasRecoverableError()).isTrue();
+    }
+
+    @Test
+    public void getCheckInStatus_withKeyAttestationLeafCertificate_succeeds() throws Exception {
+        // GIVEN the service succeeds through the default network
+        Security.addProvider(new FakeAndroidKeystore.FakeSecurityProvider());
+        FakeAndroidKeystore.SingletonKeystore.certs.put("DLCKeyAttestation",
+                TestCertificateProviderUtil.getTestCertificates());
+
+        mGrpcCleanup.register(InProcessServerBuilder
+                .forName(mDefaultNetworkServerName)
+                .directExecutor()
+                .addService(makeSucceedingService())
+                .build()
+                .start());
+
+        // WHEN we ask for the check in status
+        AtomicReference<GetDeviceCheckInStatusGrpcResponse> response = new AtomicReference<>();
+        mBgExecutor.submit(() -> response.set(
+                        mDeviceCheckInClientImpl.getDeviceCheckInStatus(
+                                new ArraySet<>(),
+                                TEST_CARRIER_INFO,
+                                TEST_DEVICE_LOCALE,
+                                TEST_DEVICE_LOCK_APEX_VERSION,
+                                TEST_FCM_TOKEN, TEST_KEY_ATTESTATION_LEAF_CERTIFICATE)))
+                .get();
+
+        // THEN the response is successful
+        assertThat(response.get().isSuccessful()).isTrue();
+        assertThat(mReceivedLeafCertificate).isEqualTo(TEST_KEY_ATTESTATION_LEAF_CERTIFICATE);
     }
 
     @Test
@@ -491,7 +538,7 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we check if device is in a approved country
         AtomicReference<IsDeviceInApprovedCountryGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() -> response.set(
-                mDeviceCheckInClientImpl.isDeviceInApprovedCountry(TEST_CARRIER_INFO)))
+                        mDeviceCheckInClientImpl.isDeviceInApprovedCountry(TEST_CARRIER_INFO)))
                 .get();
 
         // THEN the response is successful
@@ -713,8 +760,8 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we pause provisioning
         AtomicReference<PauseDeviceProvisioningGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() -> response.set(
-                mDeviceCheckInClientImpl.pauseDeviceProvisioning(
-                        USER_DEFERRED_DEVICE_PROVISIONING)))
+                        mDeviceCheckInClientImpl.pauseDeviceProvisioning(
+                                USER_DEFERRED_DEVICE_PROVISIONING)))
                 .get();
 
         // THEN the response is unsuccessful
@@ -805,10 +852,10 @@ public final  class DeviceCheckinClientImplTest {
         // WHEN we report device provisioning state
         AtomicReference<ReportDeviceProvisionStateGrpcResponse> response = new AtomicReference<>();
         mBgExecutor.submit(() -> response.set(
-                        mDeviceCheckInClientImpl.reportDeviceProvisionState(
-                                PROVISION_STATE_UNSPECIFIED,
-                                /* isSuccessful= */ true,
-                                UNKNOWN_REASON))).get();
+                mDeviceCheckInClientImpl.reportDeviceProvisionState(
+                        PROVISION_STATE_UNSPECIFIED,
+                        /* isSuccessful= */ true,
+                        UNKNOWN_REASON))).get();
 
         // THEN the response is unsuccessful
         assertThat(response.get().isSuccessful()).isFalse();
@@ -1012,6 +1059,7 @@ public final  class DeviceCheckinClientImplTest {
                 mReceivedFcmToken = req.getFcmRegistrationToken();
                 mReceivedDeviceLocale = req.getDeviceLocale();
                 mReceivedDeviceLockApexVersion = req.getApexVersion();
+                mReceivedLeafCertificate = req.getLeafCertificate().toByteArray();
                 GetDeviceCheckinStatusResponse response = GetDeviceCheckinStatusResponse
                         .newBuilder()
                         .build();
