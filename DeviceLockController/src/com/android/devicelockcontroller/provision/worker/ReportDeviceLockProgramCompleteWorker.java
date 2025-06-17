@@ -25,6 +25,7 @@ import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
 
 import com.android.devicelockcontroller.ClientInterceptorProvider;
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.R;
 import com.android.devicelockcontroller.policy.FinalizationController;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
@@ -81,9 +82,13 @@ public final class ReportDeviceLockProgramCompleteWorker extends ListenableWorke
                     (ClientInterceptorProvider) context.getApplicationContext();
             final ClientInterceptor clientInterceptor =
                     clientInterceptorProvider.getClientInterceptor();
+            boolean isImeiHardeningDeregistrationEnabled =
+                    ((FeatureFlagProvider) context.getApplicationContext())
+                            .isImeiHardeningDeregistrationEnabled();
             mClient = Futures.transform(registeredDeviceId,
                     id -> DeviceFinalizeClient.getInstance(context, hostName,
-                            portNumber, clientInterceptor, id), executorService);
+                            portNumber, clientInterceptor, id,
+                            isImeiHardeningDeregistrationEnabled), executorService);
         } else {
             mClient = Futures.immediateFuture(client);
         }
@@ -97,6 +102,11 @@ public final class ReportDeviceLockProgramCompleteWorker extends ListenableWorke
         return Futures.transformAsync(mClient, client -> {
             DeviceFinalizeClient.ReportDeviceProgramCompleteResponse response =
                     client.reportDeviceProgramComplete();
+
+            if (response == null) {
+                return Futures.immediateFuture(Result.retry());
+            }
+
             if (response.hasRecoverableError()) {
                 LogUtil.w(TAG, "Report finalization failed w/ recoverable error " + response
                         + "\nRetrying...");

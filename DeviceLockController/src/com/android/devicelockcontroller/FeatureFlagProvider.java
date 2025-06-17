@@ -26,4 +26,9 @@ public interface FeatureFlagProvider {
      */
     boolean isImeiHardeningRegistrationEnabled();
 
+    /**
+     * Returns the feature flag value that enables IMEI hardening unbinding
+     */
+    boolean isImeiHardeningDeregistrationEnabled();
+
 }
