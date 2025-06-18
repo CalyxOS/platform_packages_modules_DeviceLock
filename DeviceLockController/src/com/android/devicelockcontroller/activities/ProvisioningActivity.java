@@ -19,54 +19,71 @@ package com.android.devicelockcontroller.activities;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisionFailureReason.POLICY_ENFORCEMENT_FAILED;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisionFailureReason.UNKNOWN_REASON;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Intent;
+import android.graphics.Insets;
 import android.os.Bundle;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.android.devicelockcontroller.R;
 import com.android.devicelockcontroller.util.LogUtil;
 
-/**
- * The activity displayed when provisioning is in progress.
- */
+/** The activity displayed when provisioning is in progress. */
 public final class ProvisioningActivity extends AppCompatActivity {
 
-    private static final String TAG = "ProvisioningActivity";
-
-    static final String EXTRA_SHOW_PROVISION_FAILED_UI_ON_START =
-            "com.android.devicelockcontroller.activities.extra.SHOW_PROVISION_FAILED_UI_ON_START";
-
     /**
-     * An extra boolean set on the provisioning activity intent to signal that it should
-     * show the provisioning failed screen on start.
+     * An extra boolean set on the provisioning activity intent to signal that it should show the
+     * provisioning failed screen on start.
      */
     public static final String EXTRA_SHOW_CRITICAL_PROVISION_FAILED_UI_ON_START =
             "com.android.devicelockcontroller.activities.extra.SHOW_CRITICAL_PROVISION"
                     + "_FAILED_UI_ON_START";
+
+    static final String EXTRA_SHOW_PROVISION_FAILED_UI_ON_START =
+            "com.android.devicelockcontroller.activities.extra.SHOW_PROVISION_FAILED_UI_ON_START";
+    private static final String TAG = "ProvisioningActivity";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.provisioning_activity);
 
+        FragmentContainerView fragmentContainerView = findViewById(R.id.fragment_container);
+        checkNotNull(fragmentContainerView);
+        fragmentContainerView.setOnApplyWindowInsetsListener(
+                (view, insets) -> {
+                    Insets systemBars = insets.getInsets(WindowInsets.Type.systemBars());
+                    // Only set the top and bottom padding if top/bottom insets are non-zero
+                    if (systemBars.top != 0 || systemBars.bottom != 0) {
+                        view.setPadding(0, systemBars.top, 0, systemBars.bottom);
+                    }
+                    return insets;
+                });
+
         WindowInsetsController controller = getWindow().getInsetsController();
         if (controller != null) {
             controller.hide(WindowInsets.Type.systemBars());
         }
-        ProvisioningProgressViewModel viewModel = new ViewModelProvider(this).get(
-                ProvisioningProgressViewModel.class);
-        viewModel.getProvisioningProgressLiveData().observe(this, progress -> {
-            ProgressFragment progressFragment = new ProgressFragment();
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, progressFragment)
-                    .commit();
-        });
+        ProvisioningProgressViewModel viewModel =
+                new ViewModelProvider(this).get(ProvisioningProgressViewModel.class);
+        viewModel
+                .getProvisioningProgressLiveData()
+                .observe(
+                        this,
+                        progress -> {
+                            ProgressFragment progressFragment = new ProgressFragment();
+                            getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_container, progressFragment)
+                                    .commit();
+                        });
         final Intent intent = getIntent();
         if (intent.getBooleanExtra(EXTRA_SHOW_CRITICAL_PROVISION_FAILED_UI_ON_START, false)) {
             LogUtil.d(TAG, "showing critical provision failed ui");

@@ -16,24 +16,38 @@
 
 package com.android.devicelockcontroller.activities;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import android.graphics.Insets;
 import android.os.Bundle;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentContainerView;
 
 import com.android.devicelockcontroller.R;
 
-/**
- * The first activity displayed during the provisioning flow.
- */
+/** The first activity displayed during the provisioning flow. */
 public final class LandingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.landing_activity);
+
+        FragmentContainerView fragmentContainerView = findViewById(R.id.fragment_container);
+        checkNotNull(fragmentContainerView);
+        fragmentContainerView.setOnApplyWindowInsetsListener(
+                (view, insets) -> {
+                    Insets systemBars = insets.getInsets(WindowInsets.Type.systemBars());
+                    // Only set the top and bottom padding if top/bottom insets are non-zero
+                    if (systemBars.top != 0 || systemBars.bottom != 0) {
+                        view.setPadding(0, systemBars.top, 0, systemBars.bottom);
+                    }
+                    return insets;
+                });
 
         WindowInsetsController controller = getWindow().getInsetsController();
         if (controller != null) {
