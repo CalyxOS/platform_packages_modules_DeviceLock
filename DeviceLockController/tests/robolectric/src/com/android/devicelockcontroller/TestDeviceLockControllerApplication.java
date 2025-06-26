@@ -59,7 +59,8 @@ public final class TestDeviceLockControllerApplication extends Application imple
         DeviceLockControllerSchedulerProvider,
         FcmRegistrationTokenProvider,
         PlayInstallPackageTaskClassProvider,
-        StatsLoggerProvider {
+        StatsLoggerProvider,
+        FeatureFlagProvider{
 
     public static final String TEST_FCM_TOKEN = "fcmToken";
 
@@ -164,6 +165,11 @@ public final class TestDeviceLockControllerApplication extends Application imple
     @Override
     public Class<? extends ListenableWorker> getPlayInstallPackageTaskClass() {
         return PlayInstallPackageWorker.class;
+    }
+
+    @Override
+    public boolean isImeiHardeningRegistrationEnabled() {
+        return false;
     }
 
     /**
