@@ -86,7 +86,7 @@
     <string name="settings_intro_preference_key" msgid="6610461073400554162">"settings_intro_preference_key"</string>
     <string name="settings_restrictions_category" msgid="5746868117342406677">"Gailua guztiz ordaindu arte, ezingo dituzu egin hauek:"</string>
     <string name="settings_restrictions_category_preference_key" msgid="88318147152676512">"settings_restrictions_category_preference_key"</string>
-    <string name="settings_install_apps" msgid="3634279771448183713">"Play Store-tik kanpoko aplikazioak instalatu."</string>
+    <string name="settings_install_apps" msgid="3634279771448183713">"Google Play Store-tik kanpoko aplikazioak instalatu."</string>
     <string name="settings_install_apps_preference_key" msgid="27542314345238427">"settings_install_apps_preference_key"</string>
     <string name="settings_safe_mode" msgid="3035228015586375153">"Gailua modu seguruan berrabiarazi."</string>
     <string name="settings_safe_mode_preference_key" msgid="2106617747358027424">"settings_safe_mode_preference_key"</string>
