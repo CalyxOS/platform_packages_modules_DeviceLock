@@ -60,7 +60,8 @@ public class DeviceLockControllerApplication extends Application implements
         FcmRegistrationTokenProvider,
         PlayInstallPackageTaskClassProvider,
         StatsLoggerProvider,
-        ClientInterceptorProvider {
+        ClientInterceptorProvider,
+        FeatureFlagProvider {
     private static final String TAG = "DeviceLockControllerApplication";
 
     private static Context sApplicationContext;
@@ -183,5 +184,10 @@ public class DeviceLockControllerApplication extends Application implements
         }
 
         return mClientInterceptor;
+    }
+
+    @Override
+    public boolean isImeiHardeningRegistrationEnabled() {
+        return false;
     }
 }
