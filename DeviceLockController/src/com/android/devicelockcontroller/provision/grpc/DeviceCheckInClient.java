@@ -142,13 +142,15 @@ public abstract class DeviceCheckInClient {
      * @param deviceLocale         The locale of the device.
      * @param deviceLockApexVersion The version of the device lock apex.
      * @param fcmRegistrationToken The fcm registration token
+     * @param keyAttestationLeafCertificate The key attestation leaf certificate
      * @return A class that encapsulate the response from the backend server.
      */
     @WorkerThread
     public abstract GetDeviceCheckInStatusGrpcResponse getDeviceCheckInStatus(
             ArraySet<DeviceId> deviceIds, String carrierInfo,
             String deviceLocale, long deviceLockApexVersion,
-            @Nullable String fcmRegistrationToken);
+            @Nullable String fcmRegistrationToken,
+            @Nullable byte[] keyAttestationLeafCertificate);
 
     /**
      * Check if the device is in an approved country for the device lock program.

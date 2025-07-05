@@ -76,6 +76,8 @@ message GetDeviceCheckinStatusRequest {
   optional string device_locale = 7;
   // The version of the apex package on the device.
   optional uint64 apex_version = 8;
+  // The leaf certificate of the device.
+  optional bytes leaf_certificate = 9;
 }
 
 message ClientDeviceIdentifier {

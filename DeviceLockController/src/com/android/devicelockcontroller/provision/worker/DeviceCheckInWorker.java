@@ -23,6 +23,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.work.WorkerParameters;
 
 import com.android.devicelockcontroller.FcmRegistrationTokenProvider;
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
 import com.android.devicelockcontroller.provision.grpc.DeviceCheckInClient;
 import com.android.devicelockcontroller.provision.grpc.GetDeviceCheckInStatusGrpcResponse;
@@ -30,12 +31,19 @@ import com.android.devicelockcontroller.schedule.DeviceLockControllerScheduler;
 import com.android.devicelockcontroller.schedule.DeviceLockControllerSchedulerProvider;
 import com.android.devicelockcontroller.stats.StatsLogger;
 import com.android.devicelockcontroller.stats.StatsLoggerProvider;
+import com.android.devicelockcontroller.util.KeyAttestationUtil;
 import com.android.devicelockcontroller.util.LogUtil;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 
 /**
@@ -45,6 +53,8 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
 
     private final AbstractDeviceCheckInHelper mCheckInHelper;
     private final FcmRegistrationTokenProvider mFcmRegistrationTokenProvider;
+
+    private final FeatureFlagProvider mFeatureFlagProvider;
 
     private final StatsLogger mStatsLogger;
 
@@ -56,19 +66,21 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
         this(context, workerParams, new DeviceCheckInHelper(context),
                 (FcmRegistrationTokenProvider) context.getApplicationContext(),
                 /* client= */ null,
-                executorService);
+                executorService, (FeatureFlagProvider) context.getApplicationContext());
     }
 
     @VisibleForTesting
     DeviceCheckInWorker(@NonNull Context context, @NonNull WorkerParameters workerParameters,
             AbstractDeviceCheckInHelper helper, FcmRegistrationTokenProvider tokenProvider,
-            DeviceCheckInClient client, ListeningExecutorService executorService) {
+            DeviceCheckInClient client, ListeningExecutorService executorService,
+            FeatureFlagProvider featureFlagProvider) {
         super(context, workerParameters, client, executorService);
         mFcmRegistrationTokenProvider = tokenProvider;
         mCheckInHelper = helper;
         StatsLoggerProvider loggerProvider =
                 (StatsLoggerProvider) context.getApplicationContext();
         mStatsLogger = loggerProvider.getStatsLogger();
+        mFeatureFlagProvider = featureFlagProvider;
     }
 
     @NonNull
@@ -98,6 +110,27 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                     return Futures.whenAllSucceed(mClient, fcmRegistrationToken).call(() -> {
                         DeviceCheckInClient client = Futures.getDone(mClient);
                         String fcmToken = Futures.getDone(fcmRegistrationToken);
+
+                        byte[] keyAttestationLeafCertificate = null;
+
+                        if (mFeatureFlagProvider.isImeiHardeningRegistrationEnabled()) {
+                            try {
+                                keyAttestationLeafCertificate =
+                                        KeyAttestationUtil.getKeyAttestationLeafCertificate();
+                            } catch (NoSuchAlgorithmException | NoSuchProviderException |
+                                     CertificateException |
+                                     IOException | KeyStoreException |
+                                     InvalidAlgorithmParameterException e) {
+                                LogUtil.e(TAG, "Fetching KeyAttestation Leaf certificate failed",
+                                        e);
+                                return Result.retry();
+                            }
+
+                            if (keyAttestationLeafCertificate == null) {
+                                return Result.retry();
+                            }
+                        }
+
                         GetDeviceCheckInStatusGrpcResponse response =
                                 client.getDeviceCheckInStatus(
                                         deviceIds,
@@ -105,7 +138,9 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                                         mCheckInHelper.getDeviceLocale(),
                                         mCheckInHelper.getDeviceLockApexVersion(
                                                 mContext.getPackageName()),
-                                        fcmToken);
+                                        fcmToken,
+                                        keyAttestationLeafCertificate
+                                );
                         mStatsLogger.logGetDeviceCheckInStatus();
                         if (response.hasRecoverableError()) {
                             LogUtil.w(TAG, "Check-in failed w/ recoverable error " + response
@@ -135,4 +170,5 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                     }, mExecutorService);
                 }, mExecutorService);
     }
+
 }

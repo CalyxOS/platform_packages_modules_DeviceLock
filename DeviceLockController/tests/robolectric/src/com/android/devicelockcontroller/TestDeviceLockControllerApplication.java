@@ -60,7 +60,7 @@ public final class TestDeviceLockControllerApplication extends Application imple
         FcmRegistrationTokenProvider,
         PlayInstallPackageTaskClassProvider,
         StatsLoggerProvider,
-        FeatureFlagProvider{
+        FeatureFlagProvider {
 
     public static final String TEST_FCM_TOKEN = "fcmToken";
 

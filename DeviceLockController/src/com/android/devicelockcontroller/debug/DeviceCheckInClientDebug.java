@@ -127,7 +127,8 @@ public final class DeviceCheckInClientDebug extends DeviceCheckInClient {
             String carrierInfo,
             String deviceLocale,
             long deviceLockApexVersion,
-            @Nullable String fcmRegistrationToken) {
+            @Nullable String fcmRegistrationToken,
+            @Nullable byte[] keyAttestationLeafCertificate) {
         ThreadAsserts.assertWorkerThread("getDeviceCheckInStatus");
         return new GetDeviceCheckInStatusGrpcResponse() {
             @Override
