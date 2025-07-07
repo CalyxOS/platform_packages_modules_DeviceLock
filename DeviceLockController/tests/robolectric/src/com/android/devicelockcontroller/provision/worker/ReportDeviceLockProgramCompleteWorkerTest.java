@@ -49,6 +49,13 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
+
 @RunWith(RobolectricTestRunner.class)
 public final class ReportDeviceLockProgramCompleteWorkerTest {
     @Rule
@@ -95,8 +102,11 @@ public final class ReportDeviceLockProgramCompleteWorkerTest {
     }
 
     @Test
-    public void doWork_responseHasRecoverableError_returnRetry() {
-        when(mClient.reportDeviceProgramComplete()).thenReturn(
+    public void doWork_responseHasRecoverableError_returnRetry()
+            throws InvalidAlgorithmParameterException, CertificateException,
+            NoSuchAlgorithmException, IOException, KeyStoreException, NoSuchProviderException {
+        when(mClient.reportDeviceProgramComplete(
+        )).thenReturn(
                 new DeviceFinalizeClient.ReportDeviceProgramCompleteResponse(Status.UNAVAILABLE));
 
         assertThat(Futures.getUnchecked(mWorker.startWork())).isEqualTo(Result.retry());
@@ -108,5 +118,12 @@ public final class ReportDeviceLockProgramCompleteWorkerTest {
                 new DeviceFinalizeClient.ReportDeviceProgramCompleteResponse(Status.UNIMPLEMENTED));
 
         assertThat(Futures.getUnchecked(mWorker.startWork())).isEqualTo(Result.failure());
+    }
+
+    @Test
+    public void doWork_responseIsNull_returnRetry() {
+        when(mClient.reportDeviceProgramComplete()).thenReturn(null);
+
+        assertThat(Futures.getUnchecked(mWorker.startWork())).isEqualTo(Result.retry());
     }
 }

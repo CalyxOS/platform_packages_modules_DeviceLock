@@ -172,6 +172,11 @@ public final class TestDeviceLockControllerApplication extends Application imple
         return false;
     }
 
+    @Override
+    public boolean isImeiHardeningDeregistrationEnabled() {
+        return false;
+    }
+
     /**
      * A stub class for play install worker.
      */

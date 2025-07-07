@@ -80,7 +80,8 @@ public abstract class DeviceFinalizeClient {
             String hostName,
             int portNumber,
             ClientInterceptor clientInterceptor,
-            String registeredId) {
+            String registeredId,
+            boolean isImeiHardeningDeregistrationEnabled) {
         boolean useDebugClient = false;
         String hostNameOverride = "";
         if (Build.isDebuggable()) {
@@ -111,7 +112,9 @@ public abstract class DeviceFinalizeClient {
                         sClient =
                                 (DeviceFinalizeClient) clazz.getDeclaredConstructor().newInstance();
                     } else {
-                        sClient = new DeviceFinalizeClientImpl(clientInterceptor);
+                        sClient = new DeviceFinalizeClientImpl(
+                                clientInterceptor,
+                                isImeiHardeningDeregistrationEnabled);
                     }
 
                 } catch (Exception e) {

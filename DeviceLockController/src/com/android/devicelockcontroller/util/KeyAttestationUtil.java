@@ -55,6 +55,7 @@ public final class KeyAttestationUtil {
                         .setDigests(KeyProperties.DIGEST_SHA256,
                                 KeyProperties.DIGEST_SHA384,
                                 KeyProperties.DIGEST_SHA512)
+                        .setAttestationChallenge(new byte[0])
                         .build());
         // Generate the key pair. This will result in calls to both generate_key() and
         // attest_key() at the keymaster2 HAL.

@@ -35,6 +35,8 @@ message ReportDeviceProgramCompleteRequest {
   // The device identifier that is registered with the Device Lock server
   // obtained from the Device Lock Check-in service.
   optional string registered_device_identifier = 1;
+  // The key attestation leaf certificate
+  optional bytes leaf_certificate = 2;
 }
 
 message ReportDeviceProgramCompleteResponse {}
