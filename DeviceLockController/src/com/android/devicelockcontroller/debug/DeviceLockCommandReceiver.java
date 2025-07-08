@@ -64,6 +64,7 @@ import com.android.devicelockcontroller.schedule.DeviceLockControllerSchedulerPr
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
 import com.android.devicelockcontroller.storage.SetupParametersClient;
 import com.android.devicelockcontroller.storage.UserParameters;
+import com.android.devicelockcontroller.util.KeyAttestationUtil;
 import com.android.devicelockcontroller.util.LogUtil;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -71,7 +72,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import java.io.IOException;
 import java.lang.annotation.Retention;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import java.util.Objects;
 
 /**
@@ -115,6 +122,7 @@ public final class DeviceLockCommandReceiver extends BroadcastReceiver {
             Commands.DUMP_DEBUG_CLIENT_RESPONSE,
             Commands.SET_DEBUG_CLIENT_RESPONSE,
             Commands.DUMP_DEBUG_SCHEDULER,
+            Commands.DUMP_KA_LEAF_CERTIFICATE,
     })
     private @interface Commands {
         String RESET = "reset";
@@ -134,6 +142,7 @@ public final class DeviceLockCommandReceiver extends BroadcastReceiver {
         String DUMP_DEBUG_SCHEDULER = "dump-debug-scheduler";
         String ENABLE_PREINSTALLED_KIOSK = "enable-preinstalled-kiosk";
         String DISABLE_PREINSTALLED_KIOSK = "disable-preinstalled-kiosk";
+        String DUMP_KA_LEAF_CERTIFICATE = "dump-ka-leaf-certificate";
     }
 
     @Override
@@ -217,6 +226,9 @@ public final class DeviceLockCommandReceiver extends BroadcastReceiver {
                 break;
             case Commands.DISABLE_PREINSTALLED_KIOSK:
                 ProvisionHelperImpl.setPreinstalledKioskAllowed(context, false);
+                break;
+            case Commands.DUMP_KA_LEAF_CERTIFICATE:
+                dumpKeyAttestationLeafCertificate();
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported command: " + command);
@@ -446,5 +458,54 @@ public final class DeviceLockCommandReceiver extends BroadcastReceiver {
                     ((PolicyObjectsProvider) context.getApplicationContext()).destroyObjects();
                     return null;
                 }, context.getMainExecutor());
+    }
+
+    /**
+     * Dump the key attestation leaf certificate as c-escaped bytes.
+     */
+    public static void dumpKeyAttestationLeafCertificate() {
+        try {
+            LogUtil.d(TAG,
+                    "Key attestation leaf certificate:\n" + escapeBytes(
+                            KeyAttestationUtil.getKeyAttestationLeafCertificate()));
+
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | CertificateException |
+                 IOException | KeyStoreException | InvalidAlgorithmParameterException e) {
+            LogUtil.e(TAG, "Command failed: " + Commands.DUMP_KA_LEAF_CERTIFICATE, e);
+        }
+    }
+
+    /**
+     * Backslash escapes bytes in the format used in protocol buffer text format.
+     */
+    static String escapeBytes(byte[] input) {
+        final StringBuilder builder = new StringBuilder(input.length);
+        for (byte b : input) {
+            switch (b) {
+                case 0x07 -> builder.append("\\a");
+                case '\b' -> builder.append("\\b");
+                case '\f' -> builder.append("\\f");
+                case '\n' -> builder.append("\\n");
+                case '\r' -> builder.append("\\r");
+                case '\t' -> builder.append("\\t");
+                case 0x0b -> builder.append("\\v");
+                case '\\' -> builder.append("\\\\");
+                case '\'' -> builder.append("\\\'");
+                case '"' -> builder.append("\\\"");
+                default -> {
+                    // Only ASCII characters between 0x20 (space) and 0x7e (tilde) are
+                    // printable.  Other byte values must be escaped.
+                    if (b >= 0x20 && b <= 0x7e) {
+                        builder.append((char) b);
+                    } else {
+                        builder.append('\\');
+                        builder.append((char) ('0' + ((b >>> 6) & 3)));
+                        builder.append((char) ('0' + ((b >>> 3) & 7)));
+                        builder.append((char) ('0' + (b & 7)));
+                    }
+                }
+            }
+        }
+        return builder.toString();
     }
 }
