@@ -47,6 +47,7 @@ public final class DeviceLockService extends SystemService {
 
         final IntentFilter userFilter = new IntentFilter();
         userFilter.addAction(Intent.ACTION_USER_ADDED);
+        userFilter.addAction(Intent.ACTION_USER_REMOVED);
         context.registerReceiver(mUserReceiver, userFilter);
     }
 
@@ -118,6 +119,14 @@ public final class DeviceLockService extends SystemService {
                 }
                 Slog.d(TAG, "onUserAdded: " + userHandle);
                 mImpl.onUserAdded(userHandle);
+            } else if (Intent.ACTION_USER_REMOVED.equals(intent.getAction())) {
+                final int userId = intent.getIntExtra(Intent.EXTRA_USER_HANDLE, -1);
+                UserHandle userHandle = UserHandle.of(userId);
+                if (!isUserSupported(userHandle)) {
+                    return;
+                }
+                Slog.d(TAG, "onUserRemoved: " + userHandle);
+                mImpl.onUserRemoved(userHandle);
             }
         }
     };

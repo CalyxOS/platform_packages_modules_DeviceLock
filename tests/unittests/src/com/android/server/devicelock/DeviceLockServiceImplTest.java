@@ -531,6 +531,19 @@ public final class DeviceLockServiceImplTest {
     }
 
     @Test
+    public void onUserRemoved_theCorrespondingServiceConnectorIsRemoved() throws Exception {
+        ShadowBinder.setCallingUserHandle(mSystemUser);
+        final int initialConnectionCount = mService.getDeviceLockControllerConnectorsSize();
+
+        mService.onUserRemoved(mSystemUser);
+        waitUntilBgExecutorIdle();
+        shadowOf(Looper.getMainLooper()).idle();
+
+        assertThat(mService.getDeviceLockControllerConnectorsSize())
+                .isEqualTo(initialConnectionCount - 1);
+    }
+
+    @Test
     public void enableKioskKeepalive_withoutPermission_shouldFail() throws Exception {
         mShadowApplication.denyPermissions(MANAGE_DEVICE_LOCK_SERVICE_FROM_CONTROLLER);
 
