@@ -28,6 +28,8 @@ enum EnrollmentType {
   ENROLLMENT_TYPE_FINANCE = 1;
   // Device Lock Subsidy program.
   ENROLLMENT_TYPE_SUBSIDY = 2;
+  // Device Lock Recollateralization program.
+  ENROLLMENT_TYPE_RECOL = 3;
 }
 
 message EnrollmentInfo {}

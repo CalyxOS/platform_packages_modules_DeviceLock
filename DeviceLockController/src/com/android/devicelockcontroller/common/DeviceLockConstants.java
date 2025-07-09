@@ -95,11 +95,13 @@ public final class DeviceLockConstants {
             ProvisioningType.TYPE_UNDEFINED,
             ProvisioningType.TYPE_FINANCED,
             ProvisioningType.TYPE_SUBSIDY,
+            ProvisioningType.TYPE_RECOL,
     })
     public @interface ProvisioningType {
         int TYPE_UNDEFINED = 0;
         int TYPE_FINANCED = 1;
         int TYPE_SUBSIDY = 2;
+        int TYPE_RECOL = 3;
     }
 
     @Retention(RetentionPolicy.SOURCE)
