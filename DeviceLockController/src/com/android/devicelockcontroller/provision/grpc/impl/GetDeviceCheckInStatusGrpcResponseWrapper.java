@@ -128,6 +128,8 @@ final class GetDeviceCheckInStatusGrpcResponseWrapper extends GetDeviceCheckInSt
                 return ProvisioningType.TYPE_FINANCED;
             case ENROLLMENT_TYPE_SUBSIDY:
                 return ProvisioningType.TYPE_SUBSIDY;
+            case ENROLLMENT_TYPE_RECOL:
+                return ProvisioningType.TYPE_RECOL;
             case ENROLLMENT_TYPE_UNSPECIFIED:
                 return ProvisioningType.TYPE_UNDEFINED;
             default:

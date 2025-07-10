@@ -103,7 +103,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * states. Robolectric does not support creating contexts as other users, so the package manager
  * infos are the same for all users. This makes it infeasible to unit test scenarios where the
  * package states are different for different users.
- *
  */
 @RunWith(RobolectricTestRunner.class)
 public final class DeviceLockServiceImplTest {
@@ -209,6 +208,33 @@ public final class DeviceLockServiceImplTest {
     }
 
     @Test
+    public void getDeviceId_withIMEIType_differentFromTelephonyManager_shouldReturnDlcSavedIMEI()
+            throws Exception {
+        // GIVEN an IMEI registered in telephony manager
+        final String deviceFakedImei = "983402979622353";
+        final String genuineImei = "000000123462178";
+        mShadowTelephonyManager.setActiveModemCount(1);
+        mShadowTelephonyManager.setImei(/* slotIndex= */ 0, deviceFakedImei);
+        // GIVEN a successful service call to DLC app
+        doAnswer((Answer<Void>) invocation -> {
+            RemoteCallback callback = invocation.getArgument(0);
+            Bundle bundle = new Bundle();
+            bundle.putString(IDeviceLockControllerService.KEY_RESULT, genuineImei);
+            callback.sendResult(bundle);
+            return null;
+        }).when(mDeviceLockControllerService).getDeviceIdentifier(any(RemoteCallback.class));
+        IGetDeviceIdCallback mockCallback = mock(IGetDeviceIdCallback.class);
+
+        // WHEN the device id is requested with the IMEI device type
+        mService.getDeviceId(mockCallback, 1 << DEVICE_ID_TYPE_IMEI);
+        waitUntilConnected();
+
+        // THEN the IMEI id is received
+        verify(mockCallback, timeout(ONE_SEC_MILLIS)).onDeviceIdReceived(
+                eq(DEVICE_ID_TYPE_IMEI), eq(genuineImei));
+    }
+
+    @Test
     public void getDeviceId_withMEIDType_shouldReturnMEID() throws Exception {
         // GIVEN an MEID registered in telephony manager
         final String testMeid = "354403064522046";
@@ -261,6 +287,31 @@ public final class DeviceLockServiceImplTest {
         // THEN the serial id is received
         verify(mockCallback, timeout(ONE_SEC_MILLIS)).onDeviceIdReceived(
                 eq(DEVICE_ID_TYPE_SERIAL_NUMBER), eq(testSerial));
+    }
+
+    @Test
+    public void getDeviceId_withoutIdType_shouldCallOnError() throws Exception {
+        final String testDeviceId = "1234567890";
+        // GIVEN a successful service call to DLC app
+        doAnswer((Answer<Void>) invocation -> {
+            RemoteCallback callback = invocation.getArgument(0);
+            Bundle bundle = new Bundle();
+            bundle.putString(IDeviceLockControllerService.KEY_RESULT, testDeviceId);
+            callback.sendResult(bundle);
+            return null;
+        }).when(mDeviceLockControllerService).getDeviceIdentifier(any(RemoteCallback.class));
+        IGetDeviceIdCallback mockCallback = mock(IGetDeviceIdCallback.class);
+
+        mService.getDeviceId(mockCallback, 1 << DEVICE_ID_TYPE_SERIAL_NUMBER);
+        waitUntilConnected();
+
+        verify(mockCallback, timeout(ONE_SEC_MILLIS)).onError(
+                mParcelableExceptionArgumentCaptor.capture());
+        assertThat(mParcelableExceptionArgumentCaptor.getValue().getException())
+                .isInstanceOf(Exception.class);
+        assertThat(mParcelableExceptionArgumentCaptor.getValue().getException())
+                .hasMessageThat().isEqualTo(
+                        "Unable to get device id: Unspecified ID type");
     }
 
     @Test
@@ -514,7 +565,8 @@ public final class DeviceLockServiceImplTest {
     public void onUserSwitching_ifFinalizedAndDisabledOnSecondary_doesNothing() throws Exception {
         // GIVEN device is finalized and DLC is disabled on a secondary user
         ShadowBinder.setCallingUserHandle(mSecondaryUser);
-        mService.setDeviceFinalized(true, new RemoteCallback(result -> {}));
+        mService.setDeviceFinalized(true, new RemoteCallback(result -> {
+        }));
         waitUntilBgExecutorIdle();
         assertThat(mPackageManager.getApplicationEnabledSetting(DLC_PACKAGE_NAME))
                 .isEqualTo(COMPONENT_ENABLED_STATE_DISABLED);
@@ -635,6 +687,7 @@ public final class DeviceLockServiceImplTest {
     }
 
     private void waitUntilBgExecutorIdle() throws InterruptedException, ExecutionException {
-        mExecutorService.submit(() -> {}).get();
+        mExecutorService.submit(() -> {
+        }).get();
     }
 }
