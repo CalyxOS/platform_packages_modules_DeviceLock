@@ -709,12 +709,12 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
 
                 int deviceIdType = -1;
 
-                if (!deviceSerialNumber.isEmpty()) {
-                    deviceIdType = DEVICE_ID_TYPE_SERIAL_NUMBER;
+                if (!imeiList.isEmpty()) {
+                    deviceIdType = DEVICE_ID_TYPE_IMEI;
                 } else if (!meidList.isEmpty()) {
                     deviceIdType = DEVICE_ID_TYPE_MEID;
-                } else if (!imeiList.isEmpty()) {
-                    deviceIdType = DEVICE_ID_TYPE_IMEI;
+                } else if (!deviceSerialNumber.isEmpty()) {
+                    deviceIdType = DEVICE_ID_TYPE_SERIAL_NUMBER;
                 }
 
                 try {
