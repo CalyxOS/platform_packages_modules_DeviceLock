@@ -524,4 +524,10 @@ final class DeviceLockControllerConnectorImpl implements DeviceLockControllerCon
             }
         }, callback);
     }
+
+    void close() {
+        if (mHandler != null) {
+            mHandler.getLooper().quitSafely();
+        }
+    }
 }
