@@ -33,8 +33,10 @@ import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryRea
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.robolectric.annotation.LooperMode.Mode.LEGACY;
@@ -55,10 +57,12 @@ import androidx.work.WorkManager;
 import androidx.work.testing.SynchronousExecutor;
 import androidx.work.testing.WorkManagerTestInitHelper;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.common.DeviceId;
 import com.android.devicelockcontroller.common.DeviceLockConstants.DeviceCheckInStatus;
 import com.android.devicelockcontroller.policy.FinalizationController;
+import com.android.devicelockcontroller.policy.FinalizationControllerImpl;
 import com.android.devicelockcontroller.policy.ProvisionStateController;
 import com.android.devicelockcontroller.provision.grpc.GetDeviceCheckInStatusGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.ProvisioningConfiguration;
@@ -131,6 +135,7 @@ public final class DeviceCheckInHelperTest {
     private StatsLogger mStatsLogger;
     private WorkManager mWorkManager;
     private ShadowPackageManager mPackageManager;
+    private FeatureFlagProvider mFeatureFlagProvider;
 
     private ProvisionStateController mMockProvisionStateController;
 
@@ -143,7 +148,10 @@ public final class DeviceCheckInHelperTest {
                 Futures.immediateVoidFuture());
         when(mFinalizationController.finalizeNotEnrolledDevice()).thenReturn(
                 Futures.immediateVoidFuture());
+        when(mFinalizationController.enforceDiskState(true)).thenReturn(
+                Futures.immediateVoidFuture());
 
+        mFeatureFlagProvider = mTestApplication.getFeatureFlagProvider();
         mTelephonyManager = Shadows.shadowOf(
                 mTestApplication.getSystemService(TelephonyManager.class));
         mHelper = new DeviceCheckInHelper(mTestApplication);
@@ -199,6 +207,36 @@ public final class DeviceCheckInHelperTest {
         assertThat(intents.size()).isEqualTo(1);
         assertThat(intents.get(0).getComponent().getClassName()).isEqualTo(
                 ProvisionReadyReceiver.class.getName());
+    }
+
+    @Test
+    public void handleProvisionReadyResponse_recolEnabled_shouldChangeFinalizedToUnfinalized() {
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+        Futures.getUnchecked(GlobalParametersClient.getInstance().setFinalizationState(
+                FinalizationControllerImpl.FinalizationState.FINALIZED));
+        GetDeviceCheckInStatusGrpcResponse response = createReadyResponse(TEST_CONFIGURATION);
+
+        assertThat(mHelper.handleProvisionReadyResponse(response)).isTrue();
+
+        assertThat(Futures.getUnchecked(
+                GlobalParametersClient.getInstance().getFinalizationState())).isEqualTo(
+                FinalizationControllerImpl.FinalizationState.UNFINALIZED);
+        verify(mFinalizationController).enforceDiskState(/* force= */ true);
+    }
+
+    @Test
+    public void handleProvisionReadyResponse_recolNotEnabled_shouldNotChangeFinalizedState() {
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(false);
+        Futures.getUnchecked(GlobalParametersClient.getInstance().setFinalizationState(
+                FinalizationControllerImpl.FinalizationState.FINALIZED));
+        GetDeviceCheckInStatusGrpcResponse response = createReadyResponse(TEST_CONFIGURATION);
+
+        assertThat(mHelper.handleProvisionReadyResponse(response)).isTrue();
+
+        assertThat(Futures.getUnchecked(
+                GlobalParametersClient.getInstance().getFinalizationState())).isEqualTo(
+                FinalizationControllerImpl.FinalizationState.FINALIZED);
+        verify(mFinalizationController, never()).enforceDiskState(anyBoolean());
     }
 
     @Test

@@ -191,7 +191,8 @@ final class GlobalParameters {
                                 + "%s: %s\n" // last-received-provision-state:
                                 + "%s: %s\n" // device_state:
                                 + "%s: %s\n" // is-provision-ready:
-                                + "%s: %s\n", // lock-task-type:
+                                + "%s: %s\n" // lock-task-type:
+                                + "%s: %s\n", // finalization state:
                         KEY_REGISTERED_DEVICE_ID,
                         getRegisteredDeviceId(context),
                         KEY_FORCED_PROVISION,
@@ -203,6 +204,9 @@ final class GlobalParameters {
                         KEY_IS_PROVISION_READY,
                         isProvisionReady(context),
                         KEY_LOCK_TASK_TYPE,
-                        getLockTaskType(context)));
+                        getLockTaskType(context),
+                        KEY_FINALIZATION_STATE,
+                        getFinalizationState(context)
+                        ));
     }
 }
