@@ -22,17 +22,25 @@ import static com.android.devicelockcontroller.provision.worker.ReportDeviceLock
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.mockito.Mockito.when;
+import static org.robolectric.Shadows.shadowOf;
+
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Looper;
 import android.os.OutcomeReceiver;
 
 import androidx.annotation.NonNull;
+import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.work.ListenableWorker;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkerParameters;
 import androidx.work.testing.WorkManagerTestInitHelper;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.SystemDeviceLockManager;
 import com.android.devicelockcontroller.provision.grpc.DeviceFinalizeClient.ReportDeviceProgramCompleteResponse;
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
@@ -41,12 +49,16 @@ import com.google.common.util.concurrent.ExecutionSequencer;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -55,23 +67,32 @@ import java.util.concurrent.TimeUnit;
 public final class FinalizationControllerImplTest {
 
     private static final int TIMEOUT_MS = 1000;
-
-    private final TestSystemDeviceLockManager mSystemDeviceLockManager =
-            new TestSystemDeviceLockManager();
+    private final ExecutionSequencer mExecutionSequencer = ExecutionSequencer.create();
+    private final Executor mBgExecutor = Executors.newCachedThreadPool();
+    private TestSystemDeviceLockManager mSystemDeviceLockManager;
     private Context mContext;
     private FinalizationControllerImpl mFinalizationController;
     private FinalizationStateDispatchQueue mDispatchQueue;
-    private final ExecutionSequencer mExecutionSequencer = ExecutionSequencer.create();
-    private final Executor mBgExecutor = Executors.newCachedThreadPool();
     private GlobalParametersClient mGlobalParametersClient;
+    @Mock
+    private FeatureFlagProvider mFeatureFlagProvider;
 
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
         mContext = ApplicationProvider.getApplicationContext();
+        mSystemDeviceLockManager = new TestSystemDeviceLockManager(mContext);
         WorkManagerTestInitHelper.initializeTestWorkManager(mContext);
 
         mGlobalParametersClient = GlobalParametersClient.getInstance();
         mDispatchQueue = new FinalizationStateDispatchQueue(mExecutionSequencer);
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+    }
+
+    @After
+    public void tearDown() {
+        // Guarantees cleanup even if a test fails, preventing resource leaks.
+        LongRunningTestWorker.reset();
     }
 
     @Test
@@ -97,10 +118,13 @@ public final class FinalizationControllerImplTest {
     public void finalizeNotEnrolledDevice_doesNotStartReportingWork() throws Exception {
         mFinalizationController = makeFinalizationController();
 
-        // WHEN a non enrolled device is finalized
+        // WHEN a non enrolled device is finalized and disabled
         ListenableFuture<Void> finalizeFuture =
                 mFinalizationController.finalizeNotEnrolledDevice();
         Futures.getChecked(finalizeFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        ListenableFuture<Void> disableFuture = mFinalizationController.disableApplication();
+        Futures.getChecked(disableFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
 
         // THEN work manager has no work scheduled to report the device is finalized and the disk
         // value is set to finalized
@@ -114,7 +138,7 @@ public final class FinalizationControllerImplTest {
     }
 
     @Test
-    public void reportingFinishedSuccessfully_fullyFinalizes() throws Exception {
+    public void reportingFinishedSuccessfully_finalizesDevice() throws Exception {
         mFinalizationController = makeFinalizationController();
 
         // GIVEN the restrictions have been requested to clear
@@ -129,9 +153,109 @@ public final class FinalizationControllerImplTest {
                 mFinalizationController.notifyFinalizationReportResult(successResponse);
         Futures.getChecked(reportedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
-        // THEN the disk value is set to finalized
+        // THEN the global parameters value is set to finalized
+        assertThat(mGlobalParametersClient.getFinalizationState().get()).isEqualTo(FINALIZED);
+    }
+
+    @Test
+    public void disableDeviceCalled_disablesDlcController() throws Exception {
+        mFinalizationController = makeFinalizationController();
+
+        // GIVEN the restrictions have been requested to clear and work is reported successfully
+        ListenableFuture<Void> clearedFuture =
+                mFinalizationController.notifyRestrictionsCleared();
+        Futures.getChecked(clearedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        ReportDeviceProgramCompleteResponse successResponse =
+                new ReportDeviceProgramCompleteResponse();
+        ListenableFuture<Void> reportedFuture =
+                mFinalizationController.notifyFinalizationReportResult(successResponse);
+        Futures.getChecked(reportedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        // WHEN the disableDevice method is called
+        ListenableFuture<Void> disableFuture = mFinalizationController.disableApplication();
+        Futures.getChecked(disableFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        // THEN both global parameters and persistent disk states are set to finalized
         assertThat(mGlobalParametersClient.getFinalizationState().get()).isEqualTo(FINALIZED);
         assertThat(mSystemDeviceLockManager.finalized).isTrue();
+    }
+
+
+    @Test
+    public void reportingFinishedSuccessfully_stopsAllWorkers() throws Exception {
+        // GIVEN a long running worker is in progress
+        mFinalizationController = makeFinalizationController(LongRunningTestWorker.class);
+        final OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(
+                LongRunningTestWorker.class).build();
+        WorkManager.getInstance(mContext).enqueue(workRequest);
+        // This allows the worker to start.
+        shadowOf(Looper.getMainLooper()).idle();
+        assertThat(LongRunningTestWorker.startLatch.await(2, TimeUnit.SECONDS)).isTrue();
+        WorkInfo workInfo = WorkManager.getInstance(mContext).getWorkInfoById(
+                workRequest.getId()).get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        assertThat(workInfo.getState()).isEqualTo(WorkInfo.State.RUNNING);
+
+        // WHEN the restrictions are cleared and finalization is reported
+        ListenableFuture<Void> clearedFuture =
+                mFinalizationController.notifyRestrictionsCleared();
+        Futures.getChecked(clearedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        ReportDeviceProgramCompleteResponse successResponse =
+                new ReportDeviceProgramCompleteResponse();
+        ListenableFuture<Void> reportedFuture =
+                mFinalizationController.notifyFinalizationReportResult(successResponse);
+        Futures.getChecked(reportedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        // THEN the long running worker is cancelled
+        workInfo = WorkManager.getInstance(mContext).getWorkInfoById(
+                workRequest.getId()).get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        assertThat(workInfo.getState()).isEqualTo(WorkInfo.State.CANCELLED);
+    }
+
+    @Test
+    public void reportingFinishedSuccessfully_doesNotDisableDeviceLockController()
+            throws Exception {
+        mFinalizationController = makeFinalizationController();
+        final String packageName = mContext.getPackageName();
+
+        // WHEN the restrictions are cleared and finalization is reported successfully
+        ListenableFuture<Void> clearedFuture =
+                mFinalizationController.notifyRestrictionsCleared();
+        Futures.getChecked(clearedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        ReportDeviceProgramCompleteResponse successResponse =
+                new ReportDeviceProgramCompleteResponse();
+        ListenableFuture<Void> reportedFuture =
+                mFinalizationController.notifyFinalizationReportResult(successResponse);
+        Futures.getChecked(reportedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        // THEN the device lock controller package is not disabled
+        int enabledSetting = mContext.getPackageManager().getApplicationEnabledSetting(packageName);
+        assertThat(enabledSetting).isEqualTo(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
+        assertThat(enabledSetting).isNotEqualTo(
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+    }
+
+    @Test
+    public void reportingFinishedSuccessfully_recolFlagIsFalse_doesDisableDeviceLockController()
+            throws Exception {
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(false);
+        mFinalizationController = makeFinalizationController();
+        final String packageName = mContext.getPackageName();
+
+        // WHEN the restrictions are cleared and finalization is reported successfully
+        ListenableFuture<Void> clearedFuture =
+                mFinalizationController.notifyRestrictionsCleared();
+        Futures.getChecked(clearedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        ReportDeviceProgramCompleteResponse successResponse =
+                new ReportDeviceProgramCompleteResponse();
+        ListenableFuture<Void> reportedFuture =
+                mFinalizationController.notifyFinalizationReportResult(successResponse);
+        Futures.getChecked(reportedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        // THEN the device lock controller package is disabled
+        int enabledSetting = mContext.getPackageManager().getApplicationEnabledSetting(packageName);
+        assertThat(enabledSetting).isEqualTo(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
     }
 
     @Test
@@ -184,10 +308,11 @@ public final class FinalizationControllerImplTest {
         mFinalizationController = makeFinalizationController();
         Futures.getChecked(mFinalizationController.enforceDiskState(/* force= */ false),
                 Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        // GIVEN the disk state is finalized (e.g. on another user)
+        // GIVEN the global parameters and persistent disk state is finalized (e.g. on another user)
         Futures.getChecked(
                 mGlobalParametersClient.setFinalizationState(FINALIZED),
                 Exception.class);
+        mSystemDeviceLockManager.finalized = true;
 
         // WHEN the controller enforces disk state with force
         Futures.getChecked(mFinalizationController.enforceDiskState(/* force= */ true),
@@ -199,11 +324,25 @@ public final class FinalizationControllerImplTest {
 
     private FinalizationControllerImpl makeFinalizationController() {
         return new FinalizationControllerImpl(
-                mContext, mDispatchQueue, mBgExecutor, TestWorker.class, mSystemDeviceLockManager);
+                mContext, mDispatchQueue, mBgExecutor, TestWorker.class, mSystemDeviceLockManager,
+                mFeatureFlagProvider);
+    }
+
+    private FinalizationControllerImpl makeFinalizationController(
+            Class<? extends ListenableWorker> workerClass) {
+        return new FinalizationControllerImpl(
+                mContext, mDispatchQueue, mBgExecutor, workerClass,
+                mSystemDeviceLockManager, mFeatureFlagProvider);
     }
 
     private static final class TestSystemDeviceLockManager implements SystemDeviceLockManager {
+        public final Context mContext;
         public boolean finalized = false;
+
+        TestSystemDeviceLockManager(Context context) {
+            mContext = context;
+        }
+
 
         @Override
         public void addFinancedDeviceKioskRole(@NonNull String packageName, Executor executor,
@@ -263,6 +402,13 @@ public final class FinalizationControllerImplTest {
         public void setDeviceFinalized(boolean finalized, Executor executor,
                 @NonNull OutcomeReceiver<Void, Exception> callback) {
             this.finalized = finalized;
+            if (finalized) {
+                final String packageName = mContext.getPackageName();
+                mContext.getPackageManager().setApplicationEnabledSetting(
+                        packageName,
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        0);
+            }
             executor.execute(() -> callback.onResult(null));
         }
 
@@ -286,6 +432,42 @@ public final class FinalizationControllerImplTest {
         @Override
         public ListenableFuture<Result> startWork() {
             return Futures.immediateFuture(Result.success());
+        }
+    }
+
+    /**
+     * Fake test worker that simulates a long running worker
+     */
+    public static final class LongRunningTestWorker extends ListenableWorker {
+        public static volatile CountDownLatch startLatch = new CountDownLatch(1);
+        // Public completer allows us to externally control the completion of the work.
+        public static volatile CallbackToFutureAdapter.Completer<Result> completer;
+
+        public LongRunningTestWorker(@NonNull Context appContext,
+                @NonNull WorkerParameters workerParams) {
+            super(appContext, workerParams);
+        }
+
+        /**
+         * Resets the state of this worker during clean up.
+         */
+        public static void reset() {
+            startLatch = new CountDownLatch(1);
+            if (completer != null) {
+                completer.setCancelled();
+            }
+            completer = null;
+        }
+
+        @NonNull
+        @Override
+        public ListenableFuture<Result> startWork() {
+            return CallbackToFutureAdapter.getFuture(c -> {
+                completer = c;
+                startLatch.countDown();
+                // Returned value is just for debugging purposes.
+                return "LongRunningTestWorker Future";
+            });
         }
     }
 }

@@ -195,4 +195,9 @@ public class DeviceLockControllerApplication extends Application implements
     public boolean isImeiHardeningDeregistrationEnabled() {
         return false;
     }
+
+    @Override
+    public boolean isRecolEnabled() {
+        return false;
+    }
 }

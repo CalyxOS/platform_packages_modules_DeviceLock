@@ -58,4 +58,11 @@ public interface FinalizationController {
      */
     ListenableFuture<Void> notifyFinalizationReportResult(
             ReportDeviceProgramCompleteResponse response);
+
+    /**
+     * Disables the entire device lock controller application.
+     *
+     * @return future for when this is done
+     */
+    ListenableFuture<Void> disableApplication();
 }

@@ -215,6 +215,7 @@ public final class DeviceLockControllerConnectorStubTest {
     }
 
     @Test
+    @DisableFlags(Flags.FLAG_CLEAR_DEVICE_RESTRICTIONS)
     public void notifyKioskSetupFinished_withClearedState_shouldThrowException()
             throws ExecutionException, InterruptedException, TimeoutException {
         // Given the device state is CLEARED
