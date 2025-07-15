@@ -384,12 +384,6 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
             // that a protected package cannot be disabled (but we're actually trying to enable it).
         }
         synchronized (this) {
-            // Cleanup any existing instances before refreshing the connector
-            DeviceLockControllerConnector dlcConnector = mDeviceLockControllerConnectors
-                    .get(userHandle.getIdentifier());
-            if (dlcConnector instanceof DeviceLockControllerConnectorImpl) {
-                ((DeviceLockControllerConnectorImpl) dlcConnector).close();
-            }
             // Refresh connector
             mDeviceLockControllerConnectors.put(userHandle.getIdentifier(), null);
             getDeviceLockControllerConnector(userHandle);
@@ -399,17 +393,6 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
     void onUserAdded(@NonNull UserHandle userHandle) {
         // New users do not have any provisioning to clean up and can be disabled immediately
         disableDlcIfNeeded(userHandle);
-    }
-
-    void onUserRemoved(@NonNull UserHandle userHandle) {
-        synchronized (this) {
-            DeviceLockControllerConnector connector = mDeviceLockControllerConnectors
-                            .get(userHandle.getIdentifier());
-            if (connector instanceof DeviceLockControllerConnectorImpl) {
-                ((DeviceLockControllerConnectorImpl) connector).close();
-            }
-            mDeviceLockControllerConnectors.remove(userHandle.getIdentifier());
-        }
     }
 
     void onUserSwitching(@NonNull UserHandle userHandle) {
@@ -1273,10 +1256,5 @@ final class DeviceLockServiceImpl extends IDeviceLockService.Stub {
         final Bundle result = new Bundle();
         result.putBoolean(KEY_REMOTE_CALLBACK_RESULT, true);
         remoteCallback.sendResult(result);
-    }
-
-    @VisibleForTesting
-    int getDeviceLockControllerConnectorsSize() {
-        return mDeviceLockControllerConnectors.size();
     }
 }
