@@ -88,13 +88,15 @@ public interface StatsLogger {
             CheckInRetryReason.RESPONSE_UNSPECIFIED,
             CheckInRetryReason.CONFIG_UNAVAILABLE,
             CheckInRetryReason.NETWORK_TIME_UNAVAILABLE,
-            CheckInRetryReason.RPC_FAILURE
+            CheckInRetryReason.RPC_FAILURE,
+            CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE
     })
     @interface CheckInRetryReason {
         int RESPONSE_UNSPECIFIED = 0;
         int CONFIG_UNAVAILABLE = 1;
         int NETWORK_TIME_UNAVAILABLE = 2;
         int RPC_FAILURE = 3;
+        int KEY_ATTESTATION_GENERATION_FAILURE = 4;
     }
 
     /**
