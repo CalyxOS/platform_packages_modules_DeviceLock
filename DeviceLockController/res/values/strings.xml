@@ -77,6 +77,8 @@
     <string name="footer_notice_content_description">The management capabilities in the financed device section of Security settings don\'t apply to this device.</string>
     <!-- Text explaining that this device is provided by the device provider. [CHAR_LIMIT=80] -->
     <string name="device_provided_by_provider">This device is provided by <xliff:g id="provider name">%1$s</xliff:g></string>
+    <!-- Text explaining that the device is being setup as collateral for a loan. [CHAR_LIMIT=NONE] -->
+    <string name="device_used_as_collateral">This device is being set up as collateral for a loan.</string>
     <!-- Text explaining the kiosk app will be downloaded and installed. [CHAR_LIMIT=NONE] -->
     <string name="download_kiosk_app">The Kiosk app will be downloaded and installed automatically</string>
     <!-- Text explaining that the kiosk app will be installed for this newly created secondary user. [CHAR_LIMIT=NONE] -->
@@ -109,6 +111,8 @@
     <string name="enroll_your_device_financing_subheader">You can now enroll your device in <xliff:g id="provider name">%1$s</xliff:g>\'s finance program</string>
     <!-- Screen subheader text explaining that the user can now enroll this device into device provider's device subsidy program. [CHAR_LIMIT=80]-->
     <string name="enroll_your_device_subsidy_subheader">You can now enroll your device in <xliff:g id="provider name">%1$s</xliff:g>\'s subsidy program</string>
+    <!-- Screen subheader text explaining that the user can now enroll this device into device provider's device financing program. [CHAR_LIMIT=80] -->
+    <string name="enroll_your_device_recol_subheader">You can now enroll your device in <xliff:g id="provider name">%1$s</xliff:g>\'s recollateralization program</string>
     <!-- Screen header text explaining that the user is on a device subsidy program. [CHAR_LIMIT=40] -->
     <string name="subsidy_program_header">You\'re on <xliff:g id="provider name">%1$s</xliff:g>\'s subsidy program</string>
     <!-- Screen header text explaining that the device will be enrolled into a device financing / subsidy program. [CHAR_LIMIT=40] -->
@@ -142,13 +146,15 @@
 
     <!-- Title of banner in Settings. This tells the user this device is provided by the carrier / reseller. [CHAR_LIMIT=80] -->
     <string name="settings_banner_title">Device provided by <xliff:g id="provider name">%1$s</xliff:g></string>
+    <!-- Title of banner in Settings when provisioning type is recol. This tells the user the device is currently collateralized by the loan provider. [CHAR_LIMIT=80] -->
+    <string name="settings_banner_title_recol">Device collateralized by <xliff:g id="provider name">%1$s</xliff:g></string>
     <!-- Body text of the banner in Settings. This tells the user the device provider can change settings. [CHAR_LIMIT=60]-->
     <string name="settings_banner_body"><xliff:g id="provider name">%1$s</xliff:g> can change settings on this device</string>
     <!-- Button text of the banner in Settings. This tells the user they can tap the button get more information. [CHAR_LIMIT=20]-->
     <string name="settings_banner_button">Learn more</string>
     <!-- Title of the settings screen. This screen summarize what would happen on the device under a finance program. [CHAR_LIMIT=40]-->
     <string name="settings_screen_title">Financed device info</string>
-    <!-- Top introduction on the Settings screen for device financing use case, summarizing the changes a device provider can make to this device. [CHAR LIMIT=NONE] -->
+    <!-- Top introduction on the Settings screen for device financing and recollateralization use case, summarizing the changes a device provider can make to this device. [CHAR LIMIT=NONE] -->
     <string name="settings_intro_device_financing"><xliff:g id="provider name">%1$s</xliff:g> can change settings and install the Kiosk app on the device.\n\nIf you miss a payment, <xliff:g id="provider name">%1$s</xliff:g> can restrict your device.\n\nTo learn more, contact <xliff:g id="provider name">%1$s</xliff:g>.</string>
     <!-- Top introduction on the Settings screen for device subsidy use case, summarizing the changes a credit provider can make to this device. [CHAR LIMIT=NONE] -->
     <string name="settings_intro_device_subsidy"><xliff:g id="provider name">%1$s</xliff:g> can change settings and install the Kiosk app on the device.\n\n<xliff:g id="provider name">%1$s</xliff:g> may also restrict this device if you miss a payment or stop using <xliff:g id="provider name">%1$s</xliff:g>\u2019s SIM.\n\nTo learn more, contact <xliff:g id="provider name">%1$s</xliff:g>.</string>

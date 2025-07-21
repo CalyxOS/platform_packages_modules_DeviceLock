@@ -138,6 +138,16 @@
             </intent-filter>
         </activity-alias>
 
+        <activity-alias
+            android:name="com.android.devicelockcontroller.activities.DeviceRecolProvisioningLandingActivity"
+            android:exported="false"
+            android:targetActivity=".activities.LandingActivity">
+            <intent-filter>
+                <action android:name="com.android.devicelockcontroller.action.START_DEVICE_RECOL_PROVISIONING" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name="com.android.devicelockcontroller.activities.DeviceLockSettingsActivity"
             android:theme="@style/Theme.DeviceLock.NoActionBar"

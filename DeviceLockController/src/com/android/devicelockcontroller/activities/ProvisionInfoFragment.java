@@ -17,6 +17,7 @@
 package com.android.devicelockcontroller.activities;
 
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_FINANCING_PROVISIONING;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_RECOL_PROVISIONING;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_SUBSIDY_PROVISIONING;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -43,6 +44,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.R;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
 import com.android.devicelockcontroller.policy.ProvisionHelper;
@@ -58,6 +60,7 @@ public final class ProvisionInfoFragment extends Fragment {
 
     private static final String TAG = "ProvisionInfoFragment";
     private ActivityResultLauncher<String> mResultLauncher;
+    private FeatureFlagProvider mFeatureFlagProvider;
 
     @Nullable
     @Override
@@ -71,6 +74,7 @@ public final class ProvisionInfoFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mFeatureFlagProvider = (FeatureFlagProvider) requireContext().getApplicationContext();
         ProvisionInfoViewModel viewModel;
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         switch (Objects.requireNonNull(getActivity()).getIntent().getAction()) {
@@ -80,6 +84,11 @@ public final class ProvisionInfoFragment extends Fragment {
             case ACTION_START_DEVICE_SUBSIDY_PROVISIONING:
                 viewModel = viewModelProvider.get(DeviceSubsidyProvisionInfoViewModel.class);
                 break;
+            case ACTION_START_DEVICE_RECOL_PROVISIONING:
+                if (mFeatureFlagProvider.isRecolEnabled()) {
+                    viewModel = viewModelProvider.get(DeviceRecolProvisionInfoViewModel.class);
+                    break;
+                }
             default:
                 LogUtil.e(TAG, "Unknown action is received, exiting");
                 return;

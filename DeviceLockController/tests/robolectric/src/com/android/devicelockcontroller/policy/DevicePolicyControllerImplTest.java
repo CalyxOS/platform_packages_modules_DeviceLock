@@ -18,10 +18,12 @@ package com.android.devicelockcontroller.policy;
 
 import static com.android.devicelockcontroller.activities.ProvisioningActivity.EXTRA_SHOW_CRITICAL_PROVISION_FAILED_UI_ON_START;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_FINANCING_PROVISIONING;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_RECOL_PROVISIONING;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_SUBSIDY_PROVISIONING;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_KIOSK_PACKAGE;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_PROVISIONING_TYPE;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisioningType.TYPE_FINANCED;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisioningType.TYPE_RECOL;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisioningType.TYPE_SUBSIDY;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisioningType.TYPE_UNDEFINED;
 import static com.android.devicelockcontroller.policy.DevicePolicyControllerImpl.ACTION_DEVICE_LOCK_KIOSK_SETUP;
@@ -60,6 +62,7 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.testing.WorkManagerTestInitHelper;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.SystemDeviceLockManager;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.activities.LandingActivity;
@@ -112,6 +115,7 @@ public final class DevicePolicyControllerImplTest {
 
     private DevicePolicyController mDevicePolicyController;
     private TestDeviceLockControllerApplication mTestApp;
+    private FeatureFlagProvider mFeatureFlagProvider;
 
     @Before
     public void setUp() {
@@ -155,6 +159,7 @@ public final class DevicePolicyControllerImplTest {
                         notificationsPolicyHandler,
                         mMockProvisionStateController,
                         bgExecutor);
+        mFeatureFlagProvider = mTestApp.getFeatureFlagProvider();
     }
 
     @Test
@@ -411,7 +416,7 @@ public final class DevicePolicyControllerImplTest {
     @Test
     public void
             getLaunchIntent_withProvisionPausedState_forCriticalFailure_shouldHaveExpectedIntent()
-            throws Exception {
+                throws Exception {
         when(mMockUserManager.isUserUnlocked()).thenReturn(true);
         setExpectationsOnDisableControllerKeepAlive();
 
@@ -828,6 +833,53 @@ public final class DevicePolicyControllerImplTest {
         assertThat(intent).isNotNull();
         assertThat(intent.getComponent().getClassName()).isEqualTo(LandingActivity.class.getName());
         assertThat(intent.getAction()).isEqualTo(ACTION_START_DEVICE_SUBSIDY_PROVISIONING);
+    }
+
+    @Test
+    public void
+            getLaunchIntentForCurrentStateRecolEnabled_withProvisionTypeRecol_shouldReturnIntent()
+                throws ExecutionException, InterruptedException {
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+        Bundle preferences = new Bundle();
+        preferences.putString(EXTRA_KIOSK_PACKAGE, TEST_KIOSK_PACKAGE);
+        preferences.putInt(EXTRA_PROVISIONING_TYPE, TYPE_RECOL);
+        SetupParametersClient.getInstance().createPrefs(preferences).get();
+
+        setupAppOpsPolicyHandlerExpectations();
+        setExpectationsOnEnableControllerKeepAlive();
+        setExpectationsOnSetPostNotificationsSystemFixed();
+        when(mMockProvisionStateController.getState()).thenReturn(Futures.immediateFuture(
+                ProvisionState.PROVISION_IN_PROGRESS));
+
+        Intent intent = mDevicePolicyController.getLaunchIntentForCurrentState().get();
+
+        shadowOf(Looper.getMainLooper()).idle();
+        assertThat(intent).isNotNull();
+        assertThat(intent.getComponent().getClassName()).isEqualTo(LandingActivity.class.getName());
+        assertThat(intent.getAction()).isEqualTo(ACTION_START_DEVICE_RECOL_PROVISIONING);
+    }
+
+    @Test
+    public void getLaunchIntentForCurrentStateWithRecolDisabled_withProvisionTypeRecol_shouldThrow()
+            throws ExecutionException, InterruptedException {
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(false);
+        Bundle preferences = new Bundle();
+        preferences.putString(EXTRA_KIOSK_PACKAGE, TEST_KIOSK_PACKAGE);
+        preferences.putInt(EXTRA_PROVISIONING_TYPE, TYPE_RECOL);
+        SetupParametersClient.getInstance().createPrefs(preferences).get();
+
+        setupAppOpsPolicyHandlerExpectations();
+        setExpectationsOnEnableControllerKeepAlive();
+        setExpectationsOnSetPostNotificationsSystemFixed();
+        when(mMockProvisionStateController.getState()).thenReturn(Futures.immediateFuture(
+                ProvisionState.PROVISION_IN_PROGRESS));
+        ExecutionException thrown = assertThrows(ExecutionException.class,
+                () -> mDevicePolicyController.getLaunchIntentForCurrentState().get());
+
+        shadowOf(Looper.getMainLooper()).idle();
+        assertThat(thrown).hasCauseThat().isInstanceOf(IllegalArgumentException.class);
+        assertThat(thrown).hasMessageThat().contains("Provisioning type is unknown!");
+
     }
 
     @Test

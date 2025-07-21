@@ -18,6 +18,7 @@ package com.android.devicelockcontroller.policy;
 
 import static com.android.devicelockcontroller.activities.ProvisioningActivity.EXTRA_SHOW_CRITICAL_PROVISION_FAILED_UI_ON_START;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_FINANCING_PROVISIONING;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_RECOL_PROVISIONING;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ACTION_START_DEVICE_SUBSIDY_PROVISIONING;
 import static com.android.devicelockcontroller.policy.DeviceStateController.DeviceState.CLEARED;
 import static com.android.devicelockcontroller.policy.DeviceStateController.DeviceState.LOCKED;
@@ -48,6 +49,7 @@ import androidx.work.Operation;
 import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkManager;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.SystemDeviceLockManager;
 import com.android.devicelockcontroller.activities.LandingActivity;
 import com.android.devicelockcontroller.activities.ProvisioningActivity;
@@ -96,6 +98,7 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
     private final ProvisionStateController mProvisionStateController;
     private final Executor mBgExecutor;
     private final UserManager mUserManager;
+    private final FeatureFlagProvider mFeatureFlagProvider;
 
     /**
      * Create a new policy controller.
@@ -151,6 +154,7 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
         mBgExecutor = bgExecutor;
         mDpm = devicePolicyManager;
         mUserManager = userManager;
+        mFeatureFlagProvider = (FeatureFlagProvider) context.getApplicationContext();
         mPolicyList.add(userRestrictionsPolicyHandler);
         mPolicyList.add(appOpsPolicyHandler);
         mPolicyList.add(lockTaskModePolicyHandler);
@@ -417,6 +421,11 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
                                     ACTION_START_DEVICE_FINANCING_PROVISIONING);
                         case ProvisioningType.TYPE_SUBSIDY:
                             return resultIntent.setAction(ACTION_START_DEVICE_SUBSIDY_PROVISIONING);
+                        case ProvisioningType.TYPE_RECOL:
+                            if (mFeatureFlagProvider.isRecolEnabled()) {
+                                return resultIntent
+                                        .setAction(ACTION_START_DEVICE_RECOL_PROVISIONING);
+                            }
                         case ProvisioningType.TYPE_UNDEFINED:
                         default:
                             throw new IllegalArgumentException("Provisioning type is unknown!");
