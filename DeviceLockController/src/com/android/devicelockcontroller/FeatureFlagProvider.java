@@ -31,4 +31,9 @@ public interface FeatureFlagProvider {
      */
     boolean isImeiHardeningDeregistrationEnabled();
 
+    /**
+     * Returns the feature flag value that enables the Recolllateralization feature
+     */
+    boolean isRecolEnabled();
+
 }

@@ -63,6 +63,7 @@ import androidx.work.WorkManager;
 
 import com.android.devicelockcontroller.R;
 import com.android.devicelockcontroller.common.DeviceId;
+import com.android.devicelockcontroller.policy.FinalizationController;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
 import com.android.devicelockcontroller.provision.grpc.GetDeviceCheckInStatusGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.ProvisioningConfiguration;
@@ -180,14 +181,15 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
                     return false;
                 }
             case STOP_CHECK_IN:
-                final ListenableFuture<Void> clearRestrictionsFuture =
-                        ((PolicyObjectsProvider) mAppContext).getFinalizationController()
-                                .finalizeNotEnrolledDevice();
-                Futures.addCallback(clearRestrictionsFuture,
+                final FinalizationController finalizationController =
+                        ((PolicyObjectsProvider) mAppContext).getFinalizationController();
+                final ListenableFuture<Void> finalizeDeviceFuture =
+                        finalizationController.finalizeNotEnrolledDevice();
+                Futures.addCallback(finalizeDeviceFuture,
                         new FutureCallback<>() {
                             @Override
                             public void onSuccess(Void result) {
-                                // no-op
+                                var unused = finalizationController.disableApplication();
                             }
 
                             @Override
