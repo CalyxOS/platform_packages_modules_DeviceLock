@@ -61,9 +61,11 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.R;
 import com.android.devicelockcontroller.common.DeviceId;
 import com.android.devicelockcontroller.policy.FinalizationController;
+import com.android.devicelockcontroller.policy.FinalizationControllerImpl;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
 import com.android.devicelockcontroller.provision.grpc.GetDeviceCheckInStatusGrpcResponse;
 import com.android.devicelockcontroller.provision.grpc.ProvisioningConfiguration;
@@ -92,11 +94,13 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
     private final Context mAppContext;
     private final TelephonyManager mTelephonyManager;
     private final StatsLogger mStatsLogger;
+    private final FeatureFlagProvider mFeatureFlagProvider;
 
     public DeviceCheckInHelper(Context appContext) {
         mAppContext = appContext;
         mTelephonyManager = mAppContext.getSystemService(TelephonyManager.class);
         mStatsLogger = ((StatsLoggerProvider) mAppContext).getStatsLogger();
+        mFeatureFlagProvider = (FeatureFlagProvider) mAppContext;
     }
 
     private boolean hasCdma() {
@@ -240,6 +244,18 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
     boolean handleProvisionReadyResponse(
             @NonNull GetDeviceCheckInStatusGrpcResponse response) {
         GlobalParametersClient globalParametersClient = GlobalParametersClient.getInstance();
+        final FinalizationController finalizationController =
+                ((PolicyObjectsProvider) mAppContext).getFinalizationController();
+
+        if (mFeatureFlagProvider.isRecolEnabled()) {
+            // Devices that were previously finalized need to have their finalization state reset
+            // back to UNFINALIZED at this point.
+            Futures.getUnchecked(GlobalParametersClient.getInstance().setFinalizationState(
+                    FinalizationControllerImpl.FinalizationState.UNFINALIZED));
+            // Now, force the FinalizationController to reload its state from disk.
+            Futures.getUnchecked(finalizationController.enforceDiskState(/* force= */ true));
+        }
+
         Futures.getUnchecked(globalParametersClient.setProvisionForced(
                 response.isProvisionForced()));
         final ProvisioningConfiguration configuration = response.getProvisioningConfig();
