@@ -48,7 +48,8 @@ abstract class GrpcResponse {
                 || mStatus.getCode() == Code.RESOURCE_EXHAUSTED
                 || mStatus.getCode() == Code.ABORTED
                 || mStatus.getCode() == Code.DATA_LOSS
-                || mStatus.getCode() == Code.UNAUTHENTICATED);
+                || mStatus.getCode() == Code.UNAUTHENTICATED
+                || mStatus.getCode() == Code.INTERNAL);
     }
 
     public boolean isSuccessful() {
