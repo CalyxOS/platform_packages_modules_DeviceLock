@@ -366,7 +366,7 @@ public class DeviceCheckInWorkerTest {
     }
 
     @Test
-    public void checkIn_imeiHardeningRegEnabled_keyAttestationFetchFails_jobReturnsRetry() {
+    public void checkIn_imeiHardeningRegEnabled_keyAttestationFetchFails_jobReturnsRetryAndLogs() {
         // GIVEN all device info available
         setDeviceIdAvailability(/* isAvailable= */ true);
         setCarrierInfoAvailability(/* isAvailable= */ true);
@@ -378,21 +378,26 @@ public class DeviceCheckInWorkerTest {
         final Result result = Futures.getUnchecked(mWorker.startWork());
 
         assertThat(result).isEqualTo(Result.retry());
+        verify(mStatsLogger).logCheckInRetry(
+                StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
     }
 
     @Test
-    public void checkIn_imeiHardeningRegEnabled_keyAttestationFetchReturnsNull_jobReturnsRetry() {
+    public void
+    checkIn_imeiHardeningRegEnabled_keyAttestationFetchReturnsNull_jobReturnsRetryAndLogs() {
         // GIVEN all device info available
         setDeviceIdAvailability(/* isAvailable= */ true);
         setCarrierInfoAvailability(/* isAvailable= */ true);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
         setImeiHardeningRegistrationEnabled(/* isEnabled= */ true);
-        FakeAndroidKeystore.SingletonKeystore.certs.clear();;
+        FakeAndroidKeystore.SingletonKeystore.certs.clear();
 
         final Result result = Futures.getUnchecked(mWorker.startWork());
 
         assertThat(result).isEqualTo(Result.retry());
+        verify(mStatsLogger).logCheckInRetry(
+                StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
     }
 
     private void setDeviceIdAvailability(boolean isAvailable) {

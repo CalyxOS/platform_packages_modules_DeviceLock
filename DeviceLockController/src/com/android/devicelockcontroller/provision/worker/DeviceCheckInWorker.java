@@ -18,6 +18,8 @@ package com.android.devicelockcontroller.provision.worker;
 
 import android.content.Context;
 
+import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryReason;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.work.WorkerParameters;
@@ -123,10 +125,14 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                                      InvalidAlgorithmParameterException e) {
                                 LogUtil.e(TAG, "Fetching KeyAttestation Leaf certificate failed",
                                         e);
+                                mStatsLogger.logCheckInRetry(
+                                        CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
                                 return Result.retry();
                             }
 
                             if (keyAttestationLeafCertificate == null) {
+                                mStatsLogger.logCheckInRetry(
+                                        CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
                                 return Result.retry();
                             }
                         }
@@ -146,7 +152,7 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                             LogUtil.w(TAG, "Check-in failed w/ recoverable error " + response
                                     + "\nRetrying...");
                             mStatsLogger.logCheckInRetry(
-                                    StatsLogger.CheckInRetryReason.RPC_FAILURE);
+                                    CheckInRetryReason.RPC_FAILURE);
                             return Result.retry();
                         }
                         if (response.isSuccessful()) {
@@ -165,7 +171,7 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                                 + RETRY_ON_FAILURE_DELAY);
                         scheduler.scheduleRetryCheckInWork(RETRY_ON_FAILURE_DELAY);
                         mStatsLogger.logCheckInRetry(
-                                StatsLogger.CheckInRetryReason.RPC_FAILURE);
+                                CheckInRetryReason.RPC_FAILURE);
                         return Result.failure();
                     }, mExecutorService);
                 }, mExecutorService);

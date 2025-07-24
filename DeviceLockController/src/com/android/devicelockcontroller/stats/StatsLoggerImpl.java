@@ -17,6 +17,7 @@
 package com.android.devicelockcontroller.stats;
 
 import static com.android.devicelockcontroller.DevicelockStatsLog.CHECK_IN_RETRY_REPORTED__REASON__COUNFIGURATION_UNAVAILABLE;
+import static com.android.devicelockcontroller.DevicelockStatsLog.CHECK_IN_RETRY_REPORTED__REASON__KEY_ATTESTATION_GENERATION_FAILURE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.CHECK_IN_RETRY_REPORTED__REASON__NETWORK_TIME_UNAVAILABLE;
 import static com.android.devicelockcontroller.DevicelockStatsLog.CHECK_IN_RETRY_REPORTED__REASON__RESPONSE_UNSPECIFIED;
 import static com.android.devicelockcontroller.DevicelockStatsLog.CHECK_IN_RETRY_REPORTED__REASON__RPC_FAILURE;
@@ -47,6 +48,7 @@ import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryRea
 import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryReason.NETWORK_TIME_UNAVAILABLE;
 import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryReason.RESPONSE_UNSPECIFIED;
 import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryReason.RPC_FAILURE;
+import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE;
 import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailureReasonStats.COUNTRY_INFO_UNAVAILABLE;
 import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailureReasonStats.NOT_IN_ELIGIBLE_COUNTRY;
 import static com.android.devicelockcontroller.stats.StatsLogger.ProvisionFailureReasonStats.PLAY_INSTALLATION_FAILED;
@@ -63,7 +65,7 @@ import com.android.modules.expresslog.Counter;
 
 import java.util.concurrent.TimeUnit;
 
-public final class StatsLoggerImpl implements StatsLogger{
+public final class StatsLoggerImpl implements StatsLogger {
 
     // The Telemetry Express metric ID for the counter of device reset due to failure of mandatory
     // provisioning. As defined in
@@ -97,6 +99,7 @@ public final class StatsLoggerImpl implements StatsLogger{
     public StatsLoggerImpl(Context context) {
         mContext = context;
     }
+
     @Override
     public void logGetDeviceCheckInStatus() {
         DevicelockStatsLog.write(DevicelockStatsLog.DEVICE_LOCK_CHECK_IN_REQUEST_REPORTED,
@@ -152,6 +155,8 @@ public final class StatsLoggerImpl implements StatsLogger{
             case RESPONSE_UNSPECIFIED -> checkInRetryReason =
                     CHECK_IN_RETRY_REPORTED__REASON__RESPONSE_UNSPECIFIED;
             case RPC_FAILURE -> checkInRetryReason = CHECK_IN_RETRY_REPORTED__REASON__RPC_FAILURE;
+            case KEY_ATTESTATION_GENERATION_FAILURE -> checkInRetryReason =
+                    CHECK_IN_RETRY_REPORTED__REASON__KEY_ATTESTATION_GENERATION_FAILURE;
             default -> checkInRetryReason = CHECK_IN_RETRY_REPORTED__REASON__RESPONSE_UNSPECIFIED;
         }
         DevicelockStatsLog.write(DEVICE_LOCK_CHECK_IN_RETRY_REPORTED, checkInRetryReason);
