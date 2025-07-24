@@ -46,6 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Açıq mənbə lisenziyaları"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Təhlükəsizlik ayarlarının maliyyələşdirilən cihaz bölməsindəki idarəetmə imkanları bu cihaza tətbiq edilmir."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Bu cihaz <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> tərəfindən təmin edilib"</string>
+    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Köşk tətbiqi avtomatik endiriləcək və quraşdırılacaq"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Bu istifadəçi üçün Köşk tətbiqi quraşdırılacaq"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Ödəniş etməsəniz, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> cihazı məhdudlaşdıra bilər. Detallar üçün <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Şərt və Müddəalara<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> baxın."</string>
@@ -62,6 +64,8 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Cihazı qeydiyyatdan keçirin"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> maliyyə proqramında cihazı qeydiyyatdan keçirə bilərsiniz"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> subsidiya proqramında cihazı qeydiyyatdan keçirə bilərsiniz"</string>
+    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
+    <skip />
     <string name="subsidy_program_header" msgid="2321508488856303554">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> subsidiya proqramındasınız"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Cihaz qeydiyyatı"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Cihaz 30 gün ərzində <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> maliyyə proqramında qeydiyyatdan keçiriləcək"</string>
@@ -78,6 +82,8 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> tətbiqi quraşdırılır…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> tətbiqi açılır…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Cihaz <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> tərəfindən təmin edilir"</string>
+    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
+    <skip />
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> bu cihazda ayarları dəyişə bilər"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Ətraflı məlumat"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Maliyyələşdirilən cihaz məlumatı"</string>

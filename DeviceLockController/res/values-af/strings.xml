@@ -46,6 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Oopbronlisensies"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Die bestuurvermoëns in Sekuriteitinstellings se afdeling oor gefinansierde toestel is nie op hierdie toestel van toepassing nie"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Hierdie toestel word verskaf deur <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Die Kiosk-app sal afgelaai en outomaties geïnstalleer word"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Die Kiosk-app sal vir hierdie gebruiker geïnstalleer word"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> kan die toestel beperk as jy ’n betaling mis. Lees die <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>bepalings en voorwaardes<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> vir besonderhede."</string>
@@ -62,6 +64,8 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Skryf jou toestel in"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Jy kan jou toestel nou vir <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> se finansiesprogram inskryf"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Jy kan jou toestel nou vir <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> se subsidieprogram inskryf"</string>
+    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
+    <skip />
     <string name="subsidy_program_header" msgid="2321508488856303554">"Jy is in <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> se subsidieprogram"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Toestelinskrywing"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Jou toestel sal binne 30 dae by <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> se finansieringprogram ingeskryf word"</string>
@@ -78,6 +82,8 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"Installeer tans <xliff:g id="CREDITOR_APP">%1$s</xliff:g>-app …"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"Maak tans <xliff:g id="CREDITOR_APP">%1$s</xliff:g>-app oop …"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Toestel is verskaf deur <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
+    <skip />
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> kan instellings op hierdie toestel verander"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Kom meer te wete"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Inligting oor gefinansierde toestel"</string>
