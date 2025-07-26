@@ -46,6 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ઓપન સૉર્સ લાઇસન્સ"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"સુરક્ષા સેટિંગના ફાઇનાન્સ ડિવાઇસ વિભાગમાં મેનેજમેન્ટની ક્ષમતાઓ આ ડિવાઇસ પર લાગુ થતી નથી."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"આ ડિવાઇસ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> દ્વારા પ્રદાન કરવામાં આવેલું છે"</string>
+    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"કિઓસ્ક ઍપ ઑટોમૅટિક રીતે ડાઉનલોડ અને ઇન્સ્ટૉલ થશે"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"આ વપરાશકર્તા માટે Kiosk ઍપ ઇન્સ્ટૉલ કરવામાં આવશે"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"જો તમે કોઈ ચુકવણી ચૂકો, તો <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ડિવાઇસને પ્રતિબંધિત કરી શકે છે. વિગતો માટે, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>નિયમો અને શરતો<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> જુઓ."</string>
@@ -62,6 +64,8 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"તમારા ડિવાઇસની નોંધણી કરો"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"તમે હવે તમારા ડિવાઇસની નોંધણી <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ના ફાઇનાન્સ પ્રોગ્રામમાં કરી શકશો"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"તમે હવે તમારા ડિવાઇસની નોંધણી <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ના સબસિડી પ્રોગ્રામમાં કરી શકશો"</string>
+    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
+    <skip />
     <string name="subsidy_program_header" msgid="2321508488856303554">"તમે <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ના સબસિડી પ્રોગ્રામનો ભાગ છો"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"ડિવાઇસની નોંધણી"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"30 દિવસની અંદર, તમારા ડિવાઇસની નોંધણી <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ના ફાઇનાન્સ પ્રોગ્રામમાં કરવામાં આવશે"</string>
@@ -78,6 +82,8 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> ઍપ ઇન્સ્ટૉલ કરી રહ્યાં છીએ…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> ઍપ ખોલી રહ્યાં છીએ…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> દ્વારા પ્રદાન કરવામાં આવેલું ડિવાઇસ"</string>
+    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
+    <skip />
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>, આ ડિવાઇસના સેટિંગમાં ફેરફાર કરી શકશે"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"વધુ જાણો"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"લોન પર લીધેલા ડિવાઇસની માહિતી"</string>

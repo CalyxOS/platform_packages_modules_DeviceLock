@@ -46,6 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ওপেন-সোর্স লাইসেন্স"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"\'সুরক্ষা\' সেটিংসের \'ফাইন্যান্স করা ডিভাইস\' বিভাগের ম্যানেজমেন্ট সংক্রান্ত সুবিধা এই ডিভাইসের ক্ষেত্রে প্রযোজ্য নয়।"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"এই ডিভাইস <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> দিয়েছে"</string>
+    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk অ্যাপ অটোমেটিক ডাউনলোড ও ইনস্টল হবে"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"এই ব্যবহারকারীর জন্য Kiosk app ইনস্টল করা হবে"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"আপনি পেমেন্ট না করলে, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ডিভাইসের ব্যবহার সীমিত করতে পারবে। আরও তথ্যের জন্য <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>নিয়ম ও শর্তাবলী দেখুন<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>।"</string>
@@ -62,6 +64,8 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"আপনার ডিভাইস এনরোল করুন"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"আপনি এখন <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-এর ফাইন্যান্স প্রোগ্রামে নিজের ডিভাইস এনরোল করতে পারবেন"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"আপনি এখন <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-এর সাবসিডি প্রোগ্রামে এনরোল করতে পারবেন"</string>
+    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
+    <skip />
     <string name="subsidy_program_header" msgid="2321508488856303554">"আপনি <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-এর সাবসিডি প্রোগ্রামে রয়েছেন"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"ডিভাইস এনরোলমেন্ট"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"৩০ দিনের মধ্যে আপনার ডিভাইসটি <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-এর ফাইন্যান্স প্রোগ্রামে এনরোল করা হবে"</string>
@@ -78,6 +82,8 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> অ্যাপ ইনস্টল করা হচ্ছে…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> অ্যাপ চালু হচ্ছে…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"ডিভাইসটি <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> দিয়েছে"</string>
+    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
+    <skip />
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> এই ডিভাইসের সেটিংস পরিবর্তন করতে পারবে"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"আরও জানুন"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"ফাইন্যান্স করা ডিভাইস সম্পর্কিত তথ্য"</string>

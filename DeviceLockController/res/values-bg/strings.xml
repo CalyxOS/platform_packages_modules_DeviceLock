@@ -46,6 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Лицензи за отворен код"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Възможностите за управление в секцията за финансирано устройство, която се намира в настройките за сигурност, не са приложими за това устройство."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Това устройство е предоставено от <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Павилионното приложение ще бъде изтеглено и инсталирано автоматично"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Павилионното приложение ще бъде инсталирано за този потребител"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> може да ограничи устройството, ако пропуснете плащане. За подробности вижте <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>общите условия<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -62,6 +64,8 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Регистрирайте устройството си"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Вече можете да регистрирате устройството си във финансовата програма на <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Вече можете да регистрирате устройството си в програмата на <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> за субсидии"</string>
+    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
+    <skip />
     <string name="subsidy_program_header" msgid="2321508488856303554">"Участвате в програмата на <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> за субсидии"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Регистриране на устройството"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"В рамките на 30 дни устройството ви ще бъде регистрирано във финансовата програма на <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
@@ -78,6 +82,8 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"Приложението <xliff:g id="CREDITOR_APP">%1$s</xliff:g> се инсталира…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"Приложението <xliff:g id="CREDITOR_APP">%1$s</xliff:g> се отваря…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Устройството е предоставено от <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
+    <skip />
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> може да променя настройките на това устройство"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Научете повече"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Информация за финансираното устройство"</string>

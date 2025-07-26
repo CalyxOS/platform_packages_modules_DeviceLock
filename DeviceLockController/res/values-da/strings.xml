@@ -46,6 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Open source-licenser"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Funktionerne til administration i sektionen om finansierede enheder i sikkerhedsindstillingerne gælder ikke for denne enhed."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Denne enhed er leveret af <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Terminalappen downloades og installeres automatisk"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Terminalappen installeres for denne bruger"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> kan begrænse enheden, hvis du ikke foretager en betaling. Du kan få flere oplysninger ved at gå til <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Vilkår og betingelser<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -62,6 +64,8 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Tilmeld din enhed"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Din enhed kan nu tilmeldes finansieringsprogrammet fra <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Du kan nu tilmelde din enhed tilskudsprogrammet fra <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
+    <skip />
     <string name="subsidy_program_header" msgid="2321508488856303554">"Du deltager i tilskudsprogrammet fra <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Tilmelding af enhed"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Din enhed tilmeldes finansieringsprogrammet fra <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> inden for 30 dage"</string>
@@ -78,6 +82,8 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"Installerer <xliff:g id="CREDITOR_APP">%1$s</xliff:g>-appen…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"Åbner <xliff:g id="CREDITOR_APP">%1$s</xliff:g>-appen…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Enheden er leveret af <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
+    <skip />
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> kan ændre indstillinger på denne enhed"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Få flere oplysninger"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Oplysninger om finansieret enhed"</string>
