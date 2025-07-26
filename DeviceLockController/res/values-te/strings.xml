@@ -46,6 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"సెక్యూరిటీ సెట్టింగ్‌లకు సంబంధించిన ఫైనాన్స్ చేసిన పరికర విభాగంలో మేనేజ్‌మెంట్ సామర్థ్యాలు ఈ పరికరానికి వర్తించవు."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"ఈ పరికరం <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ద్వారా అందించబడింది"</string>
+    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk యాప్ ఆటోమేటిక్‌గా డౌన్‌లోడ్ అయి, ఇన్‌స్టాల్ అవుతుంది"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"ఈ యూజర్ కోసం కియోస్క్ యాప్ ఇన్‌స్టాల్ అవుతుంది"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"మీరు పేమెంట్ చేయడం మిస్ చేస్తే, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> పరికరాన్ని పరిమితం చేయవచ్చు. వివరాల కోసం, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>నియమాలు &amp; షరతులను<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> చూడండి."</string>
@@ -62,6 +64,8 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"మీ పరికరాన్ని ఎన్‌రోల్ చేయండి"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"మీరు ఇప్పుడు మీ పరికరాన్ని <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ఫైనాన్స్ ప్రోగ్రామ్‌లో ఎన్‌రోల్ చేయవచ్చు"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"మీరు మీ పరికరాన్ని <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> సబ్సిడీ ప్రోగ్రామ్‌లో ఎన్‌రోల్ చేయవచ్చు"</string>
+    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
+    <skip />
     <string name="subsidy_program_header" msgid="2321508488856303554">"మీరు <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> సబ్సిడీ ప్రోగ్రామ్‌లో ఉన్నారు"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"పరికర ఎన్‌రోల్‌మెంట్"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"మీ పరికరం 30 రోజులలో <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ఫైనాన్స్ ప్రోగ్రామ్‌లో ఎన్‌రోల్ అవుతుంది"</string>
@@ -78,6 +82,8 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> యాప్ ఇన్‌స్టాల్ అవుతోంది…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> యాప్‌ను తెరుస్తోంది…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"పరికరం <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ద్వారా అందించబడుతుంది"</string>
+    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
+    <skip />
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ఈ పరికరంలోని సెట్టింగ్‌లను మార్చగలరు"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"మరింత తెలుసుకోండి"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"ఫైనాన్స్ చేసిన పరికర సమాచారం"</string>

@@ -46,6 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"মুক্ত উৎসৰ অনুজ্ঞাপত্ৰ"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"সুৰক্ষা সম্পৰ্কীয় ছেটিঙৰ বিত্তীয় সহায় পোৱা ডিভাইচৰ শাখাটোত থকা পৰিচালনাৰ সক্ষমতা এই ডিভাইচটোত প্ৰযোজ্য নহয়।"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"এই ডিভাইচটো <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>এ প্ৰদান কৰিছে"</string>
+    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk এপ্‌টো স্বয়ংক্ৰিয়ভাৱে ডাউনল’ড কৰি ইনষ্টল কৰা হ’ব"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"এই ব্যৱহাৰকাৰীগৰাকীৰ বাবে Kiosk এপ্‌টো ইনষ্টল কৰা হ’ব"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"আপুনি পৰিশোধ নকৰিলে <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>এ এই ডিভাইচটো সীমাবদ্ধ কৰিব পাৰে। সবিশেষৰ বাবে, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>নিয়ম আৰু চৰ্তাৱলী<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> চাওক।"</string>
@@ -62,6 +64,8 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"আপোনাৰ ডিভাইচটো পঞ্জীয়ন কৰক"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"আপুনি এতিয়া নিজৰ ডিভাইচটো <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ৰ বিত্তীয় সহায় প্ৰদান কৰা প্ৰ’গ্ৰামত পঞ্জীয়ন কৰিব পাৰে"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"আপুনি এতিয়া নিজৰ ডিভাইচটো <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ৰ ৰাজসাহায্য প্ৰ’গ্ৰামত পঞ্জীয়ন কৰিব পাৰে"</string>
+    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
+    <skip />
     <string name="subsidy_program_header" msgid="2321508488856303554">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ৰ ৰাজসাহায্য প্ৰ’গ্ৰামত আছে"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"ডিভাইচৰ পঞ্জীয়ন"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"আপোনাৰ ডিভাইচটো <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ৰ বিত্তীয় প্ৰ’গ্ৰামত ৩০ দিনৰ ভিতৰত পঞ্জীয়ন কৰা হ’ব"</string>
@@ -78,6 +82,8 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> টা এপ্‌ ইনষ্টল কৰি থকা হৈছে…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> এপ্‌টো খুলি থকা হৈছে…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>এ প্ৰদান কৰা ডিভাইচ"</string>
+    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
+    <skip />
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>এ এই ডিভাইচটোত ছেটিং সলনি কৰিব পাৰে"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"অধিক জানক"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"বিত্তীয় সহায় প্ৰাপ্ত ডিভাইচৰ তথ্য"</string>
