@@ -19,6 +19,7 @@ package com.android.devicelockcontroller.provision.worker;
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -31,9 +32,11 @@ import androidx.work.WorkerFactory;
 import androidx.work.WorkerParameters;
 import androidx.work.testing.TestListenableWorkerBuilder;
 
+import com.android.devicelockcontroller.DevicelockStatsLog;
 import com.android.devicelockcontroller.policy.FinalizationController;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
 import com.android.devicelockcontroller.provision.grpc.DeviceFinalizeClient;
+import com.android.devicelockcontroller.stats.StatsLoggerProvider;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.testing.TestingExecutors;
@@ -49,13 +52,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
-
 @RunWith(RobolectricTestRunner.class)
 public final class ReportDeviceLockProgramCompleteWorkerTest {
     @Rule
@@ -67,6 +63,8 @@ public final class ReportDeviceLockProgramCompleteWorkerTest {
     @Mock
     private FinalizationController mFinalizationController;
     private ReportDeviceLockProgramCompleteWorker mWorker;
+    public static int EVENT_KA_GENERATION_FAILURE_REPORT_FINALIZATION = DevicelockStatsLog.
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_KA_GEN_FAILURE_REPORT_FINALIZATION;
 
     @Before
     public void setUp() throws Exception {
@@ -102,9 +100,7 @@ public final class ReportDeviceLockProgramCompleteWorkerTest {
     }
 
     @Test
-    public void doWork_responseHasRecoverableError_returnRetry()
-            throws InvalidAlgorithmParameterException, CertificateException,
-            NoSuchAlgorithmException, IOException, KeyStoreException, NoSuchProviderException {
+    public void doWork_responseHasRecoverableError_returnRetry() {
         when(mClient.reportDeviceProgramComplete(
         )).thenReturn(
                 new DeviceFinalizeClient.ReportDeviceProgramCompleteResponse(Status.UNAVAILABLE));
@@ -125,5 +121,8 @@ public final class ReportDeviceLockProgramCompleteWorkerTest {
         when(mClient.reportDeviceProgramComplete()).thenReturn(null);
 
         assertThat(Futures.getUnchecked(mWorker.startWork())).isEqualTo(Result.retry());
+        verify(((StatsLoggerProvider) ApplicationProvider.getApplicationContext()).getStatsLogger())
+                .logProvisionStateEvent(EVENT_KA_GENERATION_FAILURE_REPORT_FINALIZATION);
+
     }
 }
