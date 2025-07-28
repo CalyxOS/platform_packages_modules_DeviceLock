@@ -97,6 +97,8 @@ public final class StatsLoggerImplTest {
             new StatsLoggerImpl(ApplicationProvider.getApplicationContext());
 
     private StatsLoggerImpl mStatsLoggerWithMockedContext;
+    public static int EVENT_KA_GENERATION_FAILURE_REPORT_FINALIZATION = DevicelockStatsLog.
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_KA_GEN_FAILURE_REPORT_FINALIZATION;
 
     @Rule
     public final ExtendedMockitoRule mExtendedMockitoRule =
@@ -105,9 +107,12 @@ public final class StatsLoggerImplTest {
                     .mockStatic(Counter.class)
                     .build();
 
-    @Mock private Context mMockContext;
-    @Mock private PackageManager mMockPackageManager;
-    @Mock private PackageInfo mMockPackageInfo;
+    @Mock
+    private Context mMockContext;
+    @Mock
+    private PackageManager mMockPackageManager;
+    @Mock
+    private PackageInfo mMockPackageInfo;
 
 
     private AutoCloseable mCloseable;
@@ -399,5 +404,14 @@ public final class StatsLoggerImplTest {
         mStatsLoggerWithMockedContext.logFcmMessageReceived();
 
         verify(() -> DevicelockStatsLog.write(DEVICE_LOCK_FCM_MESSAGE_RECEIVED, APEX_VERSION));
+    }
+
+    @Test
+    public void logProvisionStateEvent_kaGenFailureReportFinalization_writesCorrectLog() {
+        mStatsLoggerWithMockedContext.logProvisionStateEvent(
+                EVENT_KA_GENERATION_FAILURE_REPORT_FINALIZATION);
+
+        verify(() -> DevicelockStatsLog.write(DEVICE_LOCK_PROVISION_STATE_EVENT,
+                EVENT_KA_GENERATION_FAILURE_REPORT_FINALIZATION, APEX_VERSION));
     }
 }

@@ -25,11 +25,13 @@ import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
 
 import com.android.devicelockcontroller.ClientInterceptorProvider;
+import com.android.devicelockcontroller.DevicelockStatsLog;
 import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.R;
 import com.android.devicelockcontroller.policy.FinalizationController;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
 import com.android.devicelockcontroller.provision.grpc.DeviceFinalizeClient;
+import com.android.devicelockcontroller.stats.StatsLoggerProvider;
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
 import com.android.devicelockcontroller.util.LogUtil;
 
@@ -49,6 +51,8 @@ public final class ReportDeviceLockProgramCompleteWorker extends ListenableWorke
 
     public static final String REPORT_DEVICE_LOCK_PROGRAM_COMPLETE_WORK_NAME =
             "report-device-lock-program-complete";
+    public static int EVENT_KA_GENERATION_FAILURE_REPORT_FINALIZATION = DevicelockStatsLog.
+            DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_KA_GEN_FAILURE_REPORT_FINALIZATION;
     private final ListenableFuture<DeviceFinalizeClient> mClient;
     private final PolicyObjectsProvider mPolicyObjectsProvider;
 
@@ -104,6 +108,8 @@ public final class ReportDeviceLockProgramCompleteWorker extends ListenableWorke
                     client.reportDeviceProgramComplete();
 
             if (response == null) {
+                ((StatsLoggerProvider) getApplicationContext()).getStatsLogger()
+                        .logProvisionStateEvent(EVENT_KA_GENERATION_FAILURE_REPORT_FINALIZATION);
                 return Futures.immediateFuture(Result.retry());
             }
 
