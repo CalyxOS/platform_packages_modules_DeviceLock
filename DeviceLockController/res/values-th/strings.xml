@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ใบอนุญาตโอเพนซอร์ส"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"ความสามารถในการจัดการในส่วนอุปกรณ์ที่ได้รับการสนับสนุนทางการเงินของการตั้งค่าความปลอดภัยจะไม่นำมาใช้กับอุปกรณ์นี้"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"อุปกรณ์นี้ให้บริการโดย <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"กำลังตั้งค่าอุปกรณ์นี้เป็นหลักประกันสำหรับเงินกู้"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"ระบบจะดาวน์โหลดและติดตั้งแอปคีออสก์โดยอัตโนมัติ"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"ระบบจะติดตั้งแอปคีออสก์สำหรับผู้ใช้รายนี้"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> สามารถจำกัดอุปกรณ์ได้หากคุณไม่ชำระเงิน ดูรายละเอียดได้ที่<xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>ข้อกำหนดและเงื่อนไข<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>"</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"ลงทะเบียนอุปกรณ์ของคุณ"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"ตอนนี้คุณลงทะเบียนอุปกรณ์ในโปรแกรมสนับสนุนทางการเงินของ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ได้แล้ว"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"ตอนนี้คุณลงทะเบียนอุปกรณ์ในโปรแกรมสนับสนุนทางการเงินของ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ได้แล้ว"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"ตอนนี้คุณลงทะเบียนอุปกรณ์ในโปรแกรมหลักประกันใหม่ของ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ได้แล้ว"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"คุณอยู่ในโปรแกรมสนับสนุนทางการเงินของ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"การลงทะเบียนอุปกรณ์"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"ระบบจะลงทะเบียนอุปกรณ์ของคุณในโปรแกรมสนับสนุนทางการเงินของ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ภายใน 30 วัน"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"กำลังติดตั้งแอป <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"กำลังเปิดแอป <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"อุปกรณ์ให้บริการโดย <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"อุปกรณ์ที่ใช้เป็นหลักประกันของ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> สามารถเปลี่ยนการตั้งค่าในอุปกรณ์นี้ได้"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"ดูข้อมูลเพิ่มเติม"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"ข้อมูลอุปกรณ์ที่มีการสนับสนุนทางการเงิน"</string>
