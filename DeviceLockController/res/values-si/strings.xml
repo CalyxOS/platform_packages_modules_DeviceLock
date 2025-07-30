@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"විවෘත මූලාශ්‍ර බලපත්‍ර"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"ආරක්ෂක සැකසීම්වල මූල්‍යමය උපාංග අංශයේ කළමනාකරණ හැකියා මෙම උපාංගයට අදාළ නොවේ."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"මෙම උපාංගය <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> මගින් සපයනු ලබයි"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"මෙම උපාංගය ණයක් සඳහා ඇපකරයක් ලෙස සකසා ඇත."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk යෙදුම ස්වයංක්‍රීයව බාගත කර ස්ථාපනය කරනු ලැබේ"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"මෙම පරිශීලකයා සඳහා Kiosk යෙදුම ස්ථාපනය කරනු ලැබේ"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> හට ඔබට ගෙවීමක් මඟ හැරුණහොත් උපාංගය සීමා කළ හැක. විස්තර සඳහා, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>නියමයන් සහ කොන්දේසි<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> බලන්න."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"ඔබේ උපාංගය ලියාපදිංචි කරන්න"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"ඔබට දැන් <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ගේ සහනාධාර වැඩසටහනට ඔබේ උපාංගය ලියාපදිංචි කළ හැක"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"ඔබට දැන් <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ගේ සහනාධාර වැඩසටහනට ඔබේ උපාංගය ලියාපදිංචි කළ හැක"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"දැන් ඔබට ඔබේ උපාංගය <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ගේ නැවත ඇපකර වැඩසටහනට ඇතුළත් කළ හැක"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"ඔබ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ගේ සහනාධාර වැඩසටහනේ සිටී"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"උපාංගය ලියාපදිංචි කිරීම"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"ඔබේ උපාංගය දින 30ක් ඇතුළත <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ගේ මූල්‍ය වැඩසටහනට ඇතුළත් වනු ඇත"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> යෙදුම ස්ථාපනය කරමින්…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> යෙදුම විවෘත කරමින්…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> විසින් සපයන ලද උපාංගය"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> විසින් ඇපයට තබා ඇති උපාංගය"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> හට මෙම උපාංගයෙහි සැකසීම් වෙනස් කළ හැක"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"තව දැන ගන්න"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"මූල්‍යනය කළ උපාංග තතු"</string>

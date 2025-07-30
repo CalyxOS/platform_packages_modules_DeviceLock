@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"오픈소스 라이선스"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"보안 설정의 할부 기기 정보 섹션에 있는 관리 기능은 이 기기에 적용되지 않습니다."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에서 제공하는 기기"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"이 기기는 대출 담보로 설정되는 중입니다."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"키오스크 앱이 자동으로 다운로드 및 설치됩니다."</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"키오스크 앱이 이 사용자를 위해 설치됩니다."</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"결제를 하지 않으면 <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에서 기기 사용을 제한할 수 있습니다. 자세한 내용은 <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>이용약관<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>에서 확인하세요."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"기기 등록"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"이제 기기를 <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>의 재정 지원 프로그램에 등록할 수 있습니다"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"이제 기기를 <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>의 보조금 프로그램에 등록할 수 있습니다."</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"이제 기기를 <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>의 재담보 프로그램에 등록할 수 있습니다"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>의 보조금 프로그램 사용 중"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"기기 등록"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"기기가 30일 이내에 <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>의 파이낸싱 프로그램에 등록됩니다."</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"앱 <xliff:g id="CREDITOR_APP">%1$s</xliff:g>개 설치 중…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> 앱을 여는 중입니다…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에서 제공한 기기"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에 의해 담보로 설정된 기기"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에서 이 기기의 설정을 변경할 수 있습니다."</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"자세히 알아보기"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"할부 기기 정보"</string>

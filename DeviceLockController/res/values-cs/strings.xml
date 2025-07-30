@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Licence open source"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Funkce správy v sekci s informacemi o financovaném zařízení v nastavení zabezpečení se na toto zařízení nevztahují."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Toto zařízení poskytuje <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"Probíhá nastavování tohoto zařízení jako zástavy za úvěr."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Terminálová aplikace bude automaticky stažena a nainstalována"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Tomuto uživateli bude nainstalována terminálová aplikace"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Pokud zmeškáte platbu, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> může k zařízení omezit přístup. Podrobnosti najdete ve <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>smluvních podmínkách<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Zaregistrujte své zařízení"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Teď můžete zařízení zaregistrovat do programu financování <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Nyní můžete zařízení zaregistrovat do podpůrného programu <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"Teď můžete zařízení zaregistrovat do programu poskytnutí do zástavy za úvěr poskytovateli <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"Využíváte podpůrný program <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Registrace zařízení"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Zařízení bude do 30 dnů zaregistrováno do programu financování <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"Instaluje se aplikace <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"Otevírání aplikace <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Zařízení poskytuje společnost <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"Zařízení bylo zastaveno poskytovateli <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> může měnit nastavení tohoto zařízení"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Další informace"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Informace o financovaném zařízení"</string>

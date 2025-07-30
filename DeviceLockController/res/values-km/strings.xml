@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"អាជ្ញាបណ្ណ​កូដ​ចំហ"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"សមត្ថភាព​គ្រប់គ្រង​នៅក្នុងផ្នែក​ការកំណត់​សុវត្ថិភាព​របស់ឧបករណ៍​ដែលទទួលបាន​ហិរញ្ញប្បទាន​មិនអនុវត្ត​ចំពោះ​ឧបករណ៍នេះទេ។"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"ឧបករណ៍នេះត្រូវបានផ្ដល់ដោយ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"ឧបករណ៍នេះកំពុងត្រូវបានរៀបចំជាប្រាតិភោគសម្រាប់កម្ចី។"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"កម្មវិធីបញ្ជរនឹង​ត្រូវបានទាញយក និងដំឡើងដោយស្វ័យប្រវត្តិ"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"កម្មវិធីបញ្ជរនឹងត្រូវបានដំឡើងសម្រាប់អ្នកប្រើប្រាស់នេះ"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> អាចដាក់កំហិត​ឧបករណ៍នេះ ប្រសិនបើអ្នកខកខានការបង់ប្រាក់ណាមួយ។ សម្រាប់ព័ត៌មានលម្អិត សូមមើល<xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>លក្ខខណ្ឌ<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>។"</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"ចុះឈ្មោះ​ឧបករណ៍​របស់អ្នក"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"ឥឡូវនេះ អ្នកអាចចុះឈ្មោះឧបករណ៍របស់អ្នកនៅក្នុងកម្មវិធីហិរញ្ញប្បទានរបស់ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> បានហើយ"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"ឥឡូវនេះ អ្នកអាចចុះឈ្មោះឧបករណ៍របស់អ្នកនៅក្នុងកម្មវិធីឧបត្ថម្ភធនរបស់ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> បានហើយ"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"ឥឡូវ អ្នកអាចចុះឈ្មោះឧបករណ៍របស់អ្នកក្នុងកម្មវិធីប្រាតិភោគភណ្ឌិកឡើងវិញរបស់ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> បានហើយ"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"អ្នកកំពុងប្រើកម្មវិធីឧបត្ថម្ភធនរបស់ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"ការចុះឈ្មោះឧបករណ៍"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"ឧបករណ៍របស់អ្នក​នឹងត្រូវបានចុះឈ្មោះនៅក្នុង​កម្មវិធីហិរញ្ញវត្ថុរបស់ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ក្នុងរយៈពេល 30 ថ្ងៃ"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"កំពុងដំឡើង​កម្មវិធី <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"កំពុង​បើក​កម្មវិធី <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"ឧបករណ៍ត្រូវបានផ្ដល់ដោយ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"បានធ្វើប្រាតិភោគឧបករណ៍ដោយ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> អាចប្ដូរការកំណត់នៅលើឧបករណ៍នេះ"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"ស្វែងយល់បន្ថែម"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"ព័ត៌មានឧបករណ៍ដែលទទួលបានហិរញ្ញប្បទាន"</string>

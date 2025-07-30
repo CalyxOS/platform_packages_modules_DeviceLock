@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Giấy phép nguồn mở"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Các tính năng quản lý trong mục Thông tin về thiết bị trả góp của phần cài đặt Bảo mật không áp dụng cho thiết bị này."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Thiết bị này do <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> cung cấp"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"Thiết bị này đang được thiết lập làm tài sản thế chấp cho một khoản vay."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Ứng dụng Kiosk sẽ tự động được tải xuống và cài đặt"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Ứng dụng Kiosk sẽ được cài đặt cho người dùng này"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> có thể hạn chế thiết bị này nếu bạn không thanh toán kịp thời. Để biết thông tin chi tiết, hãy xem <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Điều khoản và điều kiện<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Đăng ký thiết bị của bạn"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Bây giờ, bạn có thể đăng ký chương trình hỗ trợ tài chính của <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> cho thiết bị này"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Bây giờ, bạn có thể đăng ký thiết bị này vào chương trình trợ cấp của <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"Bây giờ, bạn có thể đăng ký chương trình thế chấp lại của <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> cho thiết bị này"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"Bạn đang tham gia chương trình trợ cấp của <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Đăng ký thiết bị"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Thiết bị của bạn sẽ được đăng ký tham gia chương trình hỗ trợ tài chính của <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> trong vòng 30 ngày"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"Đang cài đặt ứng dụng <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"Đang mở ứng dụng <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Thiết bị do <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> cung cấp"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"Thiết bị được thế chấp bởi <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> có thể thay đổi các chế độ cài đặt trên thiết bị này"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Tìm hiểu thêm"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Thông tin về thiết bị trả góp"</string>
