@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ଓପନ-ସୋର୍ସ ଲାଇସେନ୍ସଗୁଡ଼ିକ"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"ସୁରକ୍ଷା ସେଟିଂସର ଫାଇନାନ୍ସଡ୍ ଡିଭାଇସ୍ ବିଭାଗରେ ଥିବା ପରିଚାଳନା ଦକ୍ଷତା ଏହି ଡିଭାଇସରେ ଲାଗୁ ହୁଏ ନାହିଁ।"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"ଏହି ଡିଭାଇସ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ଦ୍ୱାରା ପ୍ରଦାନ କରାଯାଇଛି"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"ଏହି ଡିଭାଇସକୁ ଏକ ଋଣ ପାଇଁ କୋଲାଟେରାଲ ଭାବରେ ସେଟ ଅପ କରାଯାଉଛି।"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk ଆପ ସ୍ୱତଃ ଡାଉନଲୋଡ ଏବଂ ଇନଷ୍ଟଲ ହେବ"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"ଏହି ୟୁଜରଙ୍କ ପାଇଁ Kiosk ଆପକୁ ଇନଷ୍ଟଲ କରାଯିବ"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"ଯଦି ଆପଣ କୌଣସି ପେମେଣ୍ଟ ମିସ କରନ୍ତି ତେବେ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ଡିଭାଇସକୁ ପ୍ରତିବନ୍ଧିତ କରିପାରିବ। ବିବରଣୀ ପାଇଁ, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>ଚୁକ୍ତି ଏବଂ ସର୍ତ୍ତାବଳୀ <xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> ଭ୍ୟୁ କରନ୍ତୁ।"</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"ଆପଣଙ୍କ ଡିଭାଇସକୁ ପଞ୍ଜିକରଣ କରନ୍ତୁ"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"ଆପଣ ବର୍ତ୍ତମାନ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ର ଫାଇନାନ୍ସ ପ୍ରୋଗ୍ରାମରେ ଆପଣଙ୍କ ଡିଭାଇସକୁ ପଞ୍ଜିକରଣ କରିପାରିବେ"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"ଆପଣ ବର୍ତ୍ତମାନ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ର ସବସିଡି ପ୍ରୋଗ୍ରାମରେ ଆପଣଙ୍କ ଡିଭାଇସକୁ ପଞ୍ଜିକରଣ କରିପାରିବେ"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"ଆପଣ ବର୍ତ୍ତମାନ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ର ରିକୋଲାଟେରାଲାଇଜେସନ ପ୍ରୋଗ୍ରାମରେ ଆପଣଙ୍କ ଡିଭାଇସକୁ ପଞ୍ଜିକରଣ କରିପାରିବେ"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"ଆପଣ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ର ସବସିଡି ପ୍ରୋଗ୍ରାମରେ ଅଛନ୍ତି"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"ଡିଭାଇସର ପଞ୍ଜିକରଣ"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"ଆପଣଙ୍କ ଡିଭାଇସ 30 ଦିନ ମଧ୍ୟରେ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ର ଫାଇନାନ୍ସ ପ୍ରୋଗ୍ରାମରେ ପଞ୍ଜିକୃତ ହେବ"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> ଆପ ଇନଷ୍ଟଲ ହେଉଛି…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> ଆପ ଖୋଲୁଛି…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ଦ୍ୱାରା ଡିଭାଇସ ପ୍ରଦାନ କରାଯାଇଛି"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"ଡିଭାଇସକୁ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ଦ୍ୱାରା କୋଲାଟେରାଲାଇଜ କରାଯାଇଛି"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ଏହି ଡିଭାଇସର ସେଟିଂସକୁ ପରିବର୍ତ୍ତନ କରିପାରିବେ"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"ଅଧିକ ଜାଣନ୍ତୁ"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"ଫାଇନାନ୍ସଡ୍ ଡିଭାଇସ୍ ସୂଚନା"</string>

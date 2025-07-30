@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Open-source licences"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"The management capabilities in the financed device section of security settings don\'t apply to this device."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"This device is provided by <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"This device is being set up as collateral for a loan."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"The kiosk app will be downloaded and installed automatically"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"The kiosk app will be installed for this user"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> can restrict the device if you miss a payment. For details, view the <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Terms &amp; Conditions<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Enrol your device"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"You can now enrol your device in <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\'s finance programme"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"You can now enrol your device in <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\'s subsidy programme"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"You can now enrol your device in <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\'s recollateralisation programme"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"You\'re on <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\'s subsidy programme"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Device enrolment"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Your device will be enrolled in <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\'s finance programme within 30 days"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"Installing <xliff:g id="CREDITOR_APP">%1$s</xliff:g> app…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"Opening <xliff:g id="CREDITOR_APP">%1$s</xliff:g> app…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Device provided by <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"Device collateralised by <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> can change settings on this device"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Learn more"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Financed device info"</string>

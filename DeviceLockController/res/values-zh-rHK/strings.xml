@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"開放原始碼授權"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"喺安全性設定入面，分期付款裝置部分嘅管理功能套用唔到去呢部裝置"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"此裝置由「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」提供"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"正在將此裝置設定為貸款抵押品。"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"系統將自動下載及安裝 Kiosk 應用程式"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"系統將為此使用者安裝 Kiosk 應用程式"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"如果你未按時支付款項，「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」可限制裝置。詳情請參閱《<xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>條款及細則<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>》。"</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"註冊裝置"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"裝置現可註冊「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」的分期付款計劃"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"裝置現可註冊「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」的資助計劃"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"裝置現可註冊「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」的分期付款計劃"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"你已加入「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」的資助計劃"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"裝置註冊"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"裝置將於 30 天內註冊「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」的分期付款計劃"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"正在安裝「<xliff:g id="CREDITOR_APP">%1$s</xliff:g>」應用程式…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"正在開啟「<xliff:g id="CREDITOR_APP">%1$s</xliff:g>」應用程式…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」提供的裝置"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"裝置已由「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」提供分期付款"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」可變更此裝置的設定"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"瞭解詳情"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"分期付款裝置資料"</string>

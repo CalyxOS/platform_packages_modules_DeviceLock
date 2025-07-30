@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Mga open-source na lisensya"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Hindi nalalapat sa device na ito ang mga kakayahan sa pamamahala sa seksyon ng pinopondohang device ng Mga setting ng seguridad."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Nagmula sa <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ang device na ito"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"Sine-set up ang device na ito bilang collateral para sa loan."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Awtomatikong ida-download at ii-install ang Kiosk app"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Ii-install ang Kiosk app para sa user na ito"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Puwedeng paghigpitan ng <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ang device kung may napalampas kang pagbabayad. Para sa mga detalye, basahin ang <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Mga Tuntunin at Kundisyon<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"I-enroll ang iyong device"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Puwede mo na ngayong i-enroll ang iyong device sa finance program ng <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Puwede mo na ngayong i-enroll ang iyong device sa subsidy program ng <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"Puwede mo nang i-enroll ang iyong device sa recollateralization program ng <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"Nasa subsidy program ka ng <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Pag-enroll ng device"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Mae-enroll ang iyong device sa finance program ng <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> sa loob ng 30 araw"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"Nag-i-install ng <xliff:g id="CREDITOR_APP">%1$s</xliff:g> app…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"Binubuksan ang <xliff:g id="CREDITOR_APP">%1$s</xliff:g> app…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Mula sa <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ang device"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"Na-collaterize ang device ng <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"Puwedeng baguhin ng <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ang mga setting sa device na ito"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Matuto pa"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Impormasyon ng pinopondohang device"</string>

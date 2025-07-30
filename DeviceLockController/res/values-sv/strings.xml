@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Licenser för öppen källkod"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Hanteringsfunktionerna i avsnittet om den finansierade enheten under säkerhetsinställningarna gäller inte för den här enheten."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Enheten tillhandahålls av <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"Den här enheten ställs som säkerhet för ett lån."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kioskappen laddas ned och installeras automatiskt"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Kioskappen installeras för den här användaren"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> kan begränsa användningen av enheten om en betalning uteblir. Läs <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>användarvillkoren<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> för mer information."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Registrera din enhet"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Nu kan du registrera din enhet för avbetalningsprogrammet hos <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Nu kan du registrera din enhet för finansiering med <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"Nu kan du registrera din enhet för programmet för ekonomisk säkerhet med <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"Du får finansiering med <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Registrering av enhet"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Enheten registreras för avbetalningprogrammet hos <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> inom 30 dagar"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"Installerar <xliff:g id="CREDITOR_APP">%1$s</xliff:g>-appen …"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g>-appen öppnas …"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Enhet från <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"Enheten har ställts som säkerhet av <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> kan ändra inställningar på den här enheten"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Läs mer"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Information om finansierad enhet"</string>

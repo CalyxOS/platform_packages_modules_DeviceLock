@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ஓப்பன் சோர்ஸ் உரிமங்கள்"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"பாதுகாப்பு அமைப்புகளில் \'கடன் மூலம் பெற்ற சாதனம்\' பிரிவிலுள்ள நிர்வாகத் திறன்கள் இந்தச் சாதனத்திற்குப் பொருந்தாது."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"இந்தச் சாதனம் <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> நிறுவனத்தால் வழங்கப்பட்டது"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"இந்தச் சாதனம் கடனுக்குப் பிணைய உத்திரவாதமாக அமைக்கப்படுகிறது."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk ஆப்ஸ் தானாகவே பதிவிறக்கப்பட்டு நிறுவப்படும்"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"இந்தப் பயனருக்கு Kiosk ஆப்ஸ் நிறுவப்படும்"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"நீங்கள் பேமெண்ட் செய்யத் தவறினால் சாதனத்தை <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> கட்டுப்படுத்தலாம். தகவல்களுக்கு, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>விதிமுறைகளையும் நிபந்தனைகளையும்<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> பாருங்கள்."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"உங்கள் சாதனத்தைப் பதிவுசெய்யுங்கள்"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"உங்கள் சாதனத்தை <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> இன் நிதித் திட்டத்தில் இப்போது பதிவுசெய்யலாம்"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"உங்கள் சாதனத்தை <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> இன் மானியத் திட்டத்திற்கு இப்போது பதிவுசெய்யலாம்"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"சாதனத்தை <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> இன் கூடுதல் பிணைய உத்திரவாதத் திட்டத்தில் இப்போது பதிவுசெய்யலாம்"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> மானியத் திட்டத்தில் உள்ளீர்கள்"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"சாதனத்தைப் பதிவுசெய்தல்"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"உங்கள் சாதனம் 30 நாட்களுக்குள் <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> இன் நிதித் திட்டத்திற்குப் பதிவுசெய்யப்படும்"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> ஆப்ஸ் நிறுவப்படுகிறது…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> ஆப்ஸ் திறக்கப்படுகிறது…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> வழங்கிய சாதனம்"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"சாதனத்தின் பிணைய உத்திரவாதம் <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> இடம் உள்ளது"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"இந்தச் சாதனத்திலுள்ள அமைப்புகளை <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> மாற்ற முடியும்"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"மேலும் அறிக"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"கடன் மூலம் பெறப்பட்ட சாதனத்தின் தகவல்கள்"</string>

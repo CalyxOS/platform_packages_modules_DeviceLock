@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Llicències de codi obert"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Les funcions de gestió que hi ha a la secció del dispositiu finançat de la configuració de seguretat no s\'apliquen en aquest dispositiu."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> proporciona aquest dispositiu"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"Aquest dispositiu s\'està configurant com a aval d\'un préstec."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"L\'aplicació de quiosc es baixarà i s\'instal·larà automàticament."</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"L\'aplicació de quiosc s\'instal·larà per a aquest usuari"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> pot restringir el dispositiu si falta un pagament. Per obtenir informació, consulta els <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>termes i condicions<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Inscriu el dispositiu"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Ja pots inscriure el dispositiu en el programa de finançament de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>."</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Ja pots inscriure el dispositiu en el programa de subsidis de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>."</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"Ja pots inscriure el dispositiu en el programa de refinançament de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"Formes part del programa de subsidis de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Inscripció de dispositius"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"El dispositiu s\'inscriurà en el programa de finançament de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> en un termini de 30 dies"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"S\'està instal·lant l\'aplicació <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"S\'està obrint l\'aplicació <xliff:g id="CREDITOR_APP">%1$s</xliff:g>…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> proporciona el dispositiu"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"Dispositiu avalat per <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> pot canviar la configuració d\'aquest dispositiu"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Més informació"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Informació del dispositiu finançat"</string>

@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Ачык программа уруксаттамалары"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Коопсуздук параметрлеринин каржыланган түзмөк бөлүмүндөгү башкаруу мүмкүнчүлүктөрү бул түзмөккө карата колдонулбайт."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Бул түзмөктү <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> камсыздады"</string>
-    <!-- no translation found for device_used_as_collateral (6708488375984120840) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="6708488375984120840">"Бул түзмөк насыя алуу үчүн күрөөгө коюлууда."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Киоск колдонмосу автоматтык түрдө жүктөлүп алынып, орнотулат"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Киоск колдонмосу бул колдонуучу үчүн орнотулат"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Эгер төлөмдү өткөрүп жиберсеңиз, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> түзмөктү чектеп коюшу мүмкүн. Толук маалымат алуу үчүн <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Жоболорду жана шарттарды<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> караңыз."</string>
@@ -64,8 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Түзмөгүңүздү каттаңыз"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Эми түзмөгүңүздү <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> каржы программасына каттай аласыз"</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Эми түзмөгүңүздү <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> субсидия программасына каттай аласыз"</string>
-    <!-- no translation found for enroll_your_device_recol_subheader (6875207585877997023) -->
-    <skip />
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"Эми түзмөгүңүздү <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> күрөөгө коюу программасына каттай аласыз"</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> cубсидия программасына кошулдуңуз"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Түзмөктү каттоо"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Түзмөгүңүз <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> каржы программасына 30 күндүн ичинде катталат"</string>
@@ -82,8 +80,7 @@
     <string name="installing_kiosk_app" msgid="324208168205545860">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> колдонмосу орнотулууда…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> колдонмосу ачылууда…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"Түзмөк <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> тарабынан камсыздалган"</string>
-    <!-- no translation found for settings_banner_title_recol (7269978656496777466) -->
-    <skip />
+    <string name="settings_banner_title_recol" msgid="7269978656496777466">"Түзмөктү <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> күрөөгө койду"</string>
     <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> бул түзмөктө параметрлерди өзгөртүшү мүмкүн"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"Кеңири маалымат"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"Насыяга алынган түзмөк тууралуу"</string>
