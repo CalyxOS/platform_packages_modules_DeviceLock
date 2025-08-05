@@ -22,12 +22,14 @@ import static com.android.devicelockcontroller.policy.DeviceStateController.Devi
 import static com.android.devicelockcontroller.policy.DeviceStateController.DeviceState.UNLOCKED;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_SUCCESS;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.KIOSK_PROVISIONED;
+import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.PROVISION_IN_PROGRESS;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.PROVISION_SUCCEEDED;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.UNPROVISIONED;
 
 import androidx.annotation.VisibleForTesting;
 
 import com.android.devicelock.flags.Flags;
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
 
 import com.google.common.util.concurrent.Futures;
@@ -39,6 +41,7 @@ import java.util.concurrent.Executor;
 /** An implementation of the {@link DeviceStateController} */
 public final class DeviceStateControllerImpl implements DeviceStateController {
     private final ProvisionStateController mProvisionStateController;
+    private final FeatureFlagProvider mFeatureFlagProvider;
     private final DevicePolicyController mPolicyController;
     private final GlobalParametersClient mGlobalParametersClient;
     private final Executor mExecutor;
@@ -50,9 +53,11 @@ public final class DeviceStateControllerImpl implements DeviceStateController {
     private boolean mClearingInProgress;
 
     public DeviceStateControllerImpl(DevicePolicyController policyController,
-            ProvisionStateController provisionStateController, Executor executor) {
+            ProvisionStateController provisionStateController,
+            FeatureFlagProvider featureFlagProvider, Executor executor) {
         mPolicyController = policyController;
         mProvisionStateController = provisionStateController;
+        mFeatureFlagProvider = featureFlagProvider;
         mGlobalParametersClient = GlobalParametersClient.getInstance();
         mExecutor = executor;
         mPseudoDeviceState = UNDEFINED;
@@ -106,22 +111,32 @@ public final class DeviceStateControllerImpl implements DeviceStateController {
                         mPseudoDeviceState = deviceState;
                         // Do not apply any policies
                         return Futures.immediateVoidFuture();
+                    } else if (mFeatureFlagProvider.isRecolEnabled()
+                            && provisionState == PROVISION_IN_PROGRESS && deviceState == CLEARED) {
+                        // This is the case if a provisioning failure occurs during a
+                        // recollateralization provisioning, the device is not collateralized, and
+                        // the user exits the provisioning failed screen.
+                        return setDeviceStateAndEnforcePolicies(deviceState);
                     } else {
                         throw new RuntimeException(
                                 "User has not been provisioned! Current state " + provisionState);
                     }
                     return Futures.transformAsync(maybeSetProvisioningSuccess,
-                            unused -> Futures.transformAsync(isCleared(),
-                                    isCleared -> {
-                                        if (isClearingInProgress(deviceState) || isCleared) {
-                                            throw new IllegalStateException("Device has been "
-                                                    + "cleared!");
-                                        }
-                                        return Futures.transformAsync(
-                                                mGlobalParametersClient.setDeviceState(deviceState),
-                                                state -> mPolicyController.enforceCurrentPolicies(),
-                                                mExecutor);
-                                    }, mExecutor),
+                            unused -> setDeviceStateAndEnforcePolicies(deviceState),
+                            mExecutor);
+                }, mExecutor);
+    }
+
+    private ListenableFuture<Void> setDeviceStateAndEnforcePolicies(@DeviceState int deviceState) {
+        return Futures.transformAsync(isCleared(),
+                isCleared -> {
+                    if (isClearingInProgress(deviceState) || isCleared) {
+                        throw new IllegalStateException("Device has been "
+                                + "cleared!");
+                    }
+                    return Futures.transformAsync(
+                            mGlobalParametersClient.setDeviceState(deviceState),
+                            state -> mPolicyController.enforceCurrentPolicies(),
                             mExecutor);
                 }, mExecutor);
     }
