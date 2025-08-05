@@ -247,6 +247,8 @@
     <string name="device_reset_notification_content">All device data will be deleted. For help enrolling your device, contact <xliff:g id="provider name">%1$s</xliff:g></string>
     <!-- Title text of the provisioning failed screen, this tells the user provisioning of their device failed. [CHAR LIMIT=60] -->
     <string name="provisioning_failed">Financing provisioning has failed</string>
+    <!-- Generic title text of the provisioning failed screen, this tells the user provisioning of their device failed. [CHAR LIMIT=60] -->
+    <string name="provisioning_failed_generic">Provisioning has failed</string>
     <!-- Subheader of the provisioning failed screen, this tells the user to click the link to contact their financier for help. [CHAR LIMIT=NONE] -->
     <string name="click_to_contact_financier">For help enrolling your device, <xliff:g id="support_link_start">&lt;a href="%2$s"></xliff:g>contact <xliff:g id="provider name">%1$s</xliff:g><xliff:g id="support_link_end">&lt;/a&gt;</xliff:g>.</string>
     <!-- Button text used to let the user exit the Device lock controller app. [CHAR LIMIT=20] -->
