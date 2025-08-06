@@ -520,6 +520,12 @@ public final class DeviceCheckInClientImpl extends DeviceCheckInClient {
             case DeviceProvisionState.PROVISION_STATE_SUCCESS:
                 state = ClientProvisionState.CLIENT_PROVISION_STATE_SUCCESS;
                 break;
+            case DeviceProvisionState.PROVISION_STATE_ENABLE_BOTTOM_VIEW:
+                state = ClientProvisionState.CLIENT_PROVISION_STATE_ENABLE_BOTTOM_VIEW;
+                break;
+            case DeviceProvisionState.PROVISION_STATE_CHECKIN:
+                state = ClientProvisionState.CLIENT_PROVISION_STATE_CHECKIN;
+                break;
             default:
                 throw new IllegalStateException(
                         "Unexpected value: " + lastReceivedProvisionState);
