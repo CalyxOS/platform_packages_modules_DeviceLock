@@ -63,7 +63,7 @@
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Зарэгіструйце прыладу"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Цяпер вы можаце зарэгістраваць сваю прыладу ў праграме фінансавання кампаніі \"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\""</string>
     <string name="enroll_your_device_subsidy_subheader" msgid="8598730780370624995">"Цяпер вы можаце зарэгістраваць прыладу ў праграме субсідзіравання кампаніі \"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\""</string>
-    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"Цяпер вы можаце зарэгістраваць сваю прыладу ў праграме паўторнага забеспячэння залогам, якую прапануе кампанія \"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\""</string>
+    <string name="enroll_your_device_recol_subheader" msgid="6875207585877997023">"Магчымая рэгістрацыя ў праграме паўторнага забеспячэння залогам ад кампаніі \"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\""</string>
     <string name="subsidy_program_header" msgid="2321508488856303554">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> дае вам субсідзіраванне"</string>
     <string name="device_enrollment_header_text" msgid="5283341102404741658">"Рэгістрацыя прылады"</string>
     <string name="device_financing_enrollment_body_text" msgid="5506086383249511498">"Ваша прылада будзе зарэгістравана ў праграме фінансавання кампаніі \"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\" на працягу 30 дзён"</string>
