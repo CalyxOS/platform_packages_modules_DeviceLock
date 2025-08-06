@@ -63,6 +63,13 @@ public final class ProvisioningProgress {
                 bottomViewVisible, countDownTimerVisible, failureReason);
     }
 
+    ProvisioningProgress(boolean bottomViewVisible, boolean countDownTimerVisible,
+            @ProvisionFailureReason int failureReason, int headerId) {
+        this(R.drawable.ic_warning_24px, headerId,
+                R.string.click_to_contact_financier, /* progressBarVisible=*/ false,
+                bottomViewVisible, countDownTimerVisible, failureReason);
+    }
+
     ProvisioningProgress(int iconId, int headerId, int subheaderId, boolean progressBarVisible,
             boolean bottomViewVisible, boolean countDownTimerVisible,
             @ProvisionFailureReason int failureReason) {
@@ -85,6 +92,34 @@ public final class ProvisioningProgress {
         return new ProvisioningProgress(
                 /* bottomViewVisible= */ false, /* countDownTimerVisible= */ true, failureReason);
     }
+
+    /**
+     * Get the provision failure progress item for mandatory case without reset countdown timer.
+     *
+     * @param failureReason one of {@link ProvisionFailureReason} The reason why provision failed.
+     */
+    public static ProvisioningProgress getMandatoryProvisioningFailedProgressNoResetTimer(
+            @ProvisionFailureReason int failureReason) {
+        return new ProvisioningProgress(
+                /* bottomViewVisible= */ false, /* countDownTimerVisible= */ false, failureReason,
+                R.string.provisioning_failed_generic);
+    }
+
+    /**
+     * Get the provision failure progress item for mandatory case without reset countdown timer
+     * and with bottom view visible.
+     *
+     * @param failureReason one of {@link ProvisionFailureReason} The reason why provision failed.
+     */
+    public static ProvisioningProgress getMandatoryProvisioningFailedProgressNoResetWithBottomView(
+            @ProvisionFailureReason int failureReason) {
+        return new ProvisioningProgress(
+                /* bottomViewVisible= */ true,
+                /* countDownTimerVisible= */ false,
+                failureReason,
+                R.string.provisioning_failed_generic);
+    }
+
 
     /**
      * Get the provision failure progress item for non-mandatory case with the failure reason.

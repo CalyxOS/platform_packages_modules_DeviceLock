@@ -16,12 +16,20 @@
 
 package com.android.devicelockcontroller.activities;
 
+import android.app.Application;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
+import androidx.work.Data;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
+import com.android.devicelockcontroller.provision.worker.ReportDeviceProvisionStateWorker;
 import com.android.devicelockcontroller.storage.SetupParametersClient;
 import com.android.devicelockcontroller.util.LogUtil;
 
@@ -30,11 +38,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import java.util.List;
+
 /**
  * A {@link ViewModel} which provides {@link ProvisioningProgress} to the
  * {@link ProvisioningActivity}.
  */
-public final class ProvisioningProgressViewModel extends ViewModel implements
+public final class ProvisioningProgressViewModel extends AndroidViewModel implements
         ProvisioningProgressController {
 
     private static final String TAG = "ProvisioningProgressViewModel";
@@ -44,8 +54,10 @@ public final class ProvisioningProgressViewModel extends ViewModel implements
     private volatile boolean mAreProviderNameAndSupportUrlReady;
     private final MutableLiveData<ProvisioningProgress> mProvisioningProgressLiveData;
     private ProvisioningProgress mProvisioningProgress;
+    private final LiveData<Boolean> mIsRecolFailed;
 
-    public ProvisioningProgressViewModel() {
+    public ProvisioningProgressViewModel(@NonNull Application application) {
+        super(application);
         mProviderNameLiveData = new MutableLiveData<>();
         mSupportUrlLiveData = new MutableLiveData<>();
 
@@ -102,6 +114,30 @@ public final class ProvisioningProgressViewModel extends ViewModel implements
                 throw new RuntimeException(t);
             }
         }, MoreExecutors.directExecutor());
+
+        // Observe the result of ReportDeviceProvisionStateWorker and if recol has failed update
+        // the live data.
+        WorkManager workManager = WorkManager.getInstance(application);
+        LiveData<List<WorkInfo>> workInfos = workManager.getWorkInfosForUniqueWorkLiveData(
+                ReportDeviceProvisionStateWorker.REPORT_PROVISION_STATE_WORK_NAME);
+
+        mIsRecolFailed = Transformations.map(workInfos, infoList -> {
+            if (infoList == null || infoList.isEmpty()) {
+                return false;
+            }
+
+            WorkInfo workInfo = infoList.getFirst();
+
+            if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                Data outputData = workInfo.getOutputData();
+                return outputData.getBoolean(ReportDeviceProvisionStateWorker.KEY_IS_RECOL_FAILED,
+                        false);
+            }
+
+            // If not succeeded or still running, return false.
+            return false;
+        });
+
     }
 
     /**
@@ -130,5 +166,9 @@ public final class ProvisioningProgressViewModel extends ViewModel implements
                     "The upstream LiveData is not ready yet, hold on until it completes");
             mProvisioningProgress = provisioningProgress;
         }
+    }
+
+    public LiveData<Boolean> getIsRecolFailed() {
+        return mIsRecolFailed;
     }
 }

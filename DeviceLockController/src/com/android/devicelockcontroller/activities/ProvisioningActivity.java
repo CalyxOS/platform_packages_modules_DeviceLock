@@ -30,6 +30,7 @@ import android.view.WindowInsetsController;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.android.devicelockcontroller.R;
@@ -98,6 +99,21 @@ public final class ProvisioningActivity extends AppCompatActivity {
             viewModel.setProvisioningProgress(
                     ProvisioningProgress.getNonMandatoryProvisioningFailedProgress(UNKNOWN_REASON));
         }
+
+        Observer<Boolean> recolFailedObserver = new Observer<>() {
+            @Override
+            public void onChanged(Boolean isRecolFailed) {
+                if (Boolean.TRUE.equals(isRecolFailed)) {
+                    viewModel.setProvisioningProgress(
+                            ProvisioningProgress
+                                    .getMandatoryProvisioningFailedProgressNoResetWithBottomView(
+                                    UNKNOWN_REASON));
+                    viewModel.getIsRecolFailed().removeObserver(this);
+                }
+            }
+        };
+        viewModel.getIsRecolFailed().observe(this,
+                recolFailedObserver);
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()

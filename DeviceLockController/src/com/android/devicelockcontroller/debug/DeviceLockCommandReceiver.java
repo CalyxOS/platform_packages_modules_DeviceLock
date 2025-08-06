@@ -333,14 +333,7 @@ public final class DeviceLockCommandReceiver extends BroadcastReceiver {
                 new FutureCallback<>() {
                     @Override
                     public void onSuccess(Boolean provisioningInfoReady) {
-                        if (!provisioningInfoReady) {
                             scheduler.scheduleInitialCheckInWork();
-                        } else {
-                            LogUtil.e(TAG,
-                                    "Can not check in when provisioning info has already been "
-                                            + "received. Use the \"reset\" command to reset "
-                                            + "DLC first.");
-                        }
                     }
 
                     @Override
