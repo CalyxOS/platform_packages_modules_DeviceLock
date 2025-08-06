@@ -167,6 +167,19 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
     @Override
     public boolean wipeDevice() {
         LogUtil.i(TAG, "Wiping device");
+        if (mFeatureFlagProvider.isRecolEnabled()) {
+            try {
+                @ProvisioningType int provisioningType =
+                        SetupParametersClient.getInstance().getProvisioningType().get();
+                if (provisioningType == ProvisioningType.TYPE_RECOL) {
+                    LogUtil.w(TAG, "Wipe is not allowed for recol provisioning type");
+                    return false;
+                }
+            } catch (java.util.concurrent.ExecutionException | InterruptedException e) {
+                // TODO: b/438125704 - Handle this edge case in a more robust way.
+                LogUtil.e(TAG, "Failed to get provisioning type, proceeding with wipe.", e);
+            }
+        }
         try {
             mDpm.wipeDevice(
                     DevicePolicyManager.WIPE_SILENTLY

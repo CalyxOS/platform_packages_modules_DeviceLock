@@ -179,6 +179,17 @@ public final class DevicePolicyControllerImplTest {
     }
 
     @Test
+    public void wipeDevice_provisionTypeIsRecol_returnsFalse()
+            throws ExecutionException, InterruptedException {
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+        Bundle preferences = new Bundle();
+        preferences.putInt(EXTRA_PROVISIONING_TYPE, TYPE_RECOL);
+        SetupParametersClient.getInstance().createPrefs(preferences).get();
+
+        assertThat(mDevicePolicyController.wipeDevice()).isFalse();
+    }
+
+    @Test
     public void enforceCurrentPolicies_withUnprovisionedState_doesNotStartLockTaskMode()
             throws Exception {
         setupSetupParameters();
