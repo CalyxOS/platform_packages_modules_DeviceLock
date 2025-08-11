@@ -130,7 +130,7 @@ public final class DeviceStateControllerImpl implements DeviceStateController {
     private ListenableFuture<Void> setDeviceStateAndEnforcePolicies(@DeviceState int deviceState) {
         return Futures.transformAsync(isCleared(),
                 isCleared -> {
-                    if (isClearingInProgress(deviceState) || isCleared) {
+                    if (isStateChangingWhileClearInProgress(deviceState) || isCleared) {
                         throw new IllegalStateException("Device has been "
                                 + "cleared!");
                     }
@@ -173,11 +173,15 @@ public final class DeviceStateControllerImpl implements DeviceStateController {
                 s -> s == CLEARED, MoreExecutors.directExecutor());
     }
 
-    // If a clear operation is immediately followed by an unlock command, sometimes a race
-    // condition occurs that results in the unlock state being enforced. This method is used to
-    // ensure that clear is always terminal.
-    // TODO: b/286324034 - these operations should be made thread safe
-    private boolean isClearingInProgress(@DeviceState int deviceStateBeingEnforced) {
+    /**
+     * The purpose of this method is to ensure that clear is always terminal by preventing a
+     * state change while a clear is in progress.
+     * Without this, if a clear operation is immediately followed by an unlock command, sometimes a
+     * race condition occurs that results in the unlock state being enforced instead of the clear
+     * state.
+     * TODO: b/286324034 - these operations should be made thread safe
+     */
+    private boolean isStateChangingWhileClearInProgress(@DeviceState int deviceStateBeingEnforced) {
         return deviceStateBeingEnforced != CLEARED && mClearingInProgress;
     }
 }
