@@ -18,6 +18,7 @@ package com.android.devicelockcontroller.activities;
 
 import static com.android.devicelockcontroller.common.DeviceLockConstants.MANDATORY_PROVISION_DEVICE_RESET_COUNTDOWN_MINUTE;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_FAILURE;
+import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_RETRY;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.PROVISION_FAILED;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
@@ -52,6 +54,7 @@ import com.android.devicelockcontroller.util.LogUtil;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.TimeUnit;
 
@@ -133,6 +136,9 @@ public final class ProgressFragment extends Fragment {
                         bottomView.setVisibility(View.VISIBLE);
                         Button retryButton = bottomView.findViewById(R.id.button_retry);
                         checkNotNull(retryButton);
+                        Button exitButton = bottomView.findViewById(R.id.button_exit);
+                        checkNotNull(exitButton);
+
                         PolicyObjectsProvider policyObjects =
                                 (PolicyObjectsProvider) context.getApplicationContext();
                         ProvisionStateController provisionStateController =
@@ -142,15 +148,52 @@ public final class ProgressFragment extends Fragment {
                                     context,
                                     provisionStateController);
                         }
-                        retryButton.setOnClickListener(
-                                view -> mProvisionHelper.scheduleKioskAppInstallation(
-                                        requireActivity(),
-                                        provisioningProgressViewModel,
-                                        /* isProvisionMandatory= */ false));
 
-                        Button exitButton = bottomView.findViewById(R.id.button_exit);
-                        checkNotNull(exitButton);
-                        FutureCallback<Integer> getProvisionStateCallback =
+                        Boolean isRecolFailed =
+                                provisioningProgressViewModel.getIsRecolFailed().getValue();
+                        if (Boolean.TRUE.equals(isRecolFailed)) {
+                            // Set up listeners for recol-failed case.
+                            retryButton.setOnClickListener(
+                                    view -> {
+                                        provisionStateController.postSetNextStateForEventRequest(
+                                                PROVISION_RETRY);
+                                    });
+                            exitButton.setOnClickListener(
+                                    view -> {
+                                        exitButton.setEnabled(false);
+                                        retryButton.setEnabled(false);
+                                        // Ensure the device is in a clean and unlocked state
+                                        // before exiting.
+                                        ListenableFuture<Void> unlockFuture =
+                                                provisionStateController.unlockAndFinalizeDevice();
+                                        Futures.addCallback(unlockFuture,
+                                                new FutureCallback<>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        if (getActivity() != null) {
+                                                            getActivity().finish();
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(@NonNull Throwable t) {
+                                                        LogUtil.e(TAG, "Failed to unlock device",
+                                                                t);
+                                                        exitButton.setEnabled(true);
+                                                        retryButton.setEnabled(true);
+                                                    }
+                                                }, requireContext().getMainExecutor());
+                                    });
+
+                        } else {
+                            // Set up listeners for default case.
+                            retryButton.setOnClickListener(
+                                    view -> mProvisionHelper.scheduleKioskAppInstallation(
+                                            requireActivity(),
+                                            provisioningProgressViewModel,
+                                            /* isProvisionMandatory= */ false));
+
+                            FutureCallback<Integer> getProvisionStateCallback =
                                 new FutureCallback<>() {
                                     @Override
                                     public void onSuccess(Integer result) {
@@ -173,10 +216,11 @@ public final class ProgressFragment extends Fragment {
                                         LogUtil.e(TAG, "Failed to get provision state", t);
                                     }
                                 };
-                        exitButton.setOnClickListener(
-                                view -> Futures.addCallback(provisionStateController.getState(),
-                                        getProvisionStateCallback,
-                                        context.getMainExecutor()));
+                            exitButton.setOnClickListener(
+                                    view -> Futures.addCallback(provisionStateController.getState(),
+                                            getProvisionStateCallback,
+                                            context.getMainExecutor()));
+                        }
                     } else {
                         bottomView.setVisibility(View.GONE);
                     }
@@ -190,6 +234,7 @@ public final class ProgressFragment extends Fragment {
                         countDownTimeView.setVisibility(View.GONE);
                     }
                 });
+
         return v;
     }
 }

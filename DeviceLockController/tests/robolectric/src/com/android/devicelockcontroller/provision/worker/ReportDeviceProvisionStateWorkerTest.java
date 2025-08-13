@@ -18,7 +18,9 @@ package com.android.devicelockcontroller.provision.worker;
 
 import static com.android.devicelockcontroller.activities.DeviceLockNotificationManager.DEVICE_RESET_NOTIFICATION_ID;
 import static com.android.devicelockcontroller.activities.DeviceLockNotificationManager.DEVICE_RESET_NOTIFICATION_TAG;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_CHECKIN;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_DISMISSIBLE_UI;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_ENABLE_BOTTOM_VIEW;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_FACTORY_RESET;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_PERSISTENT_UI;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_RETRY;
@@ -26,6 +28,7 @@ import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
@@ -41,6 +44,7 @@ import android.service.notification.StatusBarNotification;
 import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.work.Configuration;
+import androidx.work.Data;
 import androidx.work.ListenableWorker;
 import androidx.work.ListenableWorker.Result;
 import androidx.work.WorkerFactory;
@@ -51,6 +55,8 @@ import androidx.work.testing.WorkManagerTestInitHelper;
 
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.activities.DeviceLockNotificationManager;
+import com.android.devicelockcontroller.policy.DeviceStateController;
+import com.android.devicelockcontroller.policy.FinalizationController;
 import com.android.devicelockcontroller.provision.grpc.DeviceCheckInClient;
 import com.android.devicelockcontroller.provision.grpc.ReportDeviceProvisionStateGrpcResponse;
 import com.android.devicelockcontroller.stats.StatsLogger;
@@ -59,6 +65,7 @@ import com.android.devicelockcontroller.storage.GlobalParametersClient;
 import com.android.devicelockcontroller.storage.SetupParametersClient;
 import com.android.devicelockcontroller.storage.UserParameters;
 
+import com.google.common.truth.Truth;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -74,6 +81,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.shadows.ShadowNotificationManager;
 
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -86,6 +94,8 @@ public final class ReportDeviceProvisionStateWorkerTest {
     private DeviceCheckInClient mClient;
     @Mock
     private ReportDeviceProvisionStateGrpcResponse mResponse;
+    private DeviceStateController mDeviceStateController;
+    private FinalizationController mFinalizationController;
     private StatsLogger mStatsLogger;
     private SetupParametersClient mSetupParametersClient;
     private ReportDeviceProvisionStateWorker mWorker;
@@ -96,6 +106,8 @@ public final class ReportDeviceProvisionStateWorkerTest {
     @Before
     public void setUp() throws Exception {
         mTestApp = ApplicationProvider.getApplicationContext();
+        mDeviceStateController = mTestApp.getDeviceStateController();
+        mFinalizationController = mTestApp.getFinalizationController();
         WorkManagerTestInitHelper.initializeTestWorkManager(mTestApp,
                 new Configuration.Builder()
                         .setMinimumLoggingLevel(android.util.Log.DEBUG)
@@ -280,7 +292,93 @@ public final class ReportDeviceProvisionStateWorkerTest {
         verify(mTestApp.getDeviceLockControllerScheduler()).scheduleResetDeviceAlarm();
     }
 
+    @Test
+    public void doWorkWithRecolEnabled_enableBottomViewReceived_succeedsAndSetsData() {
+        when(mTestApp.getFeatureFlagProvider().isRecolEnabled()).thenReturn(true);
+        when(mResponse.isSuccessful()).thenReturn(true);
+        when(mResponse.getNextClientProvisionState()).thenReturn(
+                PROVISION_STATE_ENABLE_BOTTOM_VIEW);
+
+        ListenableWorker.Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isInstanceOf(Result.Success.class);
+        Data outputData = result.getOutputData();
+        Truth.assertThat(outputData.getBoolean(
+                        ReportDeviceProvisionStateWorker.KEY_IS_RECOL_FAILED, /* defaultValue=
+                        */ false))
+                .isTrue();
+    }
+
+    @Test
+    public void doWorkWithRecolDisabled_enableBottomViewReceived_succeedsAndDoesNotSetData() {
+        when(mTestApp.getFeatureFlagProvider().isRecolEnabled()).thenReturn(false);
+        when(mResponse.isSuccessful()).thenReturn(true);
+        when(mResponse.getNextClientProvisionState()).thenReturn(
+                PROVISION_STATE_ENABLE_BOTTOM_VIEW);
+
+        ListenableWorker.Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isInstanceOf(Result.Success.class);
+        Data outputData = result.getOutputData();
+        Truth.assertThat(outputData.getBoolean(
+                        ReportDeviceProvisionStateWorker.KEY_IS_RECOL_FAILED, /* defaultValue=
+                        */ false))
+                .isFalse();
+    }
+
+    @Test
+    public void doWorkWithRecolEnabled_retryReceived_schedulesAlarmToRetry() {
+        when(mTestApp.getFeatureFlagProvider().isRecolEnabled()).thenReturn(true);
+        when(mResponse.isSuccessful()).thenReturn(true);
+        when(mResponse.getNextClientProvisionState()).thenReturn(PROVISION_STATE_RETRY);
+
+        ListenableWorker.Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isInstanceOf(Result.Success.class);
+        verify(mTestApp.getDeviceLockControllerScheduler()).scheduleNextProvisionFailedStepAlarm();
+    }
+
+    @Test
+    public void doWorkWithRecolDisabled_retryReceived_doesNotScheduleAlarm() {
+        when(mTestApp.getFeatureFlagProvider().isRecolEnabled()).thenReturn(false);
+        when(mResponse.isSuccessful()).thenReturn(true);
+        when(mResponse.getNextClientProvisionState()).thenReturn(PROVISION_STATE_RETRY);
+
+        ListenableWorker.Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isInstanceOf(Result.Success.class);
+        verify(mTestApp.getDeviceLockControllerScheduler(),
+                never()).scheduleNextProvisionFailedStepAlarm();
+    }
+
+    @Test
+    public void doWorkWithRecolEnabled_checkInReceived_schedulesCheckInWork() {
+        when(mTestApp.getFeatureFlagProvider().isRecolEnabled()).thenReturn(true);
+        when(mResponse.isSuccessful()).thenReturn(true);
+        when(mResponse.getNextClientProvisionState()).thenReturn(PROVISION_STATE_CHECKIN);
+
+        ListenableWorker.Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isInstanceOf(Result.Success.class);
+        verify(mTestApp.getDeviceLockControllerScheduler()).scheduleRetryCheckInWork(
+                any(Duration.class));
+    }
+
+    @Test
+    public void doWorkWithRecolDisabled_checkInReceived_doesNotScheduleCheckInWork() {
+        when(mTestApp.getFeatureFlagProvider().isRecolEnabled()).thenReturn(false);
+        when(mResponse.isSuccessful()).thenReturn(true);
+        when(mResponse.getNextClientProvisionState()).thenReturn(PROVISION_STATE_CHECKIN);
+
+        ListenableWorker.Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isInstanceOf(Result.Success.class);
+        verify(mTestApp.getDeviceLockControllerScheduler(), never()).scheduleRetryCheckInWork(
+                any(Duration.class));
+    }
+
     private static void waitUntilExecutorIdle(ExecutorService executorService) {
-        Futures.getUnchecked(executorService.submit(() -> {}));
+        Futures.getUnchecked(executorService.submit(() -> {
+        }));
     }
 }

@@ -18,6 +18,7 @@ package com.android.devicelockcontroller.policy;
 
 import static com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState.FINALIZED;
 import static com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState.FINALIZED_UNREPORTED;
+import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_CLEAR;
 import static com.android.devicelockcontroller.provision.worker.ReportDeviceLockProgramCompleteWorker.REPORT_DEVICE_LOCK_PROGRAM_COMPLETE_WORK_NAME;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Looper;
 import android.os.OutcomeReceiver;
@@ -42,6 +44,7 @@ import androidx.work.testing.WorkManagerTestInitHelper;
 
 import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.SystemDeviceLockManager;
+import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.provision.grpc.DeviceFinalizeClient.ReportDeviceProgramCompleteResponse;
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
 
@@ -76,17 +79,20 @@ public final class FinalizationControllerImplTest {
     private GlobalParametersClient mGlobalParametersClient;
     @Mock
     private FeatureFlagProvider mFeatureFlagProvider;
+    private ProvisionStateController mProvisionStateController;
+    private TestDeviceLockControllerApplication mTestApp;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        mTestApp = ApplicationProvider.getApplicationContext();
         mContext = ApplicationProvider.getApplicationContext();
         mSystemDeviceLockManager = new TestSystemDeviceLockManager(mContext);
         WorkManagerTestInitHelper.initializeTestWorkManager(mContext);
 
         mGlobalParametersClient = GlobalParametersClient.getInstance();
         mDispatchQueue = new FinalizationStateDispatchQueue(mExecutionSequencer);
-        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+        mProvisionStateController = mTestApp.getProvisionStateController();
     }
 
     @After
@@ -135,6 +141,106 @@ public final class FinalizationControllerImplTest {
         assertThat(mGlobalParametersClient.getFinalizationState().get())
                 .isEqualTo(FINALIZED);
         assertThat(mSystemDeviceLockManager.finalized).isTrue();
+    }
+
+    @Test
+    public void finalizeNotEnrolledDevice_stopsAllWorkers() throws Exception {
+        // GIVEN a long running worker is in progress
+        mFinalizationController = makeFinalizationController(LongRunningTestWorker.class);
+        final OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(
+                LongRunningTestWorker.class).build();
+        WorkManager.getInstance(mContext).enqueue(workRequest);
+        // This allows the worker to start.
+        shadowOf(Looper.getMainLooper()).idle();
+        assertThat(LongRunningTestWorker.startLatch.await(2, TimeUnit.SECONDS)).isTrue();
+        WorkInfo workInfo = WorkManager.getInstance(mContext).getWorkInfoById(
+                workRequest.getId()).get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        assertThat(workInfo.getState()).isEqualTo(WorkInfo.State.RUNNING);
+
+        // WHEN the device is finalized as not enrolled
+        ListenableFuture<Void> finalizedFuture =
+                mFinalizationController.finalizeNotEnrolledDevice();
+        Futures.getChecked(finalizedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        // THEN the long running worker is cancelled
+        workInfo = WorkManager.getInstance(mContext).getWorkInfoById(
+                workRequest.getId()).get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        assertThat(workInfo.getState()).isEqualTo(WorkInfo.State.CANCELLED);
+    }
+
+    @Test
+    public void finalizeNotEnrolledDevice_recolEnabled_resetsStorageParameters() throws Exception {
+        // GIVEN recol feature is enabled
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+        when(mProvisionStateController.setNextStateForEvent(PROVISION_CLEAR)).thenReturn(
+                Futures.immediateVoidFuture());
+        mFinalizationController = makeFinalizationController();
+
+        // GIVEN some data in storage parameters
+        final Context deviceContext = mContext.createDeviceProtectedStorageContext();
+        final SharedPreferences globalPrefs = deviceContext.getSharedPreferences(
+                "global-params", Context.MODE_PRIVATE);
+        final SharedPreferences setupPrefs = deviceContext.getSharedPreferences(
+                "setup-prefs", Context.MODE_PRIVATE);
+        final SharedPreferences userPrefs = deviceContext.getSharedPreferences(
+                "user-params", Context.MODE_PRIVATE);
+
+        globalPrefs.edit().putString("test_key", "test_value").apply();
+        setupPrefs.edit().putString("test_key", "test_value").apply();
+        userPrefs.edit().putString("test_key", "test_value").apply();
+
+        assertThat(globalPrefs.getAll()).isNotEmpty();
+        assertThat(setupPrefs.getAll()).isNotEmpty();
+        assertThat(userPrefs.getAll()).isNotEmpty();
+
+        // WHEN finalizeNotEnrolledDevice is called
+        ListenableFuture<Void> finalizedFuture =
+                mFinalizationController.finalizeNotEnrolledDevice();
+        Futures.getChecked(finalizedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        shadowOf(Looper.getMainLooper()).idle();
+
+        // THEN storage parameters are cleared
+        assertThat(globalPrefs.getAll()).isEmpty();
+        assertThat(setupPrefs.getAll()).isEmpty();
+        //User prefs should only have boot-time-millis with value of 0
+        assertThat(userPrefs.getAll()).containsEntry("boot-time-mills", 0L);
+        assertThat(userPrefs.getAll()).doesNotContainKey("test_key");
+    }
+
+
+    @Test
+    public void finalizeNotEnrolledDevice_recolDisabled_doesNotResetStorageParameters()
+            throws Exception {
+        // GIVEN recol feature is not enabled
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(false);
+        mFinalizationController = makeFinalizationController();
+
+        // GIVEN some data in storage parameters
+        final Context deviceContext = mContext.createDeviceProtectedStorageContext();
+        final SharedPreferences globalPrefs = deviceContext.getSharedPreferences(
+                "global-params", Context.MODE_PRIVATE);
+        final SharedPreferences setupPrefs = deviceContext.getSharedPreferences(
+                "setup-prefs", Context.MODE_PRIVATE);
+        final SharedPreferences userPrefs = deviceContext.getSharedPreferences(
+                "user-params", Context.MODE_PRIVATE);
+
+        globalPrefs.edit().putString("test_key", "test_value").apply();
+        setupPrefs.edit().putString("test_key", "test_value").apply();
+        userPrefs.edit().putString("test_key", "test_value").apply();
+
+        assertThat(globalPrefs.getAll()).isNotEmpty();
+        assertThat(setupPrefs.getAll()).isNotEmpty();
+        assertThat(userPrefs.getAll()).isNotEmpty();
+
+        // WHEN finalizeNotEnrolledDevice is called
+        ListenableFuture<Void> finalizedFuture =
+                mFinalizationController.finalizeNotEnrolledDevice();
+        Futures.getChecked(finalizedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        // THEN storage parameters are not cleared
+        assertThat(globalPrefs.getString("test_key", "")).isEqualTo("test_value");
+        assertThat(setupPrefs.getString("test_key", "")).isEqualTo("test_value");
+        assertThat(userPrefs.getString("test_key", "")).isEqualTo("test_value");
     }
 
     @Test
@@ -212,8 +318,11 @@ public final class FinalizationControllerImplTest {
     }
 
     @Test
-    public void reportingFinishedSuccessfully_doesNotDisableDeviceLockController()
+    public void reportingFinishedSuccessfully_recolFlagIsTrue_doesNotDisableDeviceLockController()
             throws Exception {
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+        when(mProvisionStateController.setNextStateForEvent(PROVISION_CLEAR)).thenReturn(
+                Futures.immediateVoidFuture());
         mFinalizationController = makeFinalizationController();
         final String packageName = mContext.getPackageName();
 

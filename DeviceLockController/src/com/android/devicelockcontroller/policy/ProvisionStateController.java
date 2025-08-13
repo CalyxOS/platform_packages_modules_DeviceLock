@@ -78,6 +78,11 @@ public interface ProvisionStateController {
     ListenableFuture<Void> onUserSetupCompleted();
 
     /**
+     * Unlock and finalize the device.
+     */
+    ListenableFuture<Void> unlockAndFinalizeDevice();
+
+    /**
      * State definitions related to provisioning flow.
      */
     @Target(ElementType.TYPE_USE)
@@ -123,6 +128,7 @@ public interface ProvisionStateController {
             ProvisionEvent.PROVISION_KIOSK,
             ProvisionEvent.PROVISION_RESUME,
             ProvisionEvent.PROVISION_RETRY,
+            ProvisionEvent.PROVISION_CLEAR,
     })
     @interface ProvisionEvent {
 
@@ -146,5 +152,11 @@ public interface ProvisionStateController {
 
         /* Retry provision after failure */
         int PROVISION_RETRY = 6;
+
+        /**
+         * Return provisioning to its initial state.
+         * This is used if provisioning fails for the RECOL ProvisionType.
+         */
+        int PROVISION_CLEAR = 7;
     }
 }

@@ -77,8 +77,8 @@
     <string name="footer_notice_content_description">The management capabilities in the financed device section of Security settings don\'t apply to this device.</string>
     <!-- Text explaining that this device is provided by the device provider. [CHAR_LIMIT=80] -->
     <string name="device_provided_by_provider">This device is provided by <xliff:g id="provider name">%1$s</xliff:g></string>
-    <!-- Text explaining that the device is being setup as collateral for a loan. [CHAR_LIMIT=NONE] -->
-    <string name="device_used_as_collateral">This device is being set up as collateral for a loan.</string>
+    <!-- Text explaining that the device is being setup as collateral for a loan by the provider. [CHAR_LIMIT=NONE] -->
+    <string name="device_used_as_collateral">This device is being set up as collateral for a loan by <xliff:g id="provider name">%1$s</xliff:g></string>
     <!-- Text explaining the kiosk app will be downloaded and installed. [CHAR_LIMIT=NONE] -->
     <string name="download_kiosk_app">The Kiosk app will be downloaded and installed automatically</string>
     <!-- Text explaining that the kiosk app will be installed for this newly created secondary user. [CHAR_LIMIT=NONE] -->
@@ -247,6 +247,8 @@
     <string name="device_reset_notification_content">All device data will be deleted. For help enrolling your device, contact <xliff:g id="provider name">%1$s</xliff:g></string>
     <!-- Title text of the provisioning failed screen, this tells the user provisioning of their device failed. [CHAR LIMIT=60] -->
     <string name="provisioning_failed">Financing provisioning has failed</string>
+    <!-- Generic title text of the provisioning failed screen, this tells the user provisioning of their device failed. [CHAR LIMIT=60] -->
+    <string name="provisioning_failed_generic">Provisioning has failed</string>
     <!-- Subheader of the provisioning failed screen, this tells the user to click the link to contact their financier for help. [CHAR LIMIT=NONE] -->
     <string name="click_to_contact_financier">For help enrolling your device, <xliff:g id="support_link_start">&lt;a href="%2$s"></xliff:g>contact <xliff:g id="provider name">%1$s</xliff:g><xliff:g id="support_link_end">&lt;/a&gt;</xliff:g>.</string>
     <!-- Button text used to let the user exit the Device lock controller app. [CHAR LIMIT=20] -->

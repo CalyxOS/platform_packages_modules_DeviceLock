@@ -23,9 +23,15 @@ import static com.google.common.truth.Truth.assertThat;
 
 import static org.robolectric.Shadows.shadowOf;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Looper;
 import android.widget.ImageView;
+
+import androidx.test.core.app.ApplicationProvider;
+import androidx.work.Configuration;
+import androidx.work.testing.SynchronousExecutor;
+import androidx.work.testing.WorkManagerTestInitHelper;
 
 import com.android.devicelockcontroller.R;
 
@@ -50,6 +56,12 @@ public final class DevicePoliciesFragmentTest {
 
     @Before
     public void setUp() {
+        Context context = ApplicationProvider.getApplicationContext();
+        WorkManagerTestInitHelper.initializeTestWorkManager(
+                context,
+                new Configuration.Builder()
+                        .setExecutor(new SynchronousExecutor())
+                        .build());
         Intent intent = new Intent();
         intent.setAction(ACTION_START_DEVICE_FINANCING_PROVISIONING);
         mActivityController = Robolectric.buildActivity(EmptyTestFragmentActivity.class, intent);

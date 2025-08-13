@@ -17,9 +17,11 @@
 package com.android.devicelockcontroller.policy;
 
 import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_KIOSK_PACKAGE;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_PROVISIONING_TYPE;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisionFailureReason.NOT_IN_ELIGIBLE_COUNTRY;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisionFailureReason.PLAY_INSTALLATION_FAILED;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisionFailureReason.UNKNOWN_REASON;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.ProvisioningType.TYPE_RECOL;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_KIOSK;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_PAUSE;
 import static com.android.devicelockcontroller.provision.worker.IsDeviceInApprovedCountryWorker.KEY_IS_IN_APPROVED_COUNTRY;
@@ -62,6 +64,7 @@ import androidx.work.WorkerParameters;
 import androidx.work.testing.TestDriver;
 import androidx.work.testing.WorkManagerTestInitHelper;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication.PlayInstallPackageWorker;
 import com.android.devicelockcontroller.activities.ProvisioningProgress;
@@ -124,6 +127,7 @@ public final class ProvisionHelperImplTest {
 
     private TestDeviceLockControllerApplication mTestApp;
     private ProvisionHelperImpl mProvisionHelper;
+    private FeatureFlagProvider mFeatureFlagProvider;
 
     private TestDriver mTestDriver;
     private TestWorkerFactory mTestWorkerFactory;
@@ -131,6 +135,7 @@ public final class ProvisionHelperImplTest {
     @Before
     public void setUp() {
         mTestApp = ApplicationProvider.getApplicationContext();
+        mFeatureFlagProvider = mTestApp.getFeatureFlagProvider();
         mMockStateController = mTestApp.getProvisionStateController();
         Executor executor = TestingExecutors.sameThreadScheduledExecutor();
         ProvisionHelperImpl.getSharedPreferences(mTestApp).edit().clear().commit();
@@ -480,6 +485,62 @@ public final class ProvisionHelperImplTest {
     }
 
     @Test
+    public void installKiosk_whenRecolProvisioningFails_thenDoNotSetResetTimer()
+            throws Exception {
+        // GIVEN Provisioning type is RECOL
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+        Bundle bundle = new Bundle();
+        bundle.putInt(EXTRA_PROVISIONING_TYPE, TYPE_RECOL);
+        SetupParametersClient.getInstance().createPrefs(bundle).get();
+
+        // GIVEN Country is approved and play installation would fail.
+        mTestWorkerFactory.setWorkResult(COUNTRY_WORKER_CLASS_NAME,
+                Result.success(
+                        new Data.Builder().putBoolean(KEY_IS_IN_APPROVED_COUNTRY, true).build()));
+        mTestWorkerFactory.setWorkResult(PLAY_INSTALL_WORKER_CLASS_NAME, Result.failure());
+
+
+        // WHEN installation is executed for mandatory provisioning
+        mProvisionHelper.scheduleKioskAppInstallation(mMockLifecycleOwner,
+                mProgressController, /* isProvisionMandatory= */ true);
+        shadowOf(Looper.getMainLooper()).idle();
+        executeWork(COUNTRY_WORKER_UNIQUE_NAME);
+        executeWork(PLAY_INSTALL_WORKER_UNIQUE_NAME);
+
+        // THEN schedule reset alarm is not called.
+        verify(mTestApp.getDeviceLockControllerScheduler(),
+                never()).scheduleMandatoryResetDeviceAlarm();
+    }
+
+    @Test
+    public void installKiosk_whenRecolProvisioningFails_setsCorrectProgress() throws Exception {
+        // GIVEN Provisioning type is RECOL
+        when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
+        Bundle bundle = new Bundle();
+        bundle.putInt(EXTRA_PROVISIONING_TYPE, TYPE_RECOL);
+        SetupParametersClient.getInstance().createPrefs(bundle).get();
+
+        // GIVEN Country is approved and play installation would fail.
+        mTestWorkerFactory.setWorkResult(COUNTRY_WORKER_CLASS_NAME,
+                Result.success(
+                        new Data.Builder().putBoolean(KEY_IS_IN_APPROVED_COUNTRY, true).build()));
+        mTestWorkerFactory.setWorkResult(PLAY_INSTALL_WORKER_CLASS_NAME, Result.failure());
+
+        // WHEN installation is executed for mandatory provisioning
+        mProvisionHelper.scheduleKioskAppInstallation(mMockLifecycleOwner,
+                mProgressController, /* isProvisionMandatory= */ true);
+        shadowOf(Looper.getMainLooper()).idle();
+        executeWork(COUNTRY_WORKER_UNIQUE_NAME);
+        executeWork(PLAY_INSTALL_WORKER_UNIQUE_NAME);
+
+        // THEN go through correct ProvisioningProgress.
+        verifyProgressesSet(Arrays.asList(ProvisioningProgress.GETTING_DEVICE_READY,
+                ProvisioningProgress.INSTALLING_KIOSK_APP,
+                ProvisioningProgress.getMandatoryProvisioningFailedProgressNoResetTimer(
+                        PLAY_INSTALLATION_FAILED)));
+    }
+
+    @Test
     public void installKiosk_whenInstallationFailsAndIsMandatory_thenSetProgress()
             throws Exception {
         // GIVEN Country is approved and play installation would fail.
@@ -724,7 +785,8 @@ public final class ProvisionHelperImplTest {
                 @Override
                 public ListenableFuture<Result> startWork() {
                     mWorkerInputDataAssertions.getOrDefault(workerClassName,
-                            data -> {}).accept(getInputData());
+                            data -> {
+                            }).accept(getInputData());
                     return Futures.immediateFuture(
                             mWorkerResults.getOrDefault(workerClassName, Result.success()));
                 }

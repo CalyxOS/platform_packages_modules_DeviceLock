@@ -52,10 +52,12 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.PlayInstallPackageTaskClassProvider;
 import com.android.devicelockcontroller.activities.DeviceLockNotificationManager;
 import com.android.devicelockcontroller.activities.ProvisioningProgress;
 import com.android.devicelockcontroller.activities.ProvisioningProgressController;
+import com.android.devicelockcontroller.common.DeviceLockConstants;
 import com.android.devicelockcontroller.common.DeviceLockConstants.ProvisionFailureReason;
 import com.android.devicelockcontroller.provision.worker.IsDeviceInApprovedCountryWorker;
 import com.android.devicelockcontroller.provision.worker.PauseProvisioningWorker;
@@ -106,6 +108,7 @@ public final class ProvisionHelperImpl implements ProvisionHelper {
 
     private final Context mContext;
     private final ProvisionStateController mStateController;
+    private final FeatureFlagProvider mFeatureFlagProvider;
     private final Executor mExecutor;
     private final DeviceLockControllerScheduler mScheduler;
 
@@ -120,6 +123,7 @@ public final class ProvisionHelperImpl implements ProvisionHelper {
         mStateController = stateController;
         DeviceLockControllerSchedulerProvider schedulerProvider =
                 (DeviceLockControllerSchedulerProvider) mContext.getApplicationContext();
+        mFeatureFlagProvider = (FeatureFlagProvider) mContext.getApplicationContext();
         mScheduler = schedulerProvider.getDeviceLockControllerScheduler();
         mExecutor = executor;
     }
@@ -350,11 +354,33 @@ public final class ProvisionHelperImpl implements ProvisionHelper {
             }
         }
         if (isMandatory) {
-            ReportDeviceProvisionStateWorker.reportSetupFailed(
-                    WorkManager.getInstance(mContext), reason);
-            progressController.setProvisioningProgress(
-                    ProvisioningProgress.getMandatoryProvisioningFailedProgress(reason));
-            mScheduler.scheduleMandatoryResetDeviceAlarm();
+            if (mFeatureFlagProvider.isRecolEnabled()) {
+                ReportDeviceProvisionStateWorker.reportSetupFailed(
+                        WorkManager.getInstance(mContext), reason);
+                var unused = Futures.transformAsync(SetupParametersClient.getInstance()
+                                .getProvisioningType(),
+                        provisioningType -> {
+                            if (provisioningType
+                                    == DeviceLockConstants.ProvisioningType.TYPE_RECOL) {
+                                progressController.setProvisioningProgress(
+                                        ProvisioningProgress
+                                                .getMandatoryProvisioningFailedProgressNoResetTimer(
+                                                reason));
+                            } else {
+                                progressController.setProvisioningProgress(
+                                        ProvisioningProgress.getMandatoryProvisioningFailedProgress(
+                                                reason));
+                                mScheduler.scheduleMandatoryResetDeviceAlarm();
+                            }
+                            return null;
+                        }, mExecutor);
+            } else {
+                ReportDeviceProvisionStateWorker.reportSetupFailed(
+                        WorkManager.getInstance(mContext), reason);
+                progressController.setProvisioningProgress(
+                        ProvisioningProgress.getMandatoryProvisioningFailedProgress(reason));
+                mScheduler.scheduleMandatoryResetDeviceAlarm();
+            }
         } else {
             // For non-mandatory provisioning, failure should only be reported after
             // user exits the provisioning UI; otherwise, it could be reported
