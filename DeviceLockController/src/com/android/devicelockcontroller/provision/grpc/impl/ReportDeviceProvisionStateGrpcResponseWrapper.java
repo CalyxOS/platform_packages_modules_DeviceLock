@@ -70,6 +70,10 @@ public final class ReportDeviceProvisionStateGrpcResponseWrapper extends
                 return DeviceProvisionState.PROVISION_STATE_FACTORY_RESET;
             case CLIENT_PROVISION_STATE_SUCCESS:
                 return DeviceProvisionState.PROVISION_STATE_SUCCESS;
+            case CLIENT_PROVISION_STATE_ENABLE_BOTTOM_VIEW:
+                return DeviceProvisionState.PROVISION_STATE_ENABLE_BOTTOM_VIEW;
+            case CLIENT_PROVISION_STATE_CHECKIN:
+                return DeviceProvisionState.PROVISION_STATE_CHECKIN;
             default:
                 throw new IllegalStateException(
                         "Unexpected Provision State: " + mResponse.getNextClientProvisionState());

@@ -232,6 +232,11 @@ enum ClientProvisionState {
   CLIENT_PROVISION_STATE_FACTORY_RESET = 4;
   // Device provisioning was a success.
   CLIENT_PROVISION_STATE_SUCCESS = 5;
+  // The Device Lock Android client should display the bottom view in the Progress Fragment,
+  // allowing the user to either retry or exit provisioning.
+  CLIENT_PROVISION_STATE_ENABLE_BOTTOM_VIEW = 6;
+  // The Device Lock Android client should check in with the server.
+  CLIENT_PROVISION_STATE_CHECKIN = 7;
 }
 
 // Request to report the device provision state of a device that is

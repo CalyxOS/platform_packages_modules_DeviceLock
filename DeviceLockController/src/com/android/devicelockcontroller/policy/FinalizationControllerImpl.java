@@ -20,6 +20,7 @@ import static com.android.devicelockcontroller.policy.FinalizationControllerImpl
 import static com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState.FINALIZED_UNREPORTED;
 import static com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState.UNFINALIZED;
 import static com.android.devicelockcontroller.policy.FinalizationControllerImpl.FinalizationState.UNINITIALIZED;
+import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_CLEAR;
 import static com.android.devicelockcontroller.provision.worker.AbstractCheckInWorker.BACKOFF_DELAY;
 import static com.android.devicelockcontroller.provision.worker.ReportDeviceLockProgramCompleteWorker.REPORT_DEVICE_LOCK_PROGRAM_COMPLETE_WORK_NAME;
 
@@ -50,7 +51,10 @@ import com.android.devicelockcontroller.provision.grpc.DeviceFinalizeClient.Repo
 import com.android.devicelockcontroller.provision.worker.ReportDeviceLockProgramCompleteWorker;
 import com.android.devicelockcontroller.receivers.FinalizationBootCompletedReceiver;
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
+import com.android.devicelockcontroller.storage.SetupParametersClient;
+import com.android.devicelockcontroller.storage.UserParameters;
 import com.android.devicelockcontroller.util.LogUtil;
+import com.android.devicelockcontroller.util.ThreadAsserts;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -81,6 +85,7 @@ public final class FinalizationControllerImpl implements FinalizationController 
     private final Object mLock = new Object();
     /** Future for after initial finalization state is set from disk */
     private volatile ListenableFuture<Void> mStateInitializedFuture;
+
     public FinalizationControllerImpl(Context context) {
         this(context,
                 new FinalizationStateDispatchQueue(),
@@ -203,7 +208,7 @@ public final class FinalizationControllerImpl implements FinalizationController 
             case FINALIZED:
                 if (mFeatureFlagProvider.isRecolEnabled()) {
                     return Futures.transformAsync(persistStateFuture,
-                            unused -> cancelAllWorkersAndAlarms(),
+                            unused -> returnDeviceToCleanState(),
                             mBgExecutor);
                 } else {
                     return Futures.transformAsync(persistStateFuture,
@@ -254,11 +259,44 @@ public final class FinalizationControllerImpl implements FinalizationController 
     }
 
     /**
+     * Cancels all workers and alarms and resets storage parameters.
+     */
+    private ListenableFuture<Void> returnDeviceToCleanState() {
+        LogUtil.i(TAG, "Cancelling workers and alarms and resetting storage parameters.");
+
+        ListenableFuture<Void> resetStorageParametersFuture = Futures.submit(
+                this::resetStorageParameters, mBgExecutor);
+
+        final ProvisionStateController provisionController =
+                ((PolicyObjectsProvider) mContext.getApplicationContext())
+                        .getProvisionStateController();
+
+        ListenableFuture<Void> clearProvisionStateFuture = Futures.transformAsync(
+                resetStorageParametersFuture, unused ->
+                        provisionController.setNextStateForEvent(PROVISION_CLEAR), mBgExecutor);
+
+        return Futures.transformAsync(clearProvisionStateFuture,
+                unused -> cancelAllWorkersAndAlarms(), mBgExecutor);
+    }
+
+    /**
+     * Wipes all SharedPreferences for Setup, Global, and User parameters.
+     */
+    private void resetStorageParameters() {
+        ThreadAsserts.assertWorkerThread("resetStorageParameters");
+        LogUtil.i(TAG, "Resetting storage parameters");
+        final Context deviceContext = mContext.createDeviceProtectedStorageContext();
+
+        Futures.getUnchecked(GlobalParametersClient.getInstance().clear());
+        Futures.getUnchecked(SetupParametersClient.getInstance().clear());
+        UserParameters.clear(deviceContext);
+    }
+
+    /**
      * Cancels all pending work and alarms.
-     *
-     * @return future for when this is done
      */
     private ListenableFuture<Void> cancelAllWorkersAndAlarms() {
+        LogUtil.i(TAG, "Cancelling all workers and alarms.");
         WorkManager workManager = WorkManager.getInstance(mContext);
         workManager.cancelAllWork();
         AlarmManager alarmManager = mContext.getSystemService(AlarmManager.class);

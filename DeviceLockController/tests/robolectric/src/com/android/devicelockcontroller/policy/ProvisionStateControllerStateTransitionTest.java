@@ -30,6 +30,8 @@ import static com.android.devicelockcontroller.policy.ProvisionStateController.P
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.PROVISION_SUCCEEDED;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.UNPROVISIONED;
 
+import com.android.devicelockcontroller.common.DeviceLockConstants;
+
 import com.google.common.truth.Truth;
 
 import org.junit.Test;
@@ -71,7 +73,8 @@ public class ProvisionStateControllerStateTransitionTest {
 
     @Test
     public void getNextState_nextStateIsExpectedBasedOnInputStateAndEvent() {
-        Truth.assertThat(ProvisionStateControllerImpl.getNextState(mState, mEvent)).isEqualTo(
+        Truth.assertThat(ProvisionStateControllerImpl.getNextState(mState, mEvent,
+                DeviceLockConstants.ProvisioningType.TYPE_FINANCED, false)).isEqualTo(
                 mNextState);
     }
 }

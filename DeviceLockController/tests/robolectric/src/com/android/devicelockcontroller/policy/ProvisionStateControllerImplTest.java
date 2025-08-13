@@ -37,6 +37,7 @@ import android.provider.Settings;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.work.testing.WorkManagerTestInitHelper;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent;
 import com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState;
@@ -69,6 +70,10 @@ public final class ProvisionStateControllerImplTest {
     private DevicePolicyController mMockPolicyController;
     @Mock
     private DeviceStateController mMockDeviceStateController;
+    @Mock
+    private FeatureFlagProvider mMockFeatureFlagProvider;
+    @Mock
+    private FinalizationController mMockFinalizationController;
 
     private TestDeviceLockControllerApplication mTestApp;
     private ProvisionStateController mProvisionStateController;
@@ -82,7 +87,8 @@ public final class ProvisionStateControllerImplTest {
         mTestApp = ApplicationProvider.getApplicationContext();
         WorkManagerTestInitHelper.initializeTestWorkManager(mTestApp);
         mProvisionStateController = new ProvisionStateControllerImpl(mTestApp,
-                mMockPolicyController, mMockDeviceStateController,
+                mMockPolicyController, mMockDeviceStateController, mMockFeatureFlagProvider,
+                mMockFinalizationController,
                 Executors.newSingleThreadExecutor());
         mStatsLogger = mTestApp.getStatsLogger();
     }

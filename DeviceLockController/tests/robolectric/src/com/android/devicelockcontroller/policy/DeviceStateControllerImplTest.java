@@ -27,6 +27,7 @@ import android.platform.test.annotations.EnableFlags;
 import android.platform.test.flag.junit.SetFlagsRule;
 
 import com.android.devicelock.flags.Flags;
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.policy.DeviceStateController.DeviceState;
 import com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent;
 import com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState;
@@ -62,12 +63,16 @@ public final class DeviceStateControllerImplTest {
     @Mock
     private ProvisionStateController mMockProvisionStateController;
 
+    @Mock
+    private FeatureFlagProvider mFeatureFlagProvider;
+
     private DeviceStateController mDeviceStateController;
 
     @Before
     public void setUp() {
         mDeviceStateController = new DeviceStateControllerImpl(mMockDevicePolicyController,
-                mMockProvisionStateController, Executors.newSingleThreadExecutor());
+                mMockProvisionStateController, mFeatureFlagProvider,
+                Executors.newSingleThreadExecutor());
     }
 
     @Test

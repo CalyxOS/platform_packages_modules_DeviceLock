@@ -177,6 +177,8 @@ public final class DeviceLockConstants {
                     DeviceProvisionState.PROVISION_STATE_PERSISTENT_UI,
                     DeviceProvisionState.PROVISION_STATE_FACTORY_RESET,
                     DeviceProvisionState.PROVISION_STATE_SUCCESS,
+                    DeviceProvisionState.PROVISION_STATE_ENABLE_BOTTOM_VIEW,
+                    DeviceProvisionState.PROVISION_STATE_CHECKIN,
             })
     public @interface DeviceProvisionState {
         /** The provision state of the device is unspecified */
@@ -197,6 +199,15 @@ public final class DeviceLockConstants {
         int PROVISION_STATE_FACTORY_RESET = 4;
         /** Device provisioning was a success. */
         int PROVISION_STATE_SUCCESS = 5;
+        /**
+         * The Device Lock Android client should display the bottom view in the Progress Fragment,
+         * allowing the user to either retry or exit provisioning.
+         */
+        int PROVISION_STATE_ENABLE_BOTTOM_VIEW = 6;
+        /**
+         * The Device Lock Android client should check in with the server.
+         */
+        int PROVISION_STATE_CHECKIN = 7;
     }
 
     /** Prevent instantiation. */

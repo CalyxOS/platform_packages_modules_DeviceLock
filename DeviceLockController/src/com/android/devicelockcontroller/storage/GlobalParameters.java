@@ -18,7 +18,6 @@ package com.android.devicelockcontroller.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 
 import androidx.annotation.Nullable;
 
@@ -48,7 +47,8 @@ final class GlobalParameters {
     private static final String KEY_LOCK_TASK_TYPE = "lock-task-type";
     public static final String KEY_IS_PROVISION_READY = "key-is-provision-ready";
 
-    private GlobalParameters() {}
+    private GlobalParameters() {
+    }
 
     private static SharedPreferences getSharedPreferences(Context context) {
         final Context deviceContext = context.createDeviceProtectedStorageContext();
@@ -72,7 +72,7 @@ final class GlobalParameters {
      *
      * @param context Context used to get the shared preferences.
      * @return The registered device unique identifier; null if device has never checked in with
-     *     backed server.
+     * backed server.
      */
     @Nullable
     static String getRegisteredDeviceId(Context context) {
@@ -83,7 +83,7 @@ final class GlobalParameters {
     /**
      * Set the unique identifier that is registered to DeviceLock backend server.
      *
-     * @param context Context used to get the shared preferences.
+     * @param context            Context used to get the shared preferences.
      * @param registeredDeviceId The registered device unique identifier.
      */
     static void setRegisteredDeviceId(Context context, String registeredDeviceId) {
@@ -129,7 +129,7 @@ final class GlobalParameters {
     /**
      * Set provision is forced
      *
-     * @param context Context used to get the shared preferences.
+     * @param context  Context used to get the shared preferences.
      * @param isForced The new value of the forced provision flag.
      */
     static void setProvisionForced(Context context, boolean isForced) {
@@ -166,7 +166,7 @@ final class GlobalParameters {
     /**
      * Set the current lock task type
      *
-     * @param context Context used get the shared preferences.
+     * @param context      Context used get the shared preferences.
      * @param lockTaskType The new value of the lock task type
      */
     static void setLockTaskType(Context context, @LockTaskType Integer lockTaskType) {
@@ -174,9 +174,6 @@ final class GlobalParameters {
     }
 
     static void clear(Context context) {
-        if (!Build.isDebuggable()) {
-            throw new SecurityException("Clear is not allowed in non-debuggable build!");
-        }
         getSharedPreferences(context).edit().clear().commit();
     }
 
@@ -207,6 +204,6 @@ final class GlobalParameters {
                         getLockTaskType(context),
                         KEY_FINALIZATION_STATE,
                         getFinalizationState(context)
-                        ));
+                ));
     }
 }

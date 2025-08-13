@@ -29,6 +29,7 @@ import androidx.work.Configuration;
 import androidx.work.testing.SynchronousExecutor;
 import androidx.work.testing.WorkManagerTestInitHelper;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.policy.ProvisionStateControllerImpl.StateTransitionException;
 import com.android.devicelockcontroller.storage.UserParameters;
@@ -54,7 +55,6 @@ import java.util.concurrent.Executors;
 @RunWith(RobolectricTestRunner.class)
 public class ProvisionStateControllerThreadSafetyTest {
     private ProvisionStateController mProvisionStateController;
-
     private static final int NUMBER_OF_THREADS = 100;
 
     @Before
@@ -63,6 +63,8 @@ public class ProvisionStateControllerThreadSafetyTest {
                 ApplicationProvider.getApplicationContext();
         UserParameters.setProvisionState(testApplication, UNPROVISIONED);
         DevicePolicyController policyController = testApplication.getPolicyController();
+        FeatureFlagProvider featureFlagProvider = testApplication.getFeatureFlagProvider();
+        FinalizationController finalizationController = testApplication.getFinalizationController();
         WorkManagerTestInitHelper.initializeTestWorkManager(
                 testApplication,
                 new Configuration.Builder()
@@ -70,9 +72,11 @@ public class ProvisionStateControllerThreadSafetyTest {
                         .setExecutor(new SynchronousExecutor())
                         .build());
         mProvisionStateController = new ProvisionStateControllerImpl(testApplication,
-                policyController, testApplication.getDeviceStateController(),
+                policyController, testApplication.getDeviceStateController(), featureFlagProvider,
+                finalizationController,
                 Executors.newCachedThreadPool());
         when(policyController.enforceCurrentPolicies()).thenReturn(Futures.immediateVoidFuture());
+        when(featureFlagProvider.isRecolEnabled()).thenReturn(false);
     }
 
     @Test

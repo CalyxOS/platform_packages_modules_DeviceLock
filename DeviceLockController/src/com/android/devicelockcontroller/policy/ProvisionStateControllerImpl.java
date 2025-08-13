@@ -17,6 +17,7 @@
 package com.android.devicelockcontroller.policy;
 
 import static com.android.devicelockcontroller.DevicelockStatsLog.DEVICE_LOCK_PROVISION_STATE_EVENT__EVENT__EVENT_SUCCESSFUL_PROVISIONING;
+import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_CLEAR;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_FAILURE;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_KIOSK;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_PAUSE;
@@ -44,12 +45,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.work.WorkManager;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.SystemDeviceLockManagerImpl;
+import com.android.devicelockcontroller.common.DeviceLockConstants.ProvisioningType;
 import com.android.devicelockcontroller.provision.worker.ReviewDeviceProvisionStateWorker;
 import com.android.devicelockcontroller.receivers.LockedBootCompletedReceiver;
 import com.android.devicelockcontroller.services.SetupWizardCompletionTimeoutJobService;
 import com.android.devicelockcontroller.stats.StatsLoggerProvider;
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
+import com.android.devicelockcontroller.storage.SetupParametersClient;
 import com.android.devicelockcontroller.storage.UserParameters;
 import com.android.devicelockcontroller.util.LogUtil;
 
@@ -77,6 +81,8 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
     private final Context mContext;
     private final DevicePolicyController mPolicyController;
     private final DeviceStateController mDeviceStateController;
+    private final FinalizationController mFinalizationController;
+    private final FeatureFlagProvider mFeatureFlagProvider;
     private final Executor mBgExecutor;
 
     @GuardedBy("this")
@@ -92,16 +98,22 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
                         SystemDeviceLockManagerImpl.getInstance(),
                         this,
                         mBgExecutor);
+        mFeatureFlagProvider = (FeatureFlagProvider) mContext;
         mDeviceStateController = new DeviceStateControllerImpl(mPolicyController, this,
+                mFeatureFlagProvider,
                 mBgExecutor);
+        mFinalizationController = new FinalizationControllerImpl(context);
     }
 
     @VisibleForTesting
     ProvisionStateControllerImpl(Context context, DevicePolicyController policyController,
-            DeviceStateController stateController, Executor bgExecutor) {
+            DeviceStateController stateController, FeatureFlagProvider featureFlagProvider,
+            FinalizationController finalizationController, Executor bgExecutor) {
         mContext = context;
         mPolicyController = policyController;
         mDeviceStateController = stateController;
+        mFeatureFlagProvider = featureFlagProvider;
+        mFinalizationController = finalizationController;
         mBgExecutor = bgExecutor;
     }
 
@@ -117,6 +129,10 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
         }
     }
 
+    private ListenableFuture<@ProvisioningType Integer> getProvisioningType() {
+        return SetupParametersClient.getInstance().getProvisioningType();
+    }
+
     @Override
     public void postSetNextStateForEventRequest(@ProvisionEvent int event) {
         Futures.addCallback(setNextStateForEvent(event),
@@ -130,12 +146,16 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
             // getState() must be called here and assigned to a local variable, otherwise, if
             // retrieved down the execution flow, it will be returning the new state after
             // execution.
-            ListenableFuture<@ProvisionState Integer> currentStateFuture = getState();
+            ListenableFuture<@ProvisionState Integer> currentStateFuture =
+                    event == PROVISION_CLEAR ? Futures.immediateFuture(UNPROVISIONED) : getState();
+            ListenableFuture<@ProvisioningType Integer> provisioningTypeFuture =
+                    getProvisioningType();
             ListenableFuture<@ProvisionState Integer> stateTransitionFuture =
-                    Futures.transform(
-                            currentStateFuture,
-                            currentState -> {
-                                int newState = getNextState(currentState, event);
+                    Futures.whenAllSucceed(currentStateFuture, provisioningTypeFuture).call(() -> {
+                        int newState = getNextState(Futures.getDone(currentStateFuture),
+                                        event,
+                                        Futures.getDone(provisioningTypeFuture),
+                                        mFeatureFlagProvider.isRecolEnabled());
                                 UserParameters.setProvisionState(mContext, newState);
                                 handleNewState(newState);
                                 // We treat when the event is PROVISION_READY as the start of the
@@ -196,6 +216,27 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
                 }, mBgExecutor);
     }
 
+    @Override
+    public ListenableFuture<Void> unlockAndFinalizeDevice() {
+        LogUtil.i(TAG,
+                "Unlocking and finalizing.");
+        return FluentFuture.from(mDeviceStateController.clearDevice())
+                .transformAsync(
+                        unused -> {
+                            LogUtil.i(TAG, "Cleared device restrictions.");
+                            // Transition to the FINALIZED state. This cancels all workers and
+                            // alarms and resets storage parameters.
+                            return mFinalizationController.finalizeNotEnrolledDevice();
+                        },
+                        mBgExecutor)
+                .transform(
+                        unused -> {
+                            LogUtil.i(TAG, "Finalized device.");
+                            return null;
+                        },
+                        MoreExecutors.directExecutor());
+    }
+
     @NonNull
     private FutureCallback<Void> getFutureCallback(String message) {
         return new FutureCallback<>() {
@@ -221,13 +262,25 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
 
     @VisibleForTesting
     @ProvisionState
-    static int getNextState(@ProvisionState int state, @ProvisionEvent int event) {
+    static int getNextState(@ProvisionState int state, @ProvisionEvent int event,
+            @ProvisioningType int provisioningType) {
+        return getNextState(state, event, provisioningType, /* recolEnabled= */ false);
+    }
+
+    @VisibleForTesting
+    @ProvisionState
+    static int getNextState(@ProvisionState int state, @ProvisionEvent int event,
+            @ProvisioningType int provisioningType, boolean recolEnabled) {
         switch (event) {
             case PROVISION_READY:
                 if (state == UNPROVISIONED) {
                     return PROVISION_IN_PROGRESS;
+                } else if (recolEnabled && state == PROVISION_IN_PROGRESS
+                        && provisioningType == ProvisioningType.TYPE_RECOL) {
+                    return PROVISION_IN_PROGRESS;
+                } else {
+                    throw new StateTransitionException(state, event);
                 }
-                throw new StateTransitionException(state, event);
             case ProvisionEvent.PROVISION_PAUSE:
                 if (state == PROVISION_IN_PROGRESS) {
                     return PROVISION_PAUSED;
@@ -251,6 +304,8 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
             case ProvisionEvent.PROVISION_RETRY:
                 if (state == PROVISION_FAILED) {
                     return PROVISION_IN_PROGRESS;
+                } else if (recolEnabled && state == PROVISION_IN_PROGRESS) {
+                    return PROVISION_IN_PROGRESS;
                 }
                 throw new StateTransitionException(state, event);
             case ProvisionEvent.PROVISION_SUCCESS:
@@ -258,6 +313,8 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
                     return PROVISION_SUCCEEDED;
                 }
                 throw new StateTransitionException(state, event);
+            case PROVISION_CLEAR:
+                return UNPROVISIONED;
             default:
                 throw new IllegalArgumentException("Input state is invalid");
         }

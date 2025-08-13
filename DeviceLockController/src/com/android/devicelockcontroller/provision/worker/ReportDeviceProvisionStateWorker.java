@@ -16,7 +16,9 @@
 
 package com.android.devicelockcontroller.provision.worker;
 
+import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_CHECKIN;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_DISMISSIBLE_UI;
+import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_ENABLE_BOTTOM_VIEW;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_FACTORY_RESET;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_PERSISTENT_UI;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState.PROVISION_STATE_RETRY;
@@ -38,6 +40,7 @@ import androidx.work.Operation;
 import androidx.work.WorkManager;
 import androidx.work.WorkerParameters;
 
+import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.activities.DeviceLockNotificationManager;
 import com.android.devicelockcontroller.common.DeviceLockConstants.DeviceProvisionState;
 import com.android.devicelockcontroller.common.DeviceLockConstants.ProvisionFailureReason;
@@ -58,17 +61,21 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import java.time.Duration;
+
 /**
  * A worker class dedicated to report state of provision for the device lock program.
  */
 public final class ReportDeviceProvisionStateWorker extends AbstractCheckInWorker {
     public static final String KEY_IS_PROVISION_SUCCESSFUL = "is-provision-successful";
     public static final String KEY_PROVISION_FAILURE_REASON = "provision-failure-reason";
+    public static final String KEY_IS_RECOL_FAILED = "is-recol-failed";
     public static final String REPORT_PROVISION_STATE_WORK_NAME = "report-provision-state";
     @VisibleForTesting
     static final String UNEXPECTED_PROVISION_STATE_ERROR_MESSAGE = "Unexpected provision state!";
 
     private final StatsLogger mStatsLogger;
+    private final FeatureFlagProvider mFeatureFlagProvider;
 
     /** Report provision failure and get next failed step */
     public static void reportSetupFailed(WorkManager workManager,
@@ -113,7 +120,7 @@ public final class ReportDeviceProvisionStateWorker extends AbstractCheckInWorke
                         .build();
         ListenableFuture<Operation.State.SUCCESS> result =
                 workManager.enqueueUniqueWork(REPORT_PROVISION_STATE_WORK_NAME,
-                ExistingWorkPolicy.APPEND_OR_REPLACE, work).getResult();
+                        ExistingWorkPolicy.APPEND_OR_REPLACE, work).getResult();
         Futures.addCallback(result,
                 new FutureCallback<>() {
                     @Override
@@ -145,6 +152,7 @@ public final class ReportDeviceProvisionStateWorker extends AbstractCheckInWorke
         StatsLoggerProvider loggerProvider =
                 (StatsLoggerProvider) context.getApplicationContext();
         mStatsLogger = loggerProvider.getStatsLogger();
+        mFeatureFlagProvider = (FeatureFlagProvider) context.getApplicationContext();
     }
 
     @NonNull
@@ -159,7 +167,12 @@ public final class ReportDeviceProvisionStateWorker extends AbstractCheckInWorke
                 (DeviceLockControllerSchedulerProvider) mContext;
         DeviceLockControllerScheduler scheduler =
                 schedulerProvider.getDeviceLockControllerScheduler();
-        return Futures.whenAllSucceed(mClient, lastState, isMandatory).call(() -> {
+
+        ListenableFuture<?> allPrerequisites =
+                Futures.whenAllSucceed(mClient, lastState, isMandatory)
+                        .call(() -> null, MoreExecutors.directExecutor());
+
+        return Futures.transformAsync(allPrerequisites, unused -> {
             boolean isSuccessful = getInputData().getBoolean(
                     KEY_IS_PROVISION_SUCCESSFUL, /* defaultValue= */ false);
             int failureReason = getInputData().getInt(KEY_PROVISION_FAILURE_REASON,
@@ -176,13 +189,13 @@ public final class ReportDeviceProvisionStateWorker extends AbstractCheckInWorke
             if (response.hasRecoverableError()) {
                 LogUtil.w(TAG, "Report provision state failed w/ recoverable error " + response
                         + "\nRetrying...");
-                return Result.retry();
+                return Futures.immediateFuture(Result.retry());
             }
             if (response.hasFatalError()) {
                 LogUtil.e(TAG,
                         "Report provision state failed: " + response + "\nRetry current step");
                 scheduler.scheduleNextProvisionFailedStepAlarm();
-                return Result.failure();
+                return Futures.immediateFuture(Result.failure());
             }
             int daysLeftUntilReset = response.getDaysLeftUntilReset();
             if (daysLeftUntilReset > 0) {
@@ -191,6 +204,31 @@ public final class ReportDeviceProvisionStateWorker extends AbstractCheckInWorke
             int nextState = response.getNextClientProvisionState();
             Futures.getUnchecked(globalParametersClient.setLastReceivedProvisionState(nextState));
             mStatsLogger.logReportDeviceProvisionState();
+
+            // Handle the RECOL cases
+            if (mFeatureFlagProvider.isRecolEnabled()) {
+                switch (nextState) {
+                    case PROVISION_STATE_ENABLE_BOTTOM_VIEW:
+                        // The ProgressFragment will observe this and display the bottom view,
+                        // allowing
+                        // the user to either retry provisioning or exit entirely.
+                        LogUtil.i(TAG, "Received nextState BOTTOM_VIEW. Notifying viewmodel.");
+                        Data outputData = new Data.Builder().putBoolean(KEY_IS_RECOL_FAILED,
+                                true).build();
+                        return Futures.immediateFuture(Result.success(outputData));
+                    case PROVISION_STATE_RETRY:
+                        LogUtil.i(TAG, "Received next state RETRY. Scheduling retry.");
+                        scheduler.scheduleNextProvisionFailedStepAlarm();
+                        return Futures.immediateFuture(Result.success());
+                    case PROVISION_STATE_CHECKIN:
+                        LogUtil.i(TAG, "Received next state CHECKIN. Performing check-in.");
+                        var unused2 = scheduler.scheduleRetryCheckInWork(Duration.ZERO);
+                        return Futures.immediateFuture(Result.success());
+                    default:
+                        // No op
+                }
+            }
+
             if (!Futures.getDone(isMandatory)) {
                 onNextProvisionStateReceived(nextState, daysLeftUntilReset);
                 if (nextState == PROVISION_STATE_FACTORY_RESET) {
@@ -199,7 +237,7 @@ public final class ReportDeviceProvisionStateWorker extends AbstractCheckInWorke
                     scheduler.scheduleNextProvisionFailedStepAlarm();
                 }
             }
-            return Result.success();
+            return Futures.immediateFuture(Result.success());
         }, mExecutorService);
     }
 
@@ -210,6 +248,8 @@ public final class ReportDeviceProvisionStateWorker extends AbstractCheckInWorke
             case PROVISION_STATE_SUCCESS:
             case PROVISION_STATE_UNSPECIFIED:
             case PROVISION_STATE_FACTORY_RESET:
+            case PROVISION_STATE_ENABLE_BOTTOM_VIEW:
+            case PROVISION_STATE_CHECKIN:
                 // no-op
                 break;
             case PROVISION_STATE_DISMISSIBLE_UI:
