@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ਖੁੱਲ੍ਹੇ ਸਰੋਤ ਲਾਇਸੰਸ"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"ਸੁਰੱਖਿਆ ਸੈਟਿੰਗਾਂ ਦੇ ਵਿੱਤ ਪ੍ਰਬੰਧਿਤ ਡੀਵਾਈਸ ਸੈਕਸ਼ਨ ਵਿਚਲੀਆਂ ਪ੍ਰਬੰਧਨ ਸਮਰੱਥਾਵਾਂ ਇਸ ਡੀਵਾਈਸ \'ਤੇ ਲਾਗੂ ਨਹੀਂ ਹੁੰਦੀਆਂ।"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"ਇਹ ਡੀਵਾਈਸ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ਵੱਲੋਂ ਮੁਹੱਈਆ ਕਰਵਾਇਆ ਗਿਆ ਹੈ"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"ਇਸ ਡੀਵਾਈਸ ਦਾ ਸੈੱਟਅੱਪ ਲੋਨ ਦੀ ਸਮੱਗਰੀ ਵਜੋਂ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।"</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"ਕਿਓਸਕ ਐਪ ਸਵੈਚਲਿਤ ਤੌਰ \'ਤੇ ਡਾਊਨਲੋਡ ਅਤੇ ਸਥਾਪਤ ਹੋ ਜਾਵੇਗੀ"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"ਕਿਓਸਕ ਐਪ ਇਸ ਵਰਤੋਂਕਾਰ ਲਈ ਸਥਾਪਤ ਕੀਤੀ ਜਾਵੇਗੀ"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"ਜੇ ਤੁਸੀਂ ਭੁਗਤਾਨ ਖੁੰਝਾ ਦਿੰਦੇ ਹੋ, ਤਾਂ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ਵੱਲੋਂ ਡੀਵਾਈਸ ਨੂੰ ਪ੍ਰਤਿਬੰਧਿਤ ਕੀਤਾ ਜਾ ਸਕਦਾ ਹੈ। ਵੇਰਵਿਆਂ ਲਈ, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>ਨਿਯਮ ਅਤੇ ਸ਼ਰਤਾਂ<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> ਦੇਖੋ।"</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"ਡੀਵਾਈਸ <xliff:g id="TIMER">%s</xliff:g> ਵਿੱਚ ਰੀਸੈੱਟ ਹੋ ਜਾਵੇਗਾ"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"ਸਾਰੇ ਡੀਵਾਈਸ ਡਾਟੇ ਨੂੰ ਮਿਟਾ ਦਿੱਤਾ ਜਾਵੇਗਾ। ਤੁਹਾਡੇ ਡੀਵਾਈਸ ਨੂੰ ਦਰਜ ਕਰਨ ਵਿੱਚ ਮਦਦ ਲਈ, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ਨੂੰ ਸੰਪਰਕ ਕਰੋ"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"ਵਿੱਤ ਵਿਵਸਥਾ ਅਸਫਲ ਰਹੀ"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"ਆਪਣੇ ਡੀਵਾਈਸ ਨੂੰ ਦਰਜ ਕਰਨ ਵਿੱਚ ਮਦਦ ਲਈ, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ਨੂੰ ਸੰਪਰਕ ਕਰੋ<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>।"</string>
     <string name="exit" msgid="645084771882733921">"ਬਾਹਰ ਜਾਓ"</string>
     <string name="retry" msgid="7497287909193345356">"ਮੁੜ-ਕੋਸ਼ਿਸ਼ ਕਰੋ"</string>

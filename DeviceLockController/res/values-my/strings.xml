@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"အခမဲ့ရင်းမြစ် လိုင်စင်များ"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"‘လုံခြုံရေး ဆက်တင်များ’ ၏ အရစ်ကျပေးချေဆဲ စက်အပိုင်းရှိ စီမံခန့်ခွဲမှုဆိုင်ရာ စွမ်းဆောင်ရည်များသည် ဤစက်အတွက် အကျုံးမဝင်ပါ။"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"ဤစက်ပစ္စည်းကို <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> က ပံ့ပိုးထားသည်"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"ဤစက်ပစ္စည်းကို အကူမီဒီယာအဖြစ်ထားရန် သတ်မှတ်နေပါသည်။"</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk app ကို ဒေါင်းလုဒ်လုပ်ပြီး အလိုအလျောက် ထည့်သွင်းပါမည်"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Kiosk app ကို ဤအသုံးပြုသူအတွက် ထည့်သွင်းပါမည်"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"ငွေပေးချေမှု မပြုမိပါက <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> သည် ဤစက်ကို ကန့်သတ်နိုင်သည်။ အသေးစိတ်ကို <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>ဝန်ဆောင်မှုစည်းမျဉ်းများ<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> တွင် ကြည့်ပါ။"</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"စက်ကို <xliff:g id="TIMER">%s</xliff:g> အကြာတွင် ပြင်ဆင်သတ်မှတ်မည်"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"စက်ဒေတာအားလုံးကို ဖျက်ပါမည်။ သင့်စက်ကို စာရင်းသွင်းရာတွင် အကူအညီယူရန် <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ကို ဆက်သွယ်ပါ"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"ငွေကြေးပံ့ပိုးမှု မအောင်မြင်ပါ"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"သင့်စက်ကို စာရင်းသွင်းရာတွင် အကူအညီယူရန် <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ကို ဆက်သွယ်ပါ<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>။"</string>
     <string name="exit" msgid="645084771882733921">"ထွက်ရန်"</string>
     <string name="retry" msgid="7497287909193345356">"ထပ်စမ်းရန်"</string>

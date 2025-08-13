@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"開放原始碼授權"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"在安全性設定中，分期付款裝置部分的管理功能不適用於這部裝置。"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"這部裝置是由「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」提供"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"正在將這部裝置設為貸款抵押品。"</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"系統將自動下載及安裝 Kiosk 應用程式"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"系統將為這名使用者安裝 Kiosk 應用程式"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"如果你未按時支付款項，「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」就會對這部裝置設限。詳情請參閱《<xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>條款及細則<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>》。"</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"裝置將在 <xliff:g id="TIMER">%s</xliff:g>後重設"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"所有裝置資料皆會刪除。如需有關註冊裝置的協助，請與「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」聯絡"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"無法佈建分期付款計畫"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"如要協助註冊裝置，請<xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>與「<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>」聯絡<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>。"</string>
     <string name="exit" msgid="645084771882733921">"結束"</string>
     <string name="retry" msgid="7497287909193345356">"重試"</string>

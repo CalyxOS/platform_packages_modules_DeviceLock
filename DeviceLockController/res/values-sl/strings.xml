@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Odprtokodne licence"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Zmožnosti upravljanja, ki so v varnostnih nastavitvah navedene za napravo na obroke, ne veljajo za to napravo."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"To napravo zagotavlja <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"Ta naprava se nastavlja kot jamstvo za posojilo."</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Aplikacija Kiosk bo samodejno prenesena in nameščena."</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Aplikacija Kiosk bo nameščena za tega uporabnika"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> lahko omeji uporabo naprave v primeru zamude pri plačilu. Za podrobnosti si oglejte <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>določila in pogoje<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Naprava bo ponastavljena čez <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Vsi podatki v napravi bodo izbrisani. Če potrebujete pomoč pri včlanitvi naprave, se obrnite na ponudnika <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>."</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Priprava na financiranje ni uspela"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Če potrebujete pomoč pri včlanitvi naprave, se obrnite na <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>ponudnika <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Zapri"</string>
     <string name="retry" msgid="7497287909193345356">"Poskusi znova"</string>

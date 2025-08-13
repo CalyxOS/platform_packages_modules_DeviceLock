@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Amalayisensi omthombo ovulekile"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Amandla wokuphatha esigabeni sedivayisi enikwe imali samasethingi wokuphepha awasebenzi kule divayisi."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Le divayisi ihlinzekwa yi-<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"Le divayisi isethwa njengesibambiso seqoqo."</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"I-app ye-Kiosk izodawunilodwa futhi ifakwe ngokuzenzekelayo"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"I-app ye-Kiosk izofakwa kulo msebenzisi"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"I-<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ingabekela idivayisi imingcele uma ungakhokhile. Ukuze uthole imininingwane, buka <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Imigomo Nemibandela<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Idivayisi izosethwa kabusha ngo-<xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Yonke idatha yedivayisi izosulwa. Ukuze uthole usizo lokubhalisa idivayisi yakho, thinta i-<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Ukuxhaswa kwelungiselelo kuhlulekile"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Ukuze uthole usizo lokubhalisa idivayisi yakho, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>thinta i-<xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Phuma"</string>
     <string name="retry" msgid="7497287909193345356">"Zama futhi"</string>

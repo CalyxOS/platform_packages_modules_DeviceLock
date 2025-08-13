@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Licencje typu open source"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Możliwości zarządzania w sekcji finansowanego urządzenia w ustawieniach Bezpieczeństwa nie dotyczą tego urządzenia"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"To urządzenie dostarcza organizacja <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"To urządzenie jest konfigurowane jako zabezpieczenie pożyczki."</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Aplikacja Kiosk zostanie pobrana i zainstalowana automatycznie"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Aplikacja Kiosk zostanie zainstalowana dla tego użytkownika"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Operator <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> może ograniczyć możliwości korzystania z tego urządzenia, jeśli nie uregulujesz płatności. Szczegółowe informacje znajdziesz w <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>warunkach korzystania z usługi<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Urządzenie zostanie zresetowane za <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Wszystkie dane z urządzenia zostaną usunięte. Aby uzyskać pomoc w zarejestrowaniu urządzenia, skontaktuj się z <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Inicjowanie finansowania nie powiodło się"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Aby uzyskać pomoc w zarejestrowaniu urządzenia, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>skontaktuj się z firmą <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Zakończ"</string>
     <string name="retry" msgid="7497287909193345356">"Ponów"</string>

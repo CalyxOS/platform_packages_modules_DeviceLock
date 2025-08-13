@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Licențe open source"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Capacitățile de gestionare din secțiunea privind dispozitivele finanțate din Setări de securitate nu se aplică pentru acest dispozitiv."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Acest dispozitiv este oferit de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"Acest dispozitiv este configurat ca garanție pentru un împrumut."</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Aplicația chioșc va fi descărcată și instalată automat"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Aplicația chioșc va fi instalată pentru acest utilizator"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> poate limita folosirea acestui dispozitiv dacă nu faci o plată. Pentru detalii, consultă <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Termenii și condițiile <xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Dispozitivul se va reseta în <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Toate datele dispozitivului vor fi șterse. Pentru ajutor la înregistrarea dispozitivului, contactează <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Provizionarea finanțării nu a reușit"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Pentru ajutor la înregistrarea dispozitivului, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>contactează <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Ieși"</string>
     <string name="retry" msgid="7497287909193345356">"Încearcă din nou"</string>
