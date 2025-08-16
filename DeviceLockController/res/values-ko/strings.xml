@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"오픈소스 라이선스"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"보안 설정의 할부 기기 정보 섹션에 있는 관리 기능은 이 기기에 적용되지 않습니다."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에서 제공하는 기기"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"이 기기는 대출 담보로 설정되는 중입니다."</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"키오스크 앱이 자동으로 다운로드 및 설치됩니다."</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"키오스크 앱이 이 사용자를 위해 설치됩니다."</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"결제를 하지 않으면 <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에서 기기 사용을 제한할 수 있습니다. 자세한 내용은 <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>이용약관<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>에서 확인하세요."</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"<xliff:g id="TIMER">%s</xliff:g> 후 기기 초기화"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"기기의 모든 데이터가 삭제됩니다. 기기 등록과 관련해 도움이 필요하면 <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에 문의하세요."</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"파이낸싱 프로비저닝 실패함"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"기기 등록과 관련해 도움이 필요하면 <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g>에 문의<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>하세요"</string>
     <string name="exit" msgid="645084771882733921">"종료"</string>
     <string name="retry" msgid="7497287909193345356">"다시 시도"</string>

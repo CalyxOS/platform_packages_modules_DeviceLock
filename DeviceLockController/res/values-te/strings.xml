@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ఓపెన్ సోర్స్ లైసెన్స్‌లు"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"సెక్యూరిటీ సెట్టింగ్‌లకు సంబంధించిన ఫైనాన్స్ చేసిన పరికర విభాగంలో మేనేజ్‌మెంట్ సామర్థ్యాలు ఈ పరికరానికి వర్తించవు."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"ఈ పరికరం <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ద్వారా అందించబడింది"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"ఈ డివైజ్‌ను లోన్‌కు పూచీకత్తుగా ఏర్పాటు చేస్తున్నారు."</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk యాప్ ఆటోమేటిక్‌గా డౌన్‌లోడ్ అయి, ఇన్‌స్టాల్ అవుతుంది"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"ఈ యూజర్ కోసం కియోస్క్ యాప్ ఇన్‌స్టాల్ అవుతుంది"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"మీరు పేమెంట్ చేయడం మిస్ చేస్తే, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> పరికరాన్ని పరిమితం చేయవచ్చు. వివరాల కోసం, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>నియమాలు &amp; షరతులను<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> చూడండి."</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"పరికరం <xliff:g id="TIMER">%s</xliff:g>లో రీసెట్ అవుతుంది"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"మొత్తం పరికరం డేటా తొలగించబడుతుంది. మీ పరికరాన్ని ఎన్‌రోల్ చేయడంలో సహాయం కోసం, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>ని సంప్రదించండి"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"ఫైనాన్సింగ్ కేటాయింపు విఫలమైంది"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"మీ పరికరాన్ని ఎన్‌రోల్ చేయడం కోసం, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g>‌ను సంప్రదించండి<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"నిష్క్రమించు"</string>
     <string name="retry" msgid="7497287909193345356">"మళ్లీ ట్రై చేయండి"</string>

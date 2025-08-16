@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Nyílt forráskódú licencek"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"A Biztonsági beállítások Finanszírozott eszközök adatai részében található kezelési lehetőségek nem vonatkoznak erre az eszközre."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Ezt az eszközt a(z) <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> biztosítja"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"Az eszköz kölcsön fedezeteként van beállítva."</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"A kioszkalkalmazás automatikusan letöltődik és települ"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"A kioszkalkalmazás telepítésre kerül ezen felhasználó számára"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"A(z) <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> korlátozhatja az eszközt, ha Ön elmulaszt egy befizetést. A részleteket az <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Általános Szerződési Feltételekben<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> találja."</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"<xliff:g id="TIMER">%s</xliff:g> múlva az eszköz visszaállításra kerül"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Az eszközön lévő minden adat törlésre kerül. Ha segítségre van szüksége eszköze regisztrálásához, forduljon a következőhöz: <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>."</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"A finanszírozási kiépítés sikertelen volt"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Ha segítségre van szüksége eszköze regisztrálásához, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>forduljon a következőhöz: <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Kilépés"</string>
     <string name="retry" msgid="7497287909193345356">"Újra"</string>

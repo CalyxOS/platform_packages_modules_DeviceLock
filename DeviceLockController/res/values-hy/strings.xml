@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Բաց կոդով ծրագրակազմի լիցենզիաներ"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Այս սարքում չեն կիրառվում կառավարման գործառույթները, որոնք նշված են ֆինանսավորված սարքի անվտանգության կարգավորումների բաժնում։"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Այս սարքը տրամադրվել է <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-ի կողմից"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"Այս սարքն օգտագործվում է որպես պարտքի գրավ։"</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Կրպակ-հավելվածն ավտոմատ կներբեռնվի և կտեղադրվի"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Այս օգտատիրոջ համար կտեղադրվի կրպակ-հավելվածը"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ծառայությունը կարող է սահմանափակել սարքը, եթե որևէ վճարում բաց թողնեք։ Մանրամասների համար ծանոթացեք <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Օգտագործման պայմաններին<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>։"</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Սարքը շուտով կվերակայվի՝ <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Սարքի բոլոր տվյալները կջնջվեն։ Սարքի գրանցման հետ կապված օգնություն ստանալու համար դիմեք <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-ին"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Ֆինանսավորման կարգավորումը ձախողվեց"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Սարքի գրանցման հետ կապված օգնություն ստանալու համար <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>դիմեք <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-ին<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>։"</string>
     <string name="exit" msgid="645084771882733921">"Դուրս գալ"</string>
     <string name="retry" msgid="7497287909193345356">"Նորից փորձել"</string>

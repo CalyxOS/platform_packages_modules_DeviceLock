@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"खुला स्रोतका लाइसेन्सहरू"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"सुरक्षासम्बन्धी सेटिङअन्तर्गतको \"किस्तामा खरिद गरिएको डिभाइस\" नामक खण्डमा भएका व्यवस्थापनसम्बन्धी सुविधाहरू यो डिभाइसमा लागू हुँदैनन्।"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ले यो डिभाइस उपलब्ध गराएको हो"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"यो डिभाइस कुनै कर्जाको धितोका रूपमा सेटअप गरिँदै छ।"</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"किअस्क एप स्वतः डाउनलोड गरी इन्स्टल गरिने छ"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"यी प्रयोगकर्ताका लागि किअस्क एप इन्स्टल गरिने छ"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"तपाईंले समयमै रकम भुक्तानी गर्नुभएन भने <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ले डिभाइसमाथि प्रतिबन्ध लगाउन सक्छन्। विवरणहरू प्राप्त गर्न <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>सेवाका सर्तहरू<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> हेर्नुहोस्।"</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"डिभाइस <xliff:g id="TIMER">%s</xliff:g> पछि रिसेट हुने छ"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"डिभाइसमा रहेका सबै डेटा मेटाइने छ। आफ्नो डिभाइस दर्ता गर्न <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> मा सम्पर्क गर्नुहोस्"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"किस्तामा भुक्तानी गर्ने प्रावधान प्राप्त गर्न सकिएन"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"आफ्नो डिभाइस दर्ता गर्न सहायता प्राप्त गर्नका निम्ति <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g>मा सम्पर्क गर्नुहोस्<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>।"</string>
     <string name="exit" msgid="645084771882733921">"बाहिरिनुहोस्"</string>
     <string name="retry" msgid="7497287909193345356">"फेरि प्रयास गर्नु…"</string>

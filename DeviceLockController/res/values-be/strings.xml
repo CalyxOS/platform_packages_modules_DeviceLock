@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Ліцэнзіі на ПЗ з адкрытым зыходным кодам"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"На гэтай прыладзе не працуюць функцыі кіравання, пералічаныя ў раздзеле налад бяспекі для прылады, купленай у крэдыт."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Гэта прылада належыць кампаніі \"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\""</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"Гэта прылада задаецца ў якасці залогу па крэдыце."</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"Праграма-кіёск будзе спампавана і ўсталявана аўтаматычна"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Для гэтага карыстальніка будзе ўсталявана праграма-кіёск"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Калі вы прапусціце плацеж, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> можа абмежаваць работу прылады. Каб даведацца больш, глядзіце <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Умовы выкарыстання<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Прылада будзе скінута праз <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Усе даныя прылады будуць выдалены. Па дапамогу з рэгістрацыяй звяртайцеся ў кампанію \"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\"."</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Не ўдалося падрыхтаваць прыладу да праграмы фінансавання"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Па дапамогу з рэгістрацыяй <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>звяртайцеся ў кампанію \"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>\"<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Выйсці"</string>
     <string name="retry" msgid="7497287909193345356">"Паўтарыць спробу"</string>

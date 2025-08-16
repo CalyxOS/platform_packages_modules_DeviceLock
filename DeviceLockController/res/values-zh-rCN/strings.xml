@@ -46,7 +46,8 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"开源许可"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"在安全设置中，分期付款设备部分中的管理功能不适用于此设备。"</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"此设备由<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>提供"</string>
-    <string name="device_used_as_collateral" msgid="6708488375984120840">"正在将此设备设为贷款抵押物。"</string>
+    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
+    <skip />
     <string name="download_kiosk_app" msgid="1845089944897502656">"系统会自动下载并安装自助服务终端应用"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"系统将为此用户安装自助服务终端应用"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"如果您未按时支付款项，<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>可能会限制您使用此设备。如需了解详情，请查看<xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>条款及条件<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>。"</string>
@@ -128,6 +129,8 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"设备将在 <xliff:g id="TIMER">%s</xliff:g>后重置"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"系统将删除所有设备数据。如需注册设备方面的帮助，请与<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>联系。"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"分期付款设备配置失败"</string>
+    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
+    <skip />
     <string name="click_to_contact_financier" msgid="5932768971588112528">"如需注册设备方面的帮助，请<xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>联系<xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>。"</string>
     <string name="exit" msgid="645084771882733921">"退出"</string>
     <string name="retry" msgid="7497287909193345356">"重试"</string>
