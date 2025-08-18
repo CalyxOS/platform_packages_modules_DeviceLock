@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ஓப்பன் சோர்ஸ் உரிமங்கள்"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"பாதுகாப்பு அமைப்புகளில் \'கடன் மூலம் பெற்ற சாதனம்\' பிரிவிலுள்ள நிர்வாகத் திறன்கள் இந்தச் சாதனத்திற்குப் பொருந்தாது."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"இந்தச் சாதனம் <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> நிறுவனத்தால் வழங்கப்பட்டது"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> வழங்கும் லோனுக்கு இந்தச் சாதனம் பிணைய உத்திரவாதமாக அமைக்கப்படுகிறது"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk ஆப்ஸ் தானாகவே பதிவிறக்கப்பட்டு நிறுவப்படும்"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"இந்தப் பயனருக்கு Kiosk ஆப்ஸ் நிறுவப்படும்"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"நீங்கள் பேமெண்ட் செய்யத் தவறினால் சாதனத்தை <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> கட்டுப்படுத்தலாம். தகவல்களுக்கு, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>விதிமுறைகளையும் நிபந்தனைகளையும்<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> பாருங்கள்."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"<xliff:g id="TIMER">%s</xliff:g>ல் சாதனம் மீட்டமைக்கப்படும்"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"சாதனத்திலுள்ள அனைத்துத் தரவும் நீக்கப்படும். சாதனத்தைப் பதிவுசெய்வதற்கான உதவிக்கு, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ஐத் தொடர்புகொள்ளவும்"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"கடன் வழங்கல் தோல்வியடைந்தது"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"அமைக்க முடியவில்லை"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"உங்கள் சாதனத்தைப் பதிவுசெய்வதற்கான உதவிக்கு, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g> ஐத் தொடர்புகொள்ளுங்கள்."</string>
     <string name="exit" msgid="645084771882733921">"வெளியேறு"</string>
     <string name="retry" msgid="7497287909193345356">"மீண்டும் முயல்க"</string>
