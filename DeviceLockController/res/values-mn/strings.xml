@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Нээлттэй эхийн лицензүүд"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Аюулгүй байдлын тохиргооны санхүүжсэн төхөөрөмжийн хэсэг дэх менежментийн чадамж нь энэ төхөөрөмжид хэрэгжихгүй."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Энэ төхөөрөмжийг <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-с нийлүүлдэг"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> энэ төхөөрөмжийг зээлийн борлуулалт дэмжих медиагаар тохируулж байна."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Киоск аппыг автоматаар татаж суулгана"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Киоск аппыг энэ хэрэглэгчид суулгана"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Хэрэв та төлбөрөө төлөөгүй бол <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> энэ төхөөрөмжийг хязгаарлах боломжтой. Дэлгэрэнгүй мэдээлэл авах бол <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Үйлчилгээний ерөнхий нөхцөлийг<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> харна уу."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Төхөөрөмжийг <xliff:g id="TIMER">%s</xliff:g>-н дараа шинэчилнэ"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Төхөөрөмжийн бүх өгөгдлийг устгана. Төхөөрөмжөө бүртгүүлэх тусламж авах бол <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-тай холбогдоно уу"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Санхүүгийн бэлтгэлийг хийж чадсангүй"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Бэлтгэж чадсангүй"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Төхөөрөмжөө бүртгүүлэх тусламж авах бол <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g>-тай холбогдоно уу<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Гарах"</string>
     <string name="retry" msgid="7497287909193345356">"Дахин оролдох"</string>

@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Licenzas de código aberto"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Non se aplican a este dispositivo as funcións de xestión dispoñibles na sección do dispositivo financiado da opción de configuración Seguranza."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> proporciona este dispositivo."</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"Este dispositivo estase configurando como garantía para un préstamo de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"A aplicación de quiosco descargarase e instalarase de xeito automático"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"A aplicación de quiosco instalarase para este usuario"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> pode restrinxir o uso do dispositivo se che falta algún pago por facer. Tes máis información nos <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Termos e condicións<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"O dispositivo restablecerase dentro de <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Eliminaranse todos os datos do dispositivo. Se precisas axuda para inscribilo, ponte en contacto con <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Produciuse un erro durante o aprovisionamento financeiro"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Produciuse un erro durante o aprovisionamento"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Se precisas axuda para inscribir o dispositivo, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>ponte en contacto con <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Saír"</string>
     <string name="retry" msgid="7497287909193345356">"Tentar de novo"</string>
