@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"ઓપન સૉર્સ લાઇસન્સ"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"સુરક્ષા સેટિંગના ફાઇનાન્સ ડિવાઇસ વિભાગમાં મેનેજમેન્ટની ક્ષમતાઓ આ ડિવાઇસ પર લાગુ થતી નથી."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"આ ડિવાઇસ <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> દ્વારા પ્રદાન કરવામાં આવેલું છે"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> દ્વારા આ ડિવાઇસનું સેટઅપ લોન માટે કૉલેટરલ તરીકે કરવામાં આવી રહ્યું છે"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"કિઓસ્ક ઍપ ઑટોમૅટિક રીતે ડાઉનલોડ અને ઇન્સ્ટૉલ થશે"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"આ વપરાશકર્તા માટે Kiosk ઍપ ઇન્સ્ટૉલ કરવામાં આવશે"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"જો તમે કોઈ ચુકવણી ચૂકો, તો <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ડિવાઇસને પ્રતિબંધિત કરી શકે છે. વિગતો માટે, <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>નિયમો અને શરતો<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> જુઓ."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"ડિવાઇસ રીસેટ થવાનો કાઉન્ટર <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"ડિવાઇસનો તમામ ડેટા ડિલીટ કરવામાં આવશે. તમારા ડિવાઇસની નોંધણીમાં સહાય માટે, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>નો સંપર્ક કરો"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"ફાઇનાન્સ સંબંધી જોગવાઈઓ નિષ્ફળ થઈ છે"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"જોગવાઈ કરવામાં નિષ્ફળ રહ્યાં"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"તમારા ડિવાઇસની નોંધણીમાં સહાય માટે, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g>નો સંપર્ક કરો<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"બહાર નીકળો"</string>
     <string name="retry" msgid="7497287909193345356">"ફરી પ્રયાસ કરો"</string>

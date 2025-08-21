@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Lisenser for åpen kildekode"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Funksjonene for administrering i delen om finansiert enhet i Sikkerhet-innstillingene gjelder ikke for denne enheten."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Denne enheten leveres av <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"Denne enheten konfigureres som sikkerhet for et lån fra <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kioskappen lastes ned og installeres automatisk"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Kioskappen installeres for denne brukeren"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> kan begrense enheten hvis du hopper over en betaling. Du finner mer informasjon i <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>vilkårene<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Enheten tilbakestilles om <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Alle enhetsdata slettes. Hvis du trenger hjelp med å registrere enheten din, bør du kontakte <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Kunne ikke provisjonere finansiering"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Provisjoneringen mislyktes"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Hvis du trenger hjelp med å registrere enheten din, kan du <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>kontakte <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Avslutt"</string>
     <string name="retry" msgid="7497287909193345356">"Prøv på nytt"</string>

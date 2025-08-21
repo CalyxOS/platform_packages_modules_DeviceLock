@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"پروانه‌های متن‌باز"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"قابلیت‌های مدیریتی موجود در بخش دستگاه دارای پشتیبانی مالی از «تنظیمات ایمنی» شامل این دستگاه نمی‌شود."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"این دستگاه را <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ارائه کرده است"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"این دستگاه درحال راه‌اندازی به‌عنوان وثیقه برای وام است <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"برنامه «کیوسک» به‌طور خودکار بارگیری و نصب خواهد شد"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"برنامه «کیوسک» برای این کاربر نصب خواهد شد"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"اگر پرداختی را انجام ندهید، <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> می‌تواند دستگاه را محدود کند. برای جزئیات، <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>شرایط خدمات<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> را مشاهده کنید."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"دستگاه <xliff:g id="TIMER">%s</xliff:g> دیگر بازنشانی خواهد شد"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"همه داده‌های دستگاه حذف خواهد شد. برای دریافت راهنمایی درخصوص ثبت‌نام دستگاه، با <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> تماس بگیرید"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"تأمین مالی انجام نشد"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"تامین ناموفق بود"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"برای دریافت راهنمایی درخصوص ثبت‌نام دستگاه، <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>با <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> تماس بگیرید<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"خارج شدن"</string>
     <string name="retry" msgid="7497287909193345356">"امتحان مجدد"</string>

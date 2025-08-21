@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Licencias de código abierto"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Las funciones de administración de la sección de la Configuración de seguridad del dispositivo financiado no se aplican a este dispositivo."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Este dispositivo lo proporciona <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"Este dispositivo se está configurando como garantía para un préstamo de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Se descargará e instalará la aplicación de Kiosco automáticamente."</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Se instalará la aplicación de Kiosco para este usuario"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> puede restringir el dispositivo si no realizas un pago. Para obtener más información, consulta los <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Términos y Condiciones<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Se restablecerá el dispositivo en <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Se borrarán todos los datos del dispositivo. Si necesitas ayuda para inscribir tu dispositivo, comunícate con <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>."</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"No se pudo provisionar la financiación"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Falló el aprovisionamiento"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Si necesitas ayuda para inscribir tu dispositivo, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>comunícate con <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Salir"</string>
     <string name="retry" msgid="7497287909193345356">"Reintentar"</string>
