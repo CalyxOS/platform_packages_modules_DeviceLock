@@ -89,7 +89,7 @@
     <string name="settings_intro_preference_key" msgid="6610461073400554162">"settings_intro_preference_key"</string>
     <string name="settings_restrictions_category" msgid="5746868117342406677">"Hasta que hayas pagado tu dispositivo, no podrás:"</string>
     <string name="settings_restrictions_category_preference_key" msgid="88318147152676512">"settings_restrictions_category_preference_key"</string>
-    <string name="settings_install_apps" msgid="3634279771448183713">"Instalar aplicaciones de fuentes externas a Play Store"</string>
+    <string name="settings_install_apps" msgid="3634279771448183713">"Instalar apps de fuentes externas a Play Store"</string>
     <string name="settings_install_apps_preference_key" msgid="27542314345238427">"settings_install_apps_preference_key"</string>
     <string name="settings_safe_mode" msgid="3035228015586375153">"Reiniciar tu dispositivo en modo Seguro"</string>
     <string name="settings_safe_mode_preference_key" msgid="2106617747358027424">"settings_safe_mode_preference_key"</string>
@@ -111,7 +111,7 @@
     <string name="settings_turn_on_off_device_preference_key" msgid="5981163790552677734">"settings_turn_on_off_device_preference_key"</string>
     <string name="settings_notifications" msgid="63348993899505034">"Consultar notificaciones y mensajes de texto"</string>
     <string name="settings_notifications_preference_key" msgid="4527872342061056462">"settings_notifications_preference_key"</string>
-    <string name="settings_allowlisted_apps" msgid="5531810497056091097">"Acceder a las aplicaciones permitidas por <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <string name="settings_allowlisted_apps" msgid="5531810497056091097">"Acceder a las apps permitidas por <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_allowlisted_apps_preference_key" msgid="8662705531235468080">"settings_allowlisted_apps_preference_key"</string>
     <string name="settings_fully_paid_category" msgid="2459776591689824433">"Una vez que hayas pagado el importe completo:"</string>
     <string name="settings_fully_paid_category_preference_key" msgid="1759690898170600559">"settings_fully_paid_category_preference_key"</string>
