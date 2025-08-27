@@ -128,7 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Cihaz <xliff:g id="TIMER">%s</xliff:g> içinde sıfırlanacak"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Tüm cihaz verileri silinecek. Cihazınızı kaydetmeyle ilgili yardım almak için <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ile iletişime geçin"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Finans provizyonu başarısız oldu"</string>
-    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Temel hazırlık başarısız oldu"</string>
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Kurulum başarısız oldu"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Cihazınızı kaydetmeyle ilgili yardım almak için <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ile iletişime geçin<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Çıkış"</string>
     <string name="retry" msgid="7497287909193345356">"Tekrar dene"</string>
