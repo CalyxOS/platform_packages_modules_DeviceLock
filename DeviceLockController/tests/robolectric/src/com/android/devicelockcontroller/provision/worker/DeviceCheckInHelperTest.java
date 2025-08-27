@@ -16,6 +16,7 @@
 
 package com.android.devicelockcontroller.provision.worker;
 
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_VPN;
@@ -61,6 +62,7 @@ import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.TestDeviceLockControllerApplication;
 import com.android.devicelockcontroller.common.DeviceId;
 import com.android.devicelockcontroller.common.DeviceLockConstants.DeviceCheckInStatus;
+import com.android.devicelockcontroller.policy.DevicePolicyController;
 import com.android.devicelockcontroller.policy.FinalizationController;
 import com.android.devicelockcontroller.policy.FinalizationControllerImpl;
 import com.android.devicelockcontroller.policy.ProvisionStateController;
@@ -96,6 +98,7 @@ public final class DeviceCheckInHelperTest {
     static final Duration TEST_NEGATIVE_CHECK_RETRY_DURATION =
             Duration.ZERO.minus(TEST_CHECK_RETRY_DURATION);
     public static final boolean IS_PROVISIONING_MANDATORY = false;
+    public static final String PHONE_SYSTEM_APP_PACKAGE_NAME = "com.android.phone";
     private TestDeviceLockControllerApplication mTestApplication;
     static final int TOTAL_SLOT_COUNT = 2;
     static final int TOTAL_ID_COUNT = 4;
@@ -104,22 +107,24 @@ public final class DeviceCheckInHelperTest {
     static final String MEID_1 = "MEID1";
     static final String MEID_2 = "MEID2";
     static final ArraySet<DeviceId> ACTUAL_DEVICE_IDs =
-            new ArraySet<>(new DeviceId[]{
-                    new DeviceId(DEVICE_ID_TYPE_IMEI, IMEI_1),
-                    new DeviceId(DEVICE_ID_TYPE_IMEI, IMEI_2),
-                    new DeviceId(DEVICE_ID_TYPE_MEID, MEID_1),
-                    new DeviceId(DEVICE_ID_TYPE_MEID, MEID_2),
-            });
-    static final ProvisioningConfiguration TEST_CONFIGURATION = new ProvisioningConfiguration(
-            /* kioskAppProviderName= */ "test_provider",
-            /* kioskAppPackageName= */ "test_package",
-            /* kioskAppAllowlistPackages= */ List.of("test_allowed_app1", "test_allowed_app2"),
-            /* kioskAppEnableOutgoingCalls= */ false,
-            /* kioskAppEnableEnableNotifications= */ true,
-            /* disallowInstallingFromUnknownSources= */ false,
-            /* termsAndConditionsUrl= */ "test_terms_and_configurations_url",
-            /* supportUrl= */ "test_support_url"
-    );
+            new ArraySet<>(
+                    new DeviceId[] {
+                        new DeviceId(DEVICE_ID_TYPE_IMEI, IMEI_1),
+                        new DeviceId(DEVICE_ID_TYPE_IMEI, IMEI_2),
+                        new DeviceId(DEVICE_ID_TYPE_MEID, MEID_1),
+                        new DeviceId(DEVICE_ID_TYPE_MEID, MEID_2),
+                    });
+    static final ProvisioningConfiguration TEST_CONFIGURATION =
+            new ProvisioningConfiguration(
+                    /* kioskAppProviderName= */ "test_provider",
+                    /* kioskAppPackageName= */ "test_package",
+                    /* kioskAppAllowlistPackages= */ List.of(
+                            "test_allowed_app1", "test_allowed_app2"),
+                    /* kioskAppEnableOutgoingCalls= */ false,
+                    /* kioskAppEnableEnableNotifications= */ true,
+                    /* disallowInstallingFromUnknownSources= */ false,
+                    /* termsAndConditionsUrl= */ "test_terms_and_configurations_url",
+                    /* supportUrl= */ "test_support_url");
     static final int DEVICE_ID_TYPE_BITMAP =
             (1 << DEVICE_ID_TYPE_IMEI) | (1 << DEVICE_ID_TYPE_MEID);
     static final String FAKE_APEX_PACKAGE = "fake_apex";
@@ -134,9 +139,10 @@ public final class DeviceCheckInHelperTest {
     private DeviceLockControllerScheduler mScheduler;
     private StatsLogger mStatsLogger;
     private WorkManager mWorkManager;
-    private ShadowPackageManager mPackageManager;
+    private PackageManager mPackageManager;
+    private ShadowPackageManager mShadowPackageManager;
     private FeatureFlagProvider mFeatureFlagProvider;
-
+    private DevicePolicyController mMockDevicePolicyController;
     private ProvisionStateController mMockProvisionStateController;
 
     @Before
@@ -144,18 +150,19 @@ public final class DeviceCheckInHelperTest {
         mTestApplication = ApplicationProvider.getApplicationContext();
         mScheduler = mTestApplication.getDeviceLockControllerScheduler();
         mFinalizationController = mTestApplication.getFinalizationController();
-        when(mFinalizationController.notifyRestrictionsCleared()).thenReturn(
-                Futures.immediateVoidFuture());
-        when(mFinalizationController.finalizeNotEnrolledDevice()).thenReturn(
-                Futures.immediateVoidFuture());
-        when(mFinalizationController.enforceDiskState(true)).thenReturn(
-                Futures.immediateVoidFuture());
+        when(mFinalizationController.notifyRestrictionsCleared())
+                .thenReturn(Futures.immediateVoidFuture());
+        when(mFinalizationController.finalizeNotEnrolledDevice())
+                .thenReturn(Futures.immediateVoidFuture());
+        when(mFinalizationController.enforceDiskState(true))
+                .thenReturn(Futures.immediateVoidFuture());
 
         mFeatureFlagProvider = mTestApplication.getFeatureFlagProvider();
-        mTelephonyManager = Shadows.shadowOf(
-                mTestApplication.getSystemService(TelephonyManager.class));
+        mTelephonyManager =
+                Shadows.shadowOf(mTestApplication.getSystemService(TelephonyManager.class));
         mHelper = new DeviceCheckInHelper(mTestApplication);
-        WorkManagerTestInitHelper.initializeTestWorkManager(mTestApplication,
+        WorkManagerTestInitHelper.initializeTestWorkManager(
+                mTestApplication,
                 new Configuration.Builder()
                         .setMinimumLoggingLevel(android.util.Log.DEBUG)
                         .setExecutor(new SynchronousExecutor())
@@ -163,7 +170,9 @@ public final class DeviceCheckInHelperTest {
         mWorkManager = WorkManager.getInstance(mTestApplication);
         mGlobalParametersClient = GlobalParametersClient.getInstance();
         mStatsLogger = ((StatsLoggerProvider) mTestApplication).getStatsLogger();
-        mPackageManager = Shadows.shadowOf(mTestApplication.getPackageManager());
+        mPackageManager = mTestApplication.getPackageManager();
+        mShadowPackageManager = Shadows.shadowOf(mPackageManager);
+        mMockDevicePolicyController = mTestApplication.getPolicyController();
         mMockProvisionStateController = mTestApplication.getProvisionStateController();
         when(mMockProvisionStateController.notifyProvisioningReady())
                 .thenReturn(Futures.immediateVoidFuture());
@@ -171,15 +180,15 @@ public final class DeviceCheckInHelperTest {
 
     @Test
     public void getDeviceAvailableUniqueIds_shouldReturnAllAvailableUniqueIds() {
-        mPackageManager.setSystemFeature(PackageManager.FEATURE_TELEPHONY_CDMA,
-                /* supported= */ true);
+        mShadowPackageManager.setSystemFeature(
+                PackageManager.FEATURE_TELEPHONY_CDMA, /* supported= */ true);
         mTelephonyManager.setActiveModemCount(TOTAL_SLOT_COUNT);
         mTelephonyManager.setImei(/* slotIndex= */ 0, IMEI_1);
         mTelephonyManager.setImei(/* slotIndex= */ 1, IMEI_2);
         mTelephonyManager.setMeid(/* slotIndex= */ 0, MEID_1);
         mTelephonyManager.setMeid(/* slotIndex= */ 1, MEID_2);
-        final ArraySet<DeviceId> deviceIds = mHelper.getDeviceAvailableUniqueIds(
-                DEVICE_ID_TYPE_BITMAP);
+        final ArraySet<DeviceId> deviceIds =
+                mHelper.getDeviceAvailableUniqueIds(DEVICE_ID_TYPE_BITMAP);
         assertThat(Objects.requireNonNull(deviceIds).size()).isEqualTo(TOTAL_ID_COUNT);
         assertThat(deviceIds).containsExactlyElementsIn(ACTUAL_DEVICE_IDs);
     }
@@ -189,9 +198,12 @@ public final class DeviceCheckInHelperTest {
             throws Exception {
         final GetDeviceCheckInStatusGrpcResponse response = createStopResponse();
 
-        assertThat(mHelper.handleGetDeviceCheckInStatusResponse(response,
-                mock(DeviceLockControllerScheduler.class),
-                mTestApplication.getFcmRegistrationToken().get())).isTrue();
+        assertThat(
+                        mHelper.handleGetDeviceCheckInStatusResponse(
+                                response,
+                                mock(DeviceLockControllerScheduler.class),
+                                mTestApplication.getFcmRegistrationToken().get()))
+                .isTrue();
         Shadows.shadowOf(getMainLooper()).idle();
         verify(mFinalizationController).finalizeNotEnrolledDevice();
     }
@@ -205,44 +217,50 @@ public final class DeviceCheckInHelperTest {
         assertThat(Futures.getUnchecked(mGlobalParametersClient.isProvisionReady())).isTrue();
         List<Intent> intents = Shadows.shadowOf(mTestApplication).getBroadcastIntents();
         assertThat(intents.size()).isEqualTo(1);
-        assertThat(intents.get(0).getComponent().getClassName()).isEqualTo(
-                ProvisionReadyReceiver.class.getName());
+        assertThat(intents.get(0).getComponent().getClassName())
+                .isEqualTo(ProvisionReadyReceiver.class.getName());
     }
 
     @Test
     public void handleProvisionReadyResponse_recolEnabled_shouldChangeFinalizedToUnfinalized() {
         when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
-        Futures.getUnchecked(GlobalParametersClient.getInstance().setFinalizationState(
-                FinalizationControllerImpl.FinalizationState.FINALIZED));
+        Futures.getUnchecked(
+                GlobalParametersClient.getInstance()
+                        .setFinalizationState(
+                                FinalizationControllerImpl.FinalizationState.FINALIZED));
         GetDeviceCheckInStatusGrpcResponse response = createReadyResponse(TEST_CONFIGURATION);
 
         assertThat(mHelper.handleProvisionReadyResponse(response)).isTrue();
 
-        assertThat(Futures.getUnchecked(
-                GlobalParametersClient.getInstance().getFinalizationState())).isEqualTo(
-                FinalizationControllerImpl.FinalizationState.UNFINALIZED);
+        assertThat(
+                        Futures.getUnchecked(
+                                GlobalParametersClient.getInstance().getFinalizationState()))
+                .isEqualTo(FinalizationControllerImpl.FinalizationState.UNFINALIZED);
         verify(mFinalizationController).enforceDiskState(/* force= */ true);
     }
 
     @Test
     public void handleProvisionReadyResponse_recolNotEnabled_shouldNotChangeFinalizedState() {
         when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(false);
-        Futures.getUnchecked(GlobalParametersClient.getInstance().setFinalizationState(
-                FinalizationControllerImpl.FinalizationState.FINALIZED));
+        Futures.getUnchecked(
+                GlobalParametersClient.getInstance()
+                        .setFinalizationState(
+                                FinalizationControllerImpl.FinalizationState.FINALIZED));
         GetDeviceCheckInStatusGrpcResponse response = createReadyResponse(TEST_CONFIGURATION);
 
         assertThat(mHelper.handleProvisionReadyResponse(response)).isTrue();
 
-        assertThat(Futures.getUnchecked(
-                GlobalParametersClient.getInstance().getFinalizationState())).isEqualTo(
-                FinalizationControllerImpl.FinalizationState.FINALIZED);
+        assertThat(
+                        Futures.getUnchecked(
+                                GlobalParametersClient.getInstance().getFinalizationState()))
+                .isEqualTo(FinalizationControllerImpl.FinalizationState.FINALIZED);
         verify(mFinalizationController, never()).enforceDiskState(anyBoolean());
     }
 
     @Test
     public void handleProvisionReadyResponse_invalidConfiguration_shouldNotSendBroadcast() {
-        GetDeviceCheckInStatusGrpcResponse response = createReadyResponse(
-                /* configuration= */ null);
+        GetDeviceCheckInStatusGrpcResponse response =
+                createReadyResponse(/* configuration= */ null);
 
         assertThat(mHelper.handleProvisionReadyResponse(response)).isFalse();
 
@@ -253,8 +271,8 @@ public final class DeviceCheckInHelperTest {
 
     @Test
     public void handleProvisionReadyResponse_invalidConfiguration_shouldLogRetryCheckIn() {
-        GetDeviceCheckInStatusGrpcResponse response = createReadyResponse(
-                /* configuration= */ null);
+        GetDeviceCheckInStatusGrpcResponse response =
+                createReadyResponse(/* configuration= */ null);
 
         mHelper.handleProvisionReadyResponse(response);
 
@@ -266,8 +284,12 @@ public final class DeviceCheckInHelperTest {
             throws Exception {
         final GetDeviceCheckInStatusGrpcResponse response = createReadyResponse(TEST_CONFIGURATION);
 
-        assertThat(mHelper.handleGetDeviceCheckInStatusResponse(response, mScheduler,
-                mTestApplication.getFcmRegistrationToken().get())).isTrue();
+        assertThat(
+                        mHelper.handleGetDeviceCheckInStatusResponse(
+                                response,
+                                mScheduler,
+                                mTestApplication.getFcmRegistrationToken().get()))
+                .isTrue();
 
         assertThat(mWorkManager.getWorkInfosForUniqueWork(FCM_TOKEN_WORK_NAME).get()).isEmpty();
     }
@@ -277,28 +299,37 @@ public final class DeviceCheckInHelperTest {
             throws Exception {
         final GetDeviceCheckInStatusGrpcResponse response = createReadyResponse(TEST_CONFIGURATION);
 
-        assertThat(mHelper.handleGetDeviceCheckInStatusResponse(response, mScheduler,
-                /* fcmRegistrationToken= */ null)).isTrue();
+        assertThat(
+                        mHelper.handleGetDeviceCheckInStatusResponse(
+                                response, mScheduler, /* fcmRegistrationToken= */ null))
+                .isTrue();
 
-        List<WorkInfo> actualWorks = Futures.getUnchecked(mWorkManager.getWorkInfosForUniqueWork(
-                FCM_TOKEN_WORK_NAME));
+        List<WorkInfo> actualWorks =
+                Futures.getUnchecked(mWorkManager.getWorkInfosForUniqueWork(FCM_TOKEN_WORK_NAME));
         assertThat(actualWorks.size()).isEqualTo(1);
         WorkInfo actualWorkInfo = actualWorks.get(0);
 
         NetworkRequest networkRequest = actualWorkInfo.getConstraints().getRequiredNetworkRequest();
         assertNetworkRequestCapabilities(networkRequest);
-        assertThat(actualWorkInfo.getInitialDelayMillis()).isEqualTo(
-                FCM_TOKEN_WORKER_INITIAL_DELAY.toMillis());
+        assertThat(actualWorkInfo.getInitialDelayMillis())
+                .isEqualTo(FCM_TOKEN_WORKER_INITIAL_DELAY.toMillis());
     }
 
     @Test
     public void handleGetDeviceCheckInStatusResponse_retryCheckIn_shouldScheduleRetryWork()
             throws Exception {
-        final GetDeviceCheckInStatusGrpcResponse response = createRetryResponse(
-                SystemClock.currentNetworkTimeClock().instant().plus(TEST_CHECK_RETRY_DURATION));
+        final GetDeviceCheckInStatusGrpcResponse response =
+                createRetryResponse(
+                        SystemClock.currentNetworkTimeClock()
+                                .instant()
+                                .plus(TEST_CHECK_RETRY_DURATION));
 
-        assertThat(mHelper.handleGetDeviceCheckInStatusResponse(response, mScheduler,
-                mTestApplication.getFcmRegistrationToken().get())).isTrue();
+        assertThat(
+                        mHelper.handleGetDeviceCheckInStatusResponse(
+                                response,
+                                mScheduler,
+                                mTestApplication.getFcmRegistrationToken().get()))
+                .isTrue();
 
         verify(mScheduler).scheduleRetryCheckInWork(eq(TEST_CHECK_RETRY_DURATION));
     }
@@ -306,11 +337,18 @@ public final class DeviceCheckInHelperTest {
     @Test
     public void handleGetDeviceCheckInStatusResponse_retryCheckIn_nonEmptyFcmDoesNotStartFcmWork()
             throws Exception {
-        final GetDeviceCheckInStatusGrpcResponse response = createRetryResponse(
-                SystemClock.currentNetworkTimeClock().instant().plus(TEST_CHECK_RETRY_DURATION));
+        final GetDeviceCheckInStatusGrpcResponse response =
+                createRetryResponse(
+                        SystemClock.currentNetworkTimeClock()
+                                .instant()
+                                .plus(TEST_CHECK_RETRY_DURATION));
 
-        assertThat(mHelper.handleGetDeviceCheckInStatusResponse(response, mScheduler,
-                mTestApplication.getFcmRegistrationToken().get())).isTrue();
+        assertThat(
+                        mHelper.handleGetDeviceCheckInStatusResponse(
+                                response,
+                                mScheduler,
+                                mTestApplication.getFcmRegistrationToken().get()))
+                .isTrue();
 
         assertThat(mWorkManager.getWorkInfosForUniqueWork(FCM_TOKEN_WORK_NAME).get()).isEmpty();
     }
@@ -318,31 +356,42 @@ public final class DeviceCheckInHelperTest {
     @Test
     public void handleGetDeviceCheckInStatusResponse_retryCheckIn_emptyFcmStartsWork()
             throws Exception {
-        final GetDeviceCheckInStatusGrpcResponse response = createRetryResponse(
-                SystemClock.currentNetworkTimeClock().instant().plus(TEST_CHECK_RETRY_DURATION));
+        final GetDeviceCheckInStatusGrpcResponse response =
+                createRetryResponse(
+                        SystemClock.currentNetworkTimeClock()
+                                .instant()
+                                .plus(TEST_CHECK_RETRY_DURATION));
 
-        assertThat(mHelper.handleGetDeviceCheckInStatusResponse(response, mScheduler,
-                /* fcmRegistrationToken= */ null)).isTrue();
+        assertThat(
+                        mHelper.handleGetDeviceCheckInStatusResponse(
+                                response, mScheduler, /* fcmRegistrationToken= */ null))
+                .isTrue();
 
-        List<WorkInfo> actualWorks = Futures.getUnchecked(mWorkManager.getWorkInfosForUniqueWork(
-                FCM_TOKEN_WORK_NAME));
+        List<WorkInfo> actualWorks =
+                Futures.getUnchecked(mWorkManager.getWorkInfosForUniqueWork(FCM_TOKEN_WORK_NAME));
         assertThat(actualWorks.size()).isEqualTo(1);
         WorkInfo actualWorkInfo = actualWorks.get(0);
         NetworkRequest networkRequest = actualWorkInfo.getConstraints().getRequiredNetworkRequest();
         assertNetworkRequestCapabilities(networkRequest);
-        assertThat(actualWorkInfo.getInitialDelayMillis()).isEqualTo(
-                FCM_TOKEN_WORKER_INITIAL_DELAY.toMillis());
+        assertThat(actualWorkInfo.getInitialDelayMillis())
+                .isEqualTo(FCM_TOKEN_WORKER_INITIAL_DELAY.toMillis());
     }
 
     @Test
     public void handleGetDeviceCheckInStatusResponse_retryCheckIn_durationIsNegative_shouldRetry()
             throws Exception {
-        final GetDeviceCheckInStatusGrpcResponse response = createRetryResponse(
-                SystemClock.currentNetworkTimeClock().instant().plus(
-                        TEST_NEGATIVE_CHECK_RETRY_DURATION));
+        final GetDeviceCheckInStatusGrpcResponse response =
+                createRetryResponse(
+                        SystemClock.currentNetworkTimeClock()
+                                .instant()
+                                .plus(TEST_NEGATIVE_CHECK_RETRY_DURATION));
 
-        assertThat(mHelper.handleGetDeviceCheckInStatusResponse(response, mScheduler,
-                mTestApplication.getFcmRegistrationToken().get())).isTrue();
+        assertThat(
+                        mHelper.handleGetDeviceCheckInStatusResponse(
+                                response,
+                                mScheduler,
+                                mTestApplication.getFcmRegistrationToken().get()))
+                .isTrue();
 
         verify(mScheduler).scheduleRetryCheckInWork(eq(Duration.ZERO));
     }
@@ -358,13 +407,81 @@ public final class DeviceCheckInHelperTest {
         packageInfo.setLongVersionCode(APEX_VERSION);
         packageInfo.packageName = FAKE_APEX_PACKAGE;
         packageInfo.isApex = true;
-        mPackageManager.installPackage(packageInfo);
+        mShadowPackageManager.installPackage(packageInfo);
         assertThat(mHelper.getDeviceLockApexVersion(FAKE_APEX_PACKAGE)).isEqualTo(APEX_VERSION);
     }
 
     @Test
     public void getDeviceLocale_returnsDefaultLocale() {
         assertThat(mHelper.getDeviceLocale()).isEqualTo(DEVICE_LOCALE);
+    }
+
+    @Test
+    public void getCheckInRequiredPackageState_enabledPackage_returnsEnabled() {
+        installSystemPhonePackage(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+
+        assertThat(mHelper.getCheckInRequiredPackageState(PHONE_SYSTEM_APP_PACKAGE_NAME))
+                .isEqualTo(AbstractDeviceCheckInHelper.CheckInRequiredPackageState.ENABLED);
+    }
+
+    @Test
+    public void getCheckInRequiredPackageState_disablesPackage_returnsDisabled() {
+        installSystemPhonePackage(PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER);
+
+        assertThat(mHelper.getCheckInRequiredPackageState(PHONE_SYSTEM_APP_PACKAGE_NAME))
+                .isEqualTo(AbstractDeviceCheckInHelper.CheckInRequiredPackageState.DISABLED);
+    }
+
+    @Test
+    public void getCheckInRequiredPackageState_missingPackage_returnsUninstalled() {
+        assertThat(mHelper.getCheckInRequiredPackageState(PHONE_SYSTEM_APP_PACKAGE_NAME))
+                .isEqualTo(AbstractDeviceCheckInHelper.CheckInRequiredPackageState.UNINSTALLED);
+    }
+
+    @Test
+    public void enableCheckInRequiredPackage_disabledPackage_enablesPackage() {
+        installSystemPhonePackage(PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER);
+
+        mHelper.enableCheckInRequiredPackage(
+                PHONE_SYSTEM_APP_PACKAGE_NAME,
+                AbstractDeviceCheckInHelper.CheckInRequiredPackageState.DISABLED);
+
+        assertThat(mPackageManager.getApplicationEnabledSetting(PHONE_SYSTEM_APP_PACKAGE_NAME))
+                .isEqualTo(COMPONENT_ENABLED_STATE_DEFAULT);
+        verify(mMockDevicePolicyController)
+                .disableUserControlForCheckInRequiredPackage(PHONE_SYSTEM_APP_PACKAGE_NAME);
+    }
+
+    @Test
+    public void enableCheckInRequiredPackage_uninstalledPackage_reInstallsPackage() {
+        mHelper.enableCheckInRequiredPackage(
+                PHONE_SYSTEM_APP_PACKAGE_NAME,
+                AbstractDeviceCheckInHelper.CheckInRequiredPackageState.DISABLED);
+
+        // Actual behaviour for installing existing packages added in instrumentation tests
+        verify(mMockDevicePolicyController)
+                .disableUserControlForCheckInRequiredPackage(PHONE_SYSTEM_APP_PACKAGE_NAME);
+    }
+
+    @Test
+    public void hasTelephonyFeature_featurePresent_returnsTrue() {
+        mShadowPackageManager.setSystemFeature(
+                PackageManager.FEATURE_TELEPHONY, /* supported= */ true);
+
+        assertThat(mHelper.hasTelephonyFeature()).isTrue();
+    }
+
+    @Test
+    public void hasTelephonyFeature_featureNotPresent_returnsFalse() {
+        assertThat(mHelper.hasTelephonyFeature()).isFalse();
+    }
+
+    private void installSystemPhonePackage(int enabledSetting) {
+        PackageInfo packageInfo = new PackageInfo();
+        packageInfo.packageName = PHONE_SYSTEM_APP_PACKAGE_NAME;
+
+        mShadowPackageManager.installPackage(packageInfo);
+        mPackageManager.setApplicationEnabledSetting(packageInfo.packageName, enabledSetting, 0);
     }
 
     private void assertNetworkRequestCapabilities(NetworkRequest networkRequest) {
@@ -378,7 +495,6 @@ public final class DeviceCheckInHelperTest {
         return createMockResponse(STOP_CHECK_IN, /* nextCheckInTime= */ null, /* config= */ null);
     }
 
-
     private static GetDeviceCheckInStatusGrpcResponse createRetryResponse(Instant nextCheckInTime) {
         return createMockResponse(RETRY_CHECK_IN, nextCheckInTime, /* config= */ null);
     }
@@ -390,9 +506,10 @@ public final class DeviceCheckInHelperTest {
 
     private static GetDeviceCheckInStatusGrpcResponse createMockResponse(
             @DeviceCheckInStatus int checkInStatus,
-            @Nullable Instant nextCheckInTime, @Nullable ProvisioningConfiguration config) {
-        GetDeviceCheckInStatusGrpcResponse response = Mockito.mock(
-                GetDeviceCheckInStatusGrpcResponse.class);
+            @Nullable Instant nextCheckInTime,
+            @Nullable ProvisioningConfiguration config) {
+        GetDeviceCheckInStatusGrpcResponse response =
+                Mockito.mock(GetDeviceCheckInStatusGrpcResponse.class);
         when(response.getDeviceCheckInStatus()).thenReturn(checkInStatus);
         when(response.isProvisioningMandatory()).thenReturn(IS_PROVISIONING_MANDATORY);
         if (nextCheckInTime != null) {

@@ -36,4 +36,8 @@ public interface FeatureFlagProvider {
      */
     boolean isRecolEnabled();
 
+    /**
+     * Returns the feature flag value that enables the check-in required package enforcement
+     */
+    boolean isCheckInRequiredPackageEnforcementEnabled();
 }

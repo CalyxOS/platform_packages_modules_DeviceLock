@@ -50,17 +50,15 @@ import org.robolectric.TestLifecycleApplication;
 
 import java.lang.reflect.Method;
 
-/**
- * Application class that provides mock objects for tests.
- */
-public final class TestDeviceLockControllerApplication extends Application implements
-        PolicyObjectsProvider,
-        TestLifecycleApplication,
-        DeviceLockControllerSchedulerProvider,
-        FcmRegistrationTokenProvider,
-        PlayInstallPackageTaskClassProvider,
-        StatsLoggerProvider,
-        FeatureFlagProvider {
+/** Application class that provides mock objects for tests. */
+public final class TestDeviceLockControllerApplication extends Application
+        implements PolicyObjectsProvider,
+                TestLifecycleApplication,
+                DeviceLockControllerSchedulerProvider,
+                FcmRegistrationTokenProvider,
+                PlayInstallPackageTaskClassProvider,
+                StatsLoggerProvider,
+                FeatureFlagProvider {
 
     public static final String TEST_FCM_TOKEN = "fcmToken";
 
@@ -86,10 +84,10 @@ public final class TestDeviceLockControllerApplication extends Application imple
     public ProvisionStateController getProvisionStateController() {
         if (mProvisionStateController == null) {
             mProvisionStateController = mock(ProvisionStateController.class);
-            when(mProvisionStateController.getDevicePolicyController()).thenReturn(
-                    getPolicyController());
-            when(mProvisionStateController.getDeviceStateController()).thenReturn(
-                    getDeviceStateController());
+            when(mProvisionStateController.getDevicePolicyController())
+                    .thenReturn(getPolicyController());
+            when(mProvisionStateController.getDeviceStateController())
+                    .thenReturn(getDeviceStateController());
         }
         return mProvisionStateController;
     }
@@ -118,9 +116,7 @@ public final class TestDeviceLockControllerApplication extends Application imple
         return mStatsLogger;
     }
 
-    /**
-     * Returns a mock {@link FeatureFlagProvider} for testing purposes.
-     */
+    /** Returns a mock {@link FeatureFlagProvider} for testing purposes. */
     public synchronized FeatureFlagProvider getFeatureFlagProvider() {
         if (mFeatureFlagProvider == null) {
             mFeatureFlagProvider = mock(FeatureFlagProvider.class);
@@ -140,23 +136,23 @@ public final class TestDeviceLockControllerApplication extends Application imple
         mStateController = null;
     }
 
-
     @Override
     public void beforeTest(Method method) {
-        mSetupParametersClient = SetupParametersClient.getInstance(this,
-                TestingExecutors.sameThreadScheduledExecutor());
+        mSetupParametersClient =
+                SetupParametersClient.getInstance(
+                        this, TestingExecutors.sameThreadScheduledExecutor());
         mSetupParametersClient.setService(
                 Robolectric.setupService(SetupParametersService.class).onBind(/* intent= */ null));
 
-        mGlobalParametersClient = GlobalParametersClient.getInstance(
-                this, TestingExecutors.sameThreadScheduledExecutor());
+        mGlobalParametersClient =
+                GlobalParametersClient.getInstance(
+                        this, TestingExecutors.sameThreadScheduledExecutor());
         mGlobalParametersClient.setService(
                 Robolectric.setupService(GlobalParametersService.class).onBind(/* intent= */ null));
     }
 
     @Override
-    public void prepareTest(Object test) {
-    }
+    public void prepareTest(Object test) {}
 
     @Override
     public void afterTest(Method method) {
@@ -194,13 +190,16 @@ public final class TestDeviceLockControllerApplication extends Application imple
         return getFeatureFlagProvider().isRecolEnabled();
     }
 
-    /**
-     * A stub class for play install worker.
-     */
+    @Override
+    public boolean isCheckInRequiredPackageEnforcementEnabled() {
+        return getFeatureFlagProvider().isCheckInRequiredPackageEnforcementEnabled();
+    }
+
+    /** A stub class for play install worker. */
     public static final class PlayInstallPackageWorker extends ListenableWorker {
 
-        public PlayInstallPackageWorker(@NonNull Context appContext,
-                @NonNull WorkerParameters workerParameters) {
+        public PlayInstallPackageWorker(
+                @NonNull Context appContext, @NonNull WorkerParameters workerParameters) {
             super(appContext, workerParameters);
         }
 

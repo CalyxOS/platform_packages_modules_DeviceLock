@@ -72,6 +72,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 /**
  * An implementation of {@link DevicePolicyController}. This class guarantees thread safety by
@@ -87,8 +88,7 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
     // Added for support to existing implementations before the
     // DEVICE_LOCK_VERSION_EXTRA is merged to 25Q4
     // TODO: b/417696889 - deprecate this.
-    private static final String OLD_DEVICE_LOCK_VERSION_EXTRA =
-            "DEVICE_LOCK_VERSION";
+    private static final String OLD_DEVICE_LOCK_VERSION_EXTRA = "DEVICE_LOCK_VERSION";
     private static final String TAG = "DevicePolicyControllerImpl";
     private static final int DEVICE_LOCK_VERSION = 2;
     private final List<PolicyHandler> mPolicyList = new ArrayList<>();
@@ -278,9 +278,7 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
                         Futures.transformAsync(
                                 outcomeFuture,
                                 newLockTaskType -> {
-                                    LogUtil.i(
-                                            TAG,
-                                            "Resolved LockTaskType: " + newLockTaskType);
+                                    LogUtil.i(TAG, "Resolved LockTaskType: " + newLockTaskType);
                                     return GlobalParametersClient.getInstance()
                                             .setLockTaskType(newLockTaskType);
                                 },
@@ -435,8 +433,8 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
                             return resultIntent.setAction(ACTION_START_DEVICE_SUBSIDY_PROVISIONING);
                         case ProvisioningType.TYPE_RECOL:
                             if (mFeatureFlagProvider.isRecolEnabled()) {
-                                return resultIntent
-                                        .setAction(ACTION_START_DEVICE_RECOL_PROVISIONING);
+                                return resultIntent.setAction(
+                                        ACTION_START_DEVICE_RECOL_PROVISIONING);
                             }
                         case ProvisioningType.TYPE_UNDEFINED:
                         default:
@@ -567,6 +565,49 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
                     return null;
                 },
                 mBgExecutor);
+    }
+
+    @Override
+    public void disableUserControlForCheckInRequiredPackage(String packageName) {
+        try {
+            List<String> userControlDisabledPackages =
+                    mDpm.getUserControlDisabledPackages(null /* admin */);
+            if (!userControlDisabledPackages.contains(packageName)) {
+                List<String> updatedPackages = new ArrayList<>(userControlDisabledPackages);
+                updatedPackages.add(packageName);
+                mDpm.setUserControlDisabledPackages(null /* admin */, updatedPackages);
+            }
+        } catch (SecurityException e) {
+            // We do not expect this to happen as the controller has the required permissions.
+            LogUtil.e(
+                    TAG,
+                    "Failed to disable user control for package" + packageName + ": Exception",
+                    e);
+        }
+    }
+
+    @Override
+    public void enableUserControlForCheckInRequiredPackage(String packageName) {
+        try {
+            List<String> userControlDisabledPackages =
+                    mDpm.getUserControlDisabledPackages(null /* admin */);
+            List<String> updatedPackages =
+                    userControlDisabledPackages.stream()
+                            .filter(pkg -> !pkg.equals(packageName))
+                            .collect(Collectors.toCollection(ArrayList::new));
+
+            if (userControlDisabledPackages.contains(packageName)) {
+                mDpm.setUserControlDisabledPackages(null /* admin */, updatedPackages);
+            }
+        } catch (SecurityException e) {
+            // We do not expect this to happen as the controller has the required permissions.
+            LogUtil.e(
+                    TAG,
+                    "Failed to remove user control restrictions for package"
+                            + packageName
+                            + ": Exception",
+                    e);
+        }
     }
 
     private void startLockTaskModeIfNeeded(@LockTaskType Integer type) {
