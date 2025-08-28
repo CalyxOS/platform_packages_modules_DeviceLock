@@ -162,9 +162,27 @@ public final class DeviceStateControllerImplTest {
         globalParametersClient.setDeviceState(DeviceState.CLEARED).get();
         ExecutionException thrown = assertThrows(ExecutionException.class,
                 () -> mDeviceStateController.lockDevice().get());
-        assertThat(thrown).hasCauseThat().isInstanceOf(RuntimeException.class);
+        assertThat(thrown).hasCauseThat().isInstanceOf(IllegalStateException.class);
         assertThat(thrown).hasMessageThat().contains(DEVICE_HAS_BEEN_CLEARED);
         assertThat(mDeviceStateController.isLocked().get()).isFalse();
+    }
+
+    @Test
+    public void lockDevice_whenClearIsInProgress_throwsException() {
+        // GIVEN the device is provisioned
+        when(mMockProvisionStateController.getState()).thenReturn(
+                Futures.immediateFuture(ProvisionState.PROVISION_SUCCEEDED));
+        when(mMockDevicePolicyController.enforceCurrentPolicies()).thenReturn(
+                Futures.immediateVoidFuture());
+
+        // WHEN a clear operation is initiated, which sets the mClearingInProgress flag
+        mDeviceStateController.clearDevice();
+
+        // THEN a subsequent lock operation should fail because the clear is in progress
+        ExecutionException thrown = assertThrows(ExecutionException.class,
+                () -> mDeviceStateController.lockDevice().get());
+        assertThat(thrown).hasCauseThat().isInstanceOf(IllegalStateException.class);
+        assertThat(thrown).hasMessageThat().contains(DEVICE_HAS_BEEN_CLEARED);
     }
 
     @Test
@@ -268,7 +286,25 @@ public final class DeviceStateControllerImplTest {
         globalParametersClient.setDeviceState(DeviceState.CLEARED).get();
         ExecutionException thrown = assertThrows(ExecutionException.class,
                 () -> mDeviceStateController.unlockDevice().get());
-        assertThat(thrown).hasCauseThat().isInstanceOf(RuntimeException.class);
+        assertThat(thrown).hasCauseThat().isInstanceOf(IllegalStateException.class);
+        assertThat(thrown).hasMessageThat().contains(DEVICE_HAS_BEEN_CLEARED);
+    }
+
+    @Test
+    public void unlockDevice_whenClearIsInProgress_throwsException() {
+        // GIVEN the device is provisioned
+        when(mMockProvisionStateController.getState()).thenReturn(
+                Futures.immediateFuture(ProvisionState.PROVISION_SUCCEEDED));
+        when(mMockDevicePolicyController.enforceCurrentPolicies()).thenReturn(
+                Futures.immediateVoidFuture());
+
+        // WHEN a clear operation is initiated, which sets the mClearingInProgress flag
+        mDeviceStateController.clearDevice();
+
+        // THEN a subsequent unlock operation should fail because the clear is in progress
+        ExecutionException thrown = assertThrows(ExecutionException.class,
+                () -> mDeviceStateController.unlockDevice().get());
+        assertThat(thrown).hasCauseThat().isInstanceOf(IllegalStateException.class);
         assertThat(thrown).hasMessageThat().contains(DEVICE_HAS_BEEN_CLEARED);
     }
 
@@ -372,7 +408,7 @@ public final class DeviceStateControllerImplTest {
         globalParametersClient.setDeviceState(DeviceState.CLEARED).get();
         ExecutionException thrown = assertThrows(ExecutionException.class,
                 () -> mDeviceStateController.clearDevice().get());
-        assertThat(thrown).hasCauseThat().isInstanceOf(RuntimeException.class);
+        assertThat(thrown).hasCauseThat().isInstanceOf(IllegalStateException.class);
         assertThat(thrown).hasMessageThat().contains(DEVICE_HAS_BEEN_CLEARED);
     }
 
