@@ -16,9 +16,10 @@
 
 package com.android.devicelockcontroller.provision.worker;
 
-import android.content.Context;
-
 import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryReason;
+import static com.android.devicelockcontroller.stats.StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE;
+
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
@@ -26,6 +27,7 @@ import androidx.work.WorkerParameters;
 
 import com.android.devicelockcontroller.FcmRegistrationTokenProvider;
 import com.android.devicelockcontroller.FeatureFlagProvider;
+import com.android.devicelockcontroller.policy.DevicePolicyController;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
 import com.android.devicelockcontroller.provision.grpc.DeviceCheckInClient;
 import com.android.devicelockcontroller.provision.grpc.GetDeviceCheckInStatusGrpcResponse;
@@ -48,39 +50,43 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.time.Duration;
 
-/**
- * A worker class dedicated to execute the check-in operation for device lock program.
- */
+/** A worker class dedicated to execute the check-in operation for device lock program. */
 public final class DeviceCheckInWorker extends AbstractCheckInWorker {
-
+    private static final String PHONE_APP_PACKAGE = "com.android.phone";
     private final AbstractDeviceCheckInHelper mCheckInHelper;
     private final FcmRegistrationTokenProvider mFcmRegistrationTokenProvider;
-
     private final FeatureFlagProvider mFeatureFlagProvider;
-
     private final StatsLogger mStatsLogger;
 
-    @VisibleForTesting
-    static final Duration RETRY_ON_FAILURE_DELAY = Duration.ofDays(1);
+    @VisibleForTesting static final Duration RETRY_ON_FAILURE_DELAY = Duration.ofDays(1);
 
-    public DeviceCheckInWorker(@NonNull Context context,
-            @NonNull WorkerParameters workerParams, ListeningExecutorService executorService) {
-        this(context, workerParams, new DeviceCheckInHelper(context),
+    public DeviceCheckInWorker(
+            @NonNull Context context,
+            @NonNull WorkerParameters workerParams,
+            ListeningExecutorService executorService) {
+        this(
+                context,
+                workerParams,
+                new DeviceCheckInHelper(context),
                 (FcmRegistrationTokenProvider) context.getApplicationContext(),
                 /* client= */ null,
-                executorService, (FeatureFlagProvider) context.getApplicationContext());
+                executorService,
+                (FeatureFlagProvider) context.getApplicationContext());
     }
 
     @VisibleForTesting
-    DeviceCheckInWorker(@NonNull Context context, @NonNull WorkerParameters workerParameters,
-            AbstractDeviceCheckInHelper helper, FcmRegistrationTokenProvider tokenProvider,
-            DeviceCheckInClient client, ListeningExecutorService executorService,
+    DeviceCheckInWorker(
+            @NonNull Context context,
+            @NonNull WorkerParameters workerParameters,
+            AbstractDeviceCheckInHelper helper,
+            FcmRegistrationTokenProvider tokenProvider,
+            DeviceCheckInClient client,
+            ListeningExecutorService executorService,
             FeatureFlagProvider featureFlagProvider) {
         super(context, workerParameters, client, executorService);
         mFcmRegistrationTokenProvider = tokenProvider;
         mCheckInHelper = helper;
-        StatsLoggerProvider loggerProvider =
-                (StatsLoggerProvider) context.getApplicationContext();
+        StatsLoggerProvider loggerProvider = (StatsLoggerProvider) context.getApplicationContext();
         mStatsLogger = loggerProvider.getStatsLogger();
         mFeatureFlagProvider = featureFlagProvider;
     }
@@ -92,89 +98,131 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                 (DeviceLockControllerSchedulerProvider) mContext;
         DeviceLockControllerScheduler scheduler =
                 schedulerProvider.getDeviceLockControllerScheduler();
+
+        if (mFeatureFlagProvider.isCheckInRequiredPackageEnforcementEnabled()
+                && mCheckInHelper.hasTelephonyFeature()) {
+            @AbstractDeviceCheckInHelper.CheckInRequiredPackageState
+            int state = mCheckInHelper.getCheckInRequiredPackageState(PHONE_APP_PACKAGE);
+            if (state != AbstractDeviceCheckInHelper.CheckInRequiredPackageState.ENABLED) {
+                mCheckInHelper.enableCheckInRequiredPackage(PHONE_APP_PACKAGE, state);
+                LogUtil.e(TAG, "CheckIn failed, a required package is not enabled!");
+                return Futures.immediateFuture(Result.retry());
+            }
+        }
+
         return Futures.transformAsync(
                 mExecutorService.submit(mCheckInHelper::getDeviceUniqueIds),
                 deviceIds -> {
+                    if (mFeatureFlagProvider.isCheckInRequiredPackageEnforcementEnabled()
+                            && mCheckInHelper.hasTelephonyFeature()) {
+                        // Remove package protection for check-in required package
+                        // If no restrictions had been set, this will have no effect
+                        DevicePolicyController devicePolicyController =
+                                ((PolicyObjectsProvider) mContext).getPolicyController();
+                        devicePolicyController.enableUserControlForCheckInRequiredPackage(
+                                PHONE_APP_PACKAGE);
+                    }
                     if (deviceIds.isEmpty()) {
                         LogUtil.w(TAG, "CheckIn failed. No device identifier available!");
                         // Similarly to STOP_CHECK_IN, finalize the device (without reporting it
                         // to the backend, since it's not part of the financing program).
                         final ListenableFuture<Void> finalizeDeviceFuture =
-                                ((PolicyObjectsProvider) mContext).getFinalizationController()
+                                ((PolicyObjectsProvider) mContext)
+                                        .getFinalizationController()
                                         .finalizeNotEnrolledDevice();
-                        return Futures.transformAsync(finalizeDeviceFuture,
+                        return Futures.transformAsync(
+                                finalizeDeviceFuture,
                                 unused -> Futures.immediateFuture(Result.failure()),
                                 mExecutorService);
                     }
                     String carrierInfo = mCheckInHelper.getCarrierInfo();
                     ListenableFuture<String> fcmRegistrationToken =
                             mFcmRegistrationTokenProvider.getFcmRegistrationToken();
-                    return Futures.whenAllSucceed(mClient, fcmRegistrationToken).call(() -> {
-                        DeviceCheckInClient client = Futures.getDone(mClient);
-                        String fcmToken = Futures.getDone(fcmRegistrationToken);
+                    return Futures.whenAllSucceed(mClient, fcmRegistrationToken)
+                            .call(
+                                    () -> {
+                                        DeviceCheckInClient client = Futures.getDone(mClient);
+                                        String fcmToken = Futures.getDone(fcmRegistrationToken);
 
-                        byte[] keyAttestationLeafCertificate = null;
+                                        byte[] keyAttestationLeafCertificate = null;
 
-                        if (mFeatureFlagProvider.isImeiHardeningRegistrationEnabled()) {
-                            try {
-                                keyAttestationLeafCertificate =
-                                        KeyAttestationUtil.getKeyAttestationLeafCertificate();
-                            } catch (NoSuchAlgorithmException | NoSuchProviderException |
-                                     CertificateException |
-                                     IOException | KeyStoreException |
-                                     InvalidAlgorithmParameterException e) {
-                                LogUtil.e(TAG, "Fetching KeyAttestation Leaf certificate failed",
-                                        e);
-                                mStatsLogger.logCheckInRetry(
-                                        CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
-                                return Result.retry();
-                            }
+                                        if (mFeatureFlagProvider
+                                                .isImeiHardeningRegistrationEnabled()) {
+                                            try {
+                                                keyAttestationLeafCertificate =
+                                                        KeyAttestationUtil
+                                                                .getKeyAttestationLeafCertificate();
+                                            } catch (NoSuchAlgorithmException
+                                                    | NoSuchProviderException
+                                                    | CertificateException
+                                                    | IOException
+                                                    | KeyStoreException
+                                                    | InvalidAlgorithmParameterException e) {
+                                                LogUtil.e(
+                                                        TAG,
+                                                        "Fetching KeyAttestation Leaf "
+                                                                + "certificate failed",
+                                                        e);
+                                                mStatsLogger.logCheckInRetry(
+                                                        KEY_ATTESTATION_GENERATION_FAILURE);
+                                                return Result.retry();
+                                            }
 
-                            if (keyAttestationLeafCertificate == null) {
-                                mStatsLogger.logCheckInRetry(
-                                        CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
-                                return Result.retry();
-                            }
-                        }
+                                            if (keyAttestationLeafCertificate == null) {
+                                                mStatsLogger.logCheckInRetry(
+                                                        KEY_ATTESTATION_GENERATION_FAILURE);
+                                                return Result.retry();
+                                            }
+                                        }
 
-                        GetDeviceCheckInStatusGrpcResponse response =
-                                client.getDeviceCheckInStatus(
-                                        deviceIds,
-                                        carrierInfo,
-                                        mCheckInHelper.getDeviceLocale(),
-                                        mCheckInHelper.getDeviceLockApexVersion(
-                                                mContext.getPackageName()),
-                                        fcmToken,
-                                        keyAttestationLeafCertificate
-                                );
-                        mStatsLogger.logGetDeviceCheckInStatus();
-                        if (response.hasRecoverableError()) {
-                            LogUtil.w(TAG, "Check-in failed w/ recoverable error " + response
-                                    + "\nRetrying...");
-                            mStatsLogger.logCheckInRetry(
-                                    CheckInRetryReason.RPC_FAILURE);
-                            return Result.retry();
-                        }
-                        if (response.isSuccessful()) {
-                            boolean isResponseHandlingSuccessful = mCheckInHelper
-                                    .handleGetDeviceCheckInStatusResponse(response, scheduler,
-                                            fcmToken);
-                            return isResponseHandlingSuccessful ? Result.success() : Result.retry();
-                        }
+                                        GetDeviceCheckInStatusGrpcResponse response =
+                                                client.getDeviceCheckInStatus(
+                                                        deviceIds,
+                                                        carrierInfo,
+                                                        mCheckInHelper.getDeviceLocale(),
+                                                        mCheckInHelper.getDeviceLockApexVersion(
+                                                                mContext.getPackageName()),
+                                                        fcmToken,
+                                                        keyAttestationLeafCertificate);
+                                        mStatsLogger.logGetDeviceCheckInStatus();
+                                        if (response.hasRecoverableError()) {
+                                            LogUtil.w(
+                                                    TAG,
+                                                    "Check-in failed w/ recoverable error "
+                                                            + response
+                                                            + "\nRetrying...");
+                                            mStatsLogger.logCheckInRetry(
+                                                    CheckInRetryReason.RPC_FAILURE);
+                                            return Result.retry();
+                                        }
+                                        if (response.isSuccessful()) {
+                                            boolean isResponseHandlingSuccessful =
+                                                    mCheckInHelper
+                                                            .handleGetDeviceCheckInStatusResponse(
+                                                                    response, scheduler, fcmToken);
+                                            return isResponseHandlingSuccessful
+                                                    ? Result.success()
+                                                    : Result.retry();
+                                        }
 
-                        if (response.isInterrupted()) {
-                            LogUtil.d(TAG, "Check-in interrupted");
-                            return Result.failure();
-                        }
+                                        if (response.isInterrupted()) {
+                                            LogUtil.d(TAG, "Check-in interrupted");
+                                            return Result.failure();
+                                        }
 
-                        LogUtil.e(TAG, "CheckIn failed: " + response + "\nRetry check-in in: "
-                                + RETRY_ON_FAILURE_DELAY);
-                        scheduler.scheduleRetryCheckInWork(RETRY_ON_FAILURE_DELAY);
-                        mStatsLogger.logCheckInRetry(
-                                CheckInRetryReason.RPC_FAILURE);
-                        return Result.failure();
-                    }, mExecutorService);
-                }, mExecutorService);
+                                        LogUtil.e(
+                                                TAG,
+                                                "CheckIn failed: "
+                                                        + response
+                                                        + "\nRetry check-in in: "
+                                                        + RETRY_ON_FAILURE_DELAY);
+                                        scheduler.scheduleRetryCheckInWork(RETRY_ON_FAILURE_DELAY);
+                                        mStatsLogger.logCheckInRetry(
+                                                CheckInRetryReason.RPC_FAILURE);
+                                        return Result.failure();
+                                    },
+                                    mExecutorService);
+                },
+                mExecutorService);
     }
-
 }

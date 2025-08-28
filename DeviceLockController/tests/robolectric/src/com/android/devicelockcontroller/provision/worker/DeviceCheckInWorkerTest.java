@@ -18,13 +18,14 @@ package com.android.devicelockcontroller.provision.worker;
 
 import static com.android.devicelockcontroller.TestDeviceLockControllerApplication.TEST_FCM_TOKEN;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.DeviceIdType.DEVICE_ID_TYPE_IMEI;
+import static com.android.devicelockcontroller.provision.worker.DeviceCheckInHelperTest.PHONE_SYSTEM_APP_PACKAGE_NAME;
 import static com.android.devicelockcontroller.provision.worker.DeviceCheckInWorker.RETRY_ON_FAILURE_DELAY;
 
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.never;
@@ -71,66 +72,69 @@ import java.security.Security;
 
 @RunWith(RobolectricTestRunner.class)
 public class DeviceCheckInWorkerTest {
-    public static final ArraySet<DeviceId> TEST_DEVICE_IDS = new ArraySet<>(
-            new DeviceId[]{new DeviceId(DEVICE_ID_TYPE_IMEI, "1234667890")});
-    public static final ArraySet<DeviceId> EMPTY_DEVICE_IDS = new ArraySet<>(new DeviceId[]{});
+    public static final ArraySet<DeviceId> TEST_DEVICE_IDS =
+            new ArraySet<>(new DeviceId[] {new DeviceId(DEVICE_ID_TYPE_IMEI, "1234667890")});
+    public static final ArraySet<DeviceId> EMPTY_DEVICE_IDS = new ArraySet<>(new DeviceId[] {});
     public static final String TEST_CARRIER_INFO = "1234567890";
     public static final String EMPTY_CARRIER_INFO = "";
     public static final String TEST_DEVICE_LOCALE = "en-US";
     public static final String EMPTY_DEVICE_LOCALE = "";
     public static final long TEST_DEVICE_LOCK_APEX_VERSION = 1234567890;
-    @Rule
-    public final MockitoRule mMocks = MockitoJUnit.rule();
-    @Mock
-    private AbstractDeviceCheckInHelper mHelper;
-    @Mock
-    private FcmRegistrationTokenProvider mFcmRegistrationTokenProvider;
+    @Rule public final MockitoRule mMocks = MockitoJUnit.rule();
+    @Mock private AbstractDeviceCheckInHelper mHelper;
+    @Mock private FcmRegistrationTokenProvider mFcmRegistrationTokenProvider;
 
-    @Mock
-    private FeatureFlagProvider mFeatureFlagProvider;
-    @Mock
-    private DeviceCheckInClient mClient;
-    @Mock
-    private GetDeviceCheckInStatusGrpcResponse mResponse;
+    @Mock private FeatureFlagProvider mFeatureFlagProvider;
+    @Mock private DeviceCheckInClient mClient;
+    @Mock private GetDeviceCheckInStatusGrpcResponse mResponse;
     private StatsLogger mStatsLogger;
     private DeviceCheckInWorker mWorker;
     private TestDeviceLockControllerApplication mContext =
             ApplicationProvider.getApplicationContext();
     private FinalizationController mFinalizationController;
 
-
     @Before
     public void setUp() throws Exception {
         mFinalizationController = mContext.getFinalizationController();
-        when(mFcmRegistrationTokenProvider.getFcmRegistrationToken()).thenReturn(
-                mContext.getFcmRegistrationToken());
+        when(mFcmRegistrationTokenProvider.getFcmRegistrationToken())
+                .thenReturn(mContext.getFcmRegistrationToken());
         when(mClient.getDeviceCheckInStatus(
-                eq(TEST_DEVICE_IDS), anyString(), anyString(), anyLong(), any(),
-                nullable(byte[].class)))
+                        eq(TEST_DEVICE_IDS),
+                        anyString(),
+                        anyString(),
+                        anyLong(),
+                        any(),
+                        nullable(byte[].class)))
                 .thenReturn(mResponse);
-        mWorker = TestListenableWorkerBuilder.from(
-                        mContext, DeviceCheckInWorker.class)
-                .setWorkerFactory(
-                        new WorkerFactory() {
-                            @Override
-                            public ListenableWorker createWorker(
-                                    @NonNull Context context, @NonNull String workerClassName,
-                                    @NonNull WorkerParameters workerParameters) {
-                                return workerClassName.equals(DeviceCheckInWorker.class.getName())
-                                        ? new DeviceCheckInWorker(
-                                        context, workerParameters, mHelper,
-                                        mFcmRegistrationTokenProvider, mClient,
-                                        TestingExecutors.sameThreadScheduledExecutor(),
-                                        mFeatureFlagProvider)
-                                        : null;
-                            }
-                        }).build();
-        StatsLoggerProvider loggerProvider =
-                (StatsLoggerProvider) mContext.getApplicationContext();
+        mWorker =
+                TestListenableWorkerBuilder.from(mContext, DeviceCheckInWorker.class)
+                        .setWorkerFactory(
+                                new WorkerFactory() {
+                                    @Override
+                                    public ListenableWorker createWorker(
+                                            @NonNull Context context,
+                                            @NonNull String workerClassName,
+                                            @NonNull WorkerParameters workerParameters) {
+                                        return workerClassName.equals(
+                                                        DeviceCheckInWorker.class.getName())
+                                                ? new DeviceCheckInWorker(
+                                                        context,
+                                                        workerParameters,
+                                                        mHelper,
+                                                        mFcmRegistrationTokenProvider,
+                                                        mClient,
+                                                        TestingExecutors
+                                                                .sameThreadScheduledExecutor(),
+                                                        mFeatureFlagProvider)
+                                                : null;
+                                    }
+                                })
+                        .build();
+        StatsLoggerProvider loggerProvider = (StatsLoggerProvider) mContext.getApplicationContext();
         mStatsLogger = loggerProvider.getStatsLogger();
         Security.addProvider(new FakeAndroidKeystore.FakeSecurityProvider());
-        FakeAndroidKeystore.SingletonKeystore.certs.put("DLCKeyAttestation",
-                TestCertificateProviderUtil.getTestCertificates());
+        FakeAndroidKeystore.SingletonKeystore.certs.put(
+                "DLCKeyAttestation", TestCertificateProviderUtil.getTestCertificates());
     }
 
     @Test
@@ -248,8 +252,8 @@ public class DeviceCheckInWorkerTest {
 
     @Test
     public void checkIn_deviceIdsUnavailable_shouldNotSendCheckInRequest() {
-        when(mFinalizationController.finalizeNotEnrolledDevice()).thenReturn(
-                Futures.immediateVoidFuture());
+        when(mFinalizationController.finalizeNotEnrolledDevice())
+                .thenReturn(Futures.immediateVoidFuture());
 
         // GIVEN only device ids available
         setDeviceIdAvailability(/* isAvailable= */ false);
@@ -282,8 +286,8 @@ public class DeviceCheckInWorkerTest {
         setCarrierInfoAvailability(/* isAvailable= */ true);
         setDeviceLocaleAvailability(/* isAvailable= */ true);
         setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
-        when(mFcmRegistrationTokenProvider.getFcmRegistrationToken()).thenReturn(
-                Futures.immediateFuture(/* value= */ null));
+        when(mFcmRegistrationTokenProvider.getFcmRegistrationToken())
+                .thenReturn(Futures.immediateFuture(/* value= */ null));
 
         // GIVEN check-in response is successful
         setUpSuccessfulCheckInResponse(/* isHandleable= */ true);
@@ -345,7 +349,7 @@ public class DeviceCheckInWorkerTest {
 
     @Test
     public void
-    checkIn_allInfoAvailable_imeiHardeningRegEnabled_checkInSuccessful_successAndLogged() {
+            checkIn_allInfoAvailable_imeiHardeningRegEnabled_checkInSuccessful_successAndLogged() {
         // GIVEN all device info available
         setDeviceIdAvailability(/* isAvailable= */ true);
         setCarrierInfoAvailability(/* isAvailable= */ true);
@@ -378,13 +382,12 @@ public class DeviceCheckInWorkerTest {
         final Result result = Futures.getUnchecked(mWorker.startWork());
 
         assertThat(result).isEqualTo(Result.retry());
-        verify(mStatsLogger).logCheckInRetry(
-                StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
+        verify(mStatsLogger)
+                .logCheckInRetry(StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
     }
 
     @Test
-    public void
-    checkIn_imeiHardeningRegEnabled_keyAttestationFetchReturnsNull_jobReturnsRetryAndLogs() {
+    public void checkIn_imeiHardeningRegEnabled_keyAttestationFetchesNull_jobReturnsRetryAndLogs() {
         // GIVEN all device info available
         setDeviceIdAvailability(/* isAvailable= */ true);
         setCarrierInfoAvailability(/* isAvailable= */ true);
@@ -396,18 +399,67 @@ public class DeviceCheckInWorkerTest {
         final Result result = Futures.getUnchecked(mWorker.startWork());
 
         assertThat(result).isEqualTo(Result.retry());
-        verify(mStatsLogger).logCheckInRetry(
-                StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
+        verify(mStatsLogger)
+                .logCheckInRetry(StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
+    }
+
+    @Test
+    public void checkIn_flagEnabledAndHasTelephonyFeatureAndPackageEnabled_shouldSucceed() {
+        setCheckInRequiredPackageEnforcementEnabled(true);
+        when(mHelper.getCheckInRequiredPackageState(PHONE_SYSTEM_APP_PACKAGE_NAME))
+                .thenReturn(AbstractDeviceCheckInHelper.CheckInRequiredPackageState.ENABLED);
+        when(mHelper.hasTelephonyFeature()).thenReturn(true);
+        setDeviceIdAvailability(/* isAvailable= */ true);
+        setCarrierInfoAvailability(/* isAvailable= */ true);
+        setDeviceLocaleAvailability(/* isAvailable= */ true);
+        setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        when(mFcmRegistrationTokenProvider.getFcmRegistrationToken())
+                .thenReturn(Futures.immediateFuture(/* value= */ null));
+        setUpSuccessfulCheckInResponse(/* isHandleable= */ true);
+
+        final Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isEqualTo(Result.success());
+        verify(mContext.getPolicyController()).enableUserControlForCheckInRequiredPackage(
+                PHONE_SYSTEM_APP_PACKAGE_NAME);
+    }
+
+    @Test
+    public void checkIn_flagEnabledAndHasTelephonyFeatureAndPackageDisabled_shouldRetry() {
+        setCheckInRequiredPackageEnforcementEnabled(true);
+        when(mHelper.getCheckInRequiredPackageState(PHONE_SYSTEM_APP_PACKAGE_NAME))
+                .thenReturn(AbstractDeviceCheckInHelper.CheckInRequiredPackageState.DISABLED);
+        when(mHelper.hasTelephonyFeature()).thenReturn(true);
+        setDeviceIdAvailability(/* isAvailable= */ false);
+        setCarrierInfoAvailability(/* isAvailable= */ false);
+
+        final Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isEqualTo(Result.retry());
+    }
+
+    @Test
+    public void checkIn_flagEnabledAndHasTelephonyFeatureAndPackageUninstalled_shouldRetry() {
+        setCheckInRequiredPackageEnforcementEnabled(true);
+        when(mHelper.getCheckInRequiredPackageState(PHONE_SYSTEM_APP_PACKAGE_NAME))
+                .thenReturn(AbstractDeviceCheckInHelper.CheckInRequiredPackageState.UNINSTALLED);
+        when(mHelper.hasTelephonyFeature()).thenReturn(true);
+        setDeviceIdAvailability(/* isAvailable= */ false);
+        setCarrierInfoAvailability(/* isAvailable= */ false);
+
+        final Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isEqualTo(Result.retry());
     }
 
     private void setDeviceIdAvailability(boolean isAvailable) {
-        when(mHelper.getDeviceUniqueIds()).thenReturn(
-                isAvailable ? TEST_DEVICE_IDS : EMPTY_DEVICE_IDS);
+        when(mHelper.getDeviceUniqueIds())
+                .thenReturn(isAvailable ? TEST_DEVICE_IDS : EMPTY_DEVICE_IDS);
     }
 
     private void setCarrierInfoAvailability(boolean isAvailable) {
-        when(mHelper.getCarrierInfo()).thenReturn(
-                isAvailable ? TEST_CARRIER_INFO : EMPTY_CARRIER_INFO);
+        when(mHelper.getCarrierInfo())
+                .thenReturn(isAvailable ? TEST_CARRIER_INFO : EMPTY_CARRIER_INFO);
     }
 
     private void setDeviceLocaleAvailability(boolean isAvailable) {
@@ -434,5 +486,10 @@ public class DeviceCheckInWorkerTest {
 
     private void setImeiHardeningRegistrationEnabled(boolean isEnabled) {
         when(mFeatureFlagProvider.isImeiHardeningRegistrationEnabled()).thenReturn(isEnabled);
+    }
+
+    private void setCheckInRequiredPackageEnforcementEnabled(boolean isEnabled) {
+        when(mFeatureFlagProvider.isCheckInRequiredPackageEnforcementEnabled())
+                .thenReturn(isEnabled);
     }
 }

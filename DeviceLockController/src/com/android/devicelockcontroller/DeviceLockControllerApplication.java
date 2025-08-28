@@ -200,4 +200,9 @@ public class DeviceLockControllerApplication extends Application implements
     public boolean isRecolEnabled() {
         return false;
     }
+
+    @Override
+    public boolean isCheckInRequiredPackageEnforcementEnabled() {
+        return false;
+    }
 }
