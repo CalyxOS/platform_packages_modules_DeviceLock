@@ -20,7 +20,7 @@ import android.os.RemoteCallback;
 
 /**
  * Binder interface to communicate with DeviceLockController.
- * {@hide}
+ * @hide
  */
 oneway interface IDeviceLockControllerService {
     /**

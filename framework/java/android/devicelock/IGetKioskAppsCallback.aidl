@@ -20,7 +20,7 @@ import android.devicelock.ParcelableException;
 
 /**
   * Callback for a getActiveKioskAppPackagesAndRoles() request.
-  * {@hide}
+  * @hide
   */
 oneway interface IGetKioskAppsCallback {
     void onKioskAppsReceived(in Map roleToPackage);

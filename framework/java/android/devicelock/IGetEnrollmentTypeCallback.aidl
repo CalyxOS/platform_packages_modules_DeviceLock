@@ -20,7 +20,7 @@ import android.devicelock.ParcelableException;
 
 /**
   * Callback interface for getEnrollmentType() request.
-  * {@hide}
+  * @hide
   */
 oneway interface IGetEnrollmentTypeCallback {
     void onEnrollmentTypeReceived(in int enrollmentType);
