@@ -20,7 +20,7 @@ import android.devicelock.ParcelableException;
 
 /**
   * Callback for a getDeviceId() request.
-  * {@hide}
+  * @hide
   */
 oneway interface IGetDeviceIdCallback {
     void onDeviceIdReceived(int type, in String id);

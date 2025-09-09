@@ -16,5 +16,5 @@
 
 package android.devicelock;
 
-/** {@hide} */
+/** @hide */
 parcelable ParcelableException;

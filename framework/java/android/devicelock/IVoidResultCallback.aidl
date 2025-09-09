@@ -20,7 +20,7 @@ import android.devicelock.ParcelableException;
 
 /**
   * Generic callback for requests not returning a value.
-  * {@hide}
+  * @hide
   */
 oneway interface IVoidResultCallback {
     void onSuccess();
