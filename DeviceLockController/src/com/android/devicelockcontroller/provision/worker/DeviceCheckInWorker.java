@@ -47,6 +47,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.ProviderException;
 import java.security.cert.CertificateException;
 import java.time.Duration;
 
@@ -58,7 +59,8 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
     private final FeatureFlagProvider mFeatureFlagProvider;
     private final StatsLogger mStatsLogger;
 
-    @VisibleForTesting static final Duration RETRY_ON_FAILURE_DELAY = Duration.ofDays(1);
+    @VisibleForTesting
+    static final Duration RETRY_ON_FAILURE_DELAY = Duration.ofDays(1);
 
     public DeviceCheckInWorker(
             @NonNull Context context,
@@ -153,11 +155,12 @@ public final class DeviceCheckInWorker extends AbstractCheckInWorker {
                                                         KeyAttestationUtil
                                                                 .getKeyAttestationLeafCertificate();
                                             } catch (NoSuchAlgorithmException
-                                                    | NoSuchProviderException
-                                                    | CertificateException
-                                                    | IOException
-                                                    | KeyStoreException
-                                                    | InvalidAlgorithmParameterException e) {
+                                                     | NoSuchProviderException
+                                                     | CertificateException
+                                                     | IOException
+                                                     | KeyStoreException
+                                                     | ProviderException
+                                                     | InvalidAlgorithmParameterException e) {
                                                 LogUtil.e(
                                                         TAG,
                                                         "Fetching KeyAttestation Leaf "

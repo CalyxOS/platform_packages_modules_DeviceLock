@@ -68,25 +68,34 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 
+import java.security.KeyPair;
+import java.security.Provider;
+import java.security.ProviderException;
 import java.security.Security;
 
 @RunWith(RobolectricTestRunner.class)
 public class DeviceCheckInWorkerTest {
     public static final ArraySet<DeviceId> TEST_DEVICE_IDS =
-            new ArraySet<>(new DeviceId[] {new DeviceId(DEVICE_ID_TYPE_IMEI, "1234667890")});
-    public static final ArraySet<DeviceId> EMPTY_DEVICE_IDS = new ArraySet<>(new DeviceId[] {});
+            new ArraySet<>(new DeviceId[]{new DeviceId(DEVICE_ID_TYPE_IMEI, "1234667890")});
+    public static final ArraySet<DeviceId> EMPTY_DEVICE_IDS = new ArraySet<>(new DeviceId[]{});
     public static final String TEST_CARRIER_INFO = "1234567890";
     public static final String EMPTY_CARRIER_INFO = "";
     public static final String TEST_DEVICE_LOCALE = "en-US";
     public static final String EMPTY_DEVICE_LOCALE = "";
     public static final long TEST_DEVICE_LOCK_APEX_VERSION = 1234567890;
-    @Rule public final MockitoRule mMocks = MockitoJUnit.rule();
-    @Mock private AbstractDeviceCheckInHelper mHelper;
-    @Mock private FcmRegistrationTokenProvider mFcmRegistrationTokenProvider;
+    @Rule
+    public final MockitoRule mMocks = MockitoJUnit.rule();
+    @Mock
+    private AbstractDeviceCheckInHelper mHelper;
+    @Mock
+    private FcmRegistrationTokenProvider mFcmRegistrationTokenProvider;
 
-    @Mock private FeatureFlagProvider mFeatureFlagProvider;
-    @Mock private DeviceCheckInClient mClient;
-    @Mock private GetDeviceCheckInStatusGrpcResponse mResponse;
+    @Mock
+    private FeatureFlagProvider mFeatureFlagProvider;
+    @Mock
+    private DeviceCheckInClient mClient;
+    @Mock
+    private GetDeviceCheckInStatusGrpcResponse mResponse;
     private StatsLogger mStatsLogger;
     private DeviceCheckInWorker mWorker;
     private TestDeviceLockControllerApplication mContext =
@@ -99,12 +108,12 @@ public class DeviceCheckInWorkerTest {
         when(mFcmRegistrationTokenProvider.getFcmRegistrationToken())
                 .thenReturn(mContext.getFcmRegistrationToken());
         when(mClient.getDeviceCheckInStatus(
-                        eq(TEST_DEVICE_IDS),
-                        anyString(),
-                        anyString(),
-                        anyLong(),
-                        any(),
-                        nullable(byte[].class)))
+                eq(TEST_DEVICE_IDS),
+                anyString(),
+                anyString(),
+                anyLong(),
+                any(),
+                nullable(byte[].class)))
                 .thenReturn(mResponse);
         mWorker =
                 TestListenableWorkerBuilder.from(mContext, DeviceCheckInWorker.class)
@@ -116,16 +125,16 @@ public class DeviceCheckInWorkerTest {
                                             @NonNull String workerClassName,
                                             @NonNull WorkerParameters workerParameters) {
                                         return workerClassName.equals(
-                                                        DeviceCheckInWorker.class.getName())
+                                                DeviceCheckInWorker.class.getName())
                                                 ? new DeviceCheckInWorker(
-                                                        context,
-                                                        workerParameters,
-                                                        mHelper,
-                                                        mFcmRegistrationTokenProvider,
-                                                        mClient,
-                                                        TestingExecutors
-                                                                .sameThreadScheduledExecutor(),
-                                                        mFeatureFlagProvider)
+                                                context,
+                                                workerParameters,
+                                                mHelper,
+                                                mFcmRegistrationTokenProvider,
+                                                mClient,
+                                                TestingExecutors
+                                                        .sameThreadScheduledExecutor(),
+                                                mFeatureFlagProvider)
                                                 : null;
                                     }
                                 })
@@ -349,7 +358,7 @@ public class DeviceCheckInWorkerTest {
 
     @Test
     public void
-            checkIn_allInfoAvailable_imeiHardeningRegEnabled_checkInSuccessful_successAndLogged() {
+    checkIn_allInfoAvailable_imeiHardeningRegEnabled_checkInSuccessful_successAndLogged() {
         // GIVEN all device info available
         setDeviceIdAvailability(/* isAvailable= */ true);
         setCarrierInfoAvailability(/* isAvailable= */ true);
@@ -401,6 +410,27 @@ public class DeviceCheckInWorkerTest {
         assertThat(result).isEqualTo(Result.retry());
         verify(mStatsLogger)
                 .logCheckInRetry(StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
+    }
+
+    @Test
+    public void checkIn_imeiHardeningRegEnabled_kaFails_withFreshDevice_jobReturnsRetryAndLogs() {
+        // GIVEN all device info available
+        setDeviceIdAvailability(/* isAvailable= */ true);
+        setCarrierInfoAvailability(/* isAvailable= */ true);
+        setDeviceLocaleAvailability(/* isAvailable= */ true);
+        setDeviceLockApexVersionAvailability(/* isAvailable= */ true);
+        setImeiHardeningRegistrationEnabled(/* isEnabled= */ true);
+        Security.removeProvider("AndroidKeyStore");
+        // This device is from first boot and has never connected to the internet
+        Security.addProvider(new BrokenFakeSecurityProvider());
+
+        final Result result = Futures.getUnchecked(mWorker.startWork());
+
+        assertThat(result).isEqualTo(Result.retry());
+        verify(mStatsLogger)
+                .logCheckInRetry(StatsLogger.CheckInRetryReason.KEY_ATTESTATION_GENERATION_FAILURE);
+        // Cleanup
+        Security.removeProvider("AndroidKeyStore");
     }
 
     @Test
@@ -491,5 +521,27 @@ public class DeviceCheckInWorkerTest {
     private void setCheckInRequiredPackageEnforcementEnabled(boolean isEnabled) {
         when(mFeatureFlagProvider.isCheckInRequiredPackageEnforcementEnabled())
                 .thenReturn(isEnabled);
+    }
+
+
+    static public class BrokenFakeSecurityProvider extends Provider {
+
+        private static final String PROVIDER_NAME = "AndroidKeyStore";
+
+        public BrokenFakeSecurityProvider() {
+            super(PROVIDER_NAME, 1.0D, "");
+            put("KeyStore.AndroidKeyStore", FakeAndroidKeystore.class.getName());
+            put("KeyPairGenerator.EC", BrokenFakeEcKeyPairGenerator.class.getName());
+        }
+    }
+
+
+    public static class BrokenFakeEcKeyPairGenerator extends
+            FakeAndroidKeystore.FakeECKeyPairGenerator {
+
+        @Override
+        public KeyPair generateKeyPair() {
+            throw new ProviderException("This is broken");
+        }
     }
 }
