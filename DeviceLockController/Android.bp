@@ -151,6 +151,7 @@ android_library {
         "modules-utils-expresslog",
         "devicelockcontroller-proto-lite",
         "framework-connectivity.stubs.module_lib",
+        "framework-telecom.stubs.module_lib",
     ],
     static_libs: [
         "androidx.annotation_annotation",
