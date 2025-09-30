@@ -40,7 +40,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.robolectric.annotation.LooperMode.Mode.LEGACY;
 
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -91,7 +90,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
-@LooperMode(LEGACY)
+@LooperMode(LooperMode.Mode.PAUSED)
 @RunWith(RobolectricTestRunner.class)
 public final class DeviceCheckInHelperTest {
     static final Duration TEST_CHECK_RETRY_DURATION = Duration.ofDays(30);

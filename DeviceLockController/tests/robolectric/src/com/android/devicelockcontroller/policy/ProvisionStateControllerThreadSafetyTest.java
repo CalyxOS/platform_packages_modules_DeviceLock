@@ -22,7 +22,6 @@ import static com.android.devicelockcontroller.policy.ProvisionStateController.P
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
-import static org.robolectric.annotation.LooperMode.Mode.LEGACY;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.work.Configuration;
@@ -51,7 +50,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@LooperMode(LEGACY)
+@LooperMode(LooperMode.Mode.PAUSED)
 @RunWith(RobolectricTestRunner.class)
 public class ProvisionStateControllerThreadSafetyTest {
     private ProvisionStateController mProvisionStateController;
