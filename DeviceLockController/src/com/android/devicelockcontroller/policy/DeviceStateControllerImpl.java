@@ -26,12 +26,14 @@ import static com.android.devicelockcontroller.policy.ProvisionStateController.P
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.PROVISION_SUCCEEDED;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.UNPROVISIONED;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.devicelock.flags.Flags;
 import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.storage.GlobalParametersClient;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -134,11 +136,38 @@ public final class DeviceStateControllerImpl implements DeviceStateController {
                         throw new IllegalStateException("Device has been "
                                 + "cleared!");
                     }
+                    ListenableFuture<Void> setDeviceStateFuture =
+                            mGlobalParametersClient.setDeviceState(deviceState);
+
+                    if (deviceState == CLEARED) {
+                        Futures.addCallback(setDeviceStateFuture,
+                                new FutureCallback<>() {
+                                    @Override
+                                    public void onSuccess(Void result) {
+                                        resetClearingInProgress();
+                                    }
+
+                                    @Override
+                                    public void onFailure(@NonNull Throwable t) {
+                                        // The state was not persisted, so we are no longer
+                                        // "in progress" of clearing.
+                                        resetClearingInProgress();
+                                    }
+                                }, mExecutor);
+                    }
+
                     return Futures.transformAsync(
-                            mGlobalParametersClient.setDeviceState(deviceState),
+                            setDeviceStateFuture,
                             state -> mPolicyController.enforceCurrentPolicies(),
                             mExecutor);
                 }, mExecutor);
+    }
+
+    /**
+     * Resets the in-memory flag that indicates a clear operation is in progress.
+     */
+    private void resetClearingInProgress() {
+        mClearingInProgress = false;
     }
 
     @Override
