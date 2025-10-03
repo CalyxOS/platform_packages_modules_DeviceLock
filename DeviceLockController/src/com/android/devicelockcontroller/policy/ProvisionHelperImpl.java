@@ -248,10 +248,7 @@ public final class ProvisionHelperImpl implements ProvisionHelper {
             Futures.addCallback(workInfoFuture, new FutureCallback<>() {
                 @Override
                 public void onSuccess(WorkInfo workInfo) {
-                    WorkInfo.State state = workInfo.getState();
-                    if (!(state == WorkInfo.State.SUCCEEDED
-                            || state == WorkInfo.State.FAILED
-                            || state == WorkInfo.State.CANCELLED)) {
+                    if (workInfo != null && !workInfo.getState().isFinished()) {
                         LogUtil.e(TAG, "Cannot determine if device "
                                 + "is in an approved country, cancelling job");
                         WorkManager.getInstance(mContext)
