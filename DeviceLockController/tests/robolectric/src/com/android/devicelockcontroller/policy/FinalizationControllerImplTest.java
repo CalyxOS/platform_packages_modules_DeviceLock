@@ -162,10 +162,10 @@ public final class FinalizationControllerImplTest {
                 mFinalizationController.finalizeNotEnrolledDevice();
         Futures.getChecked(finalizedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
-        // THEN the long running worker is cancelled
+        // THEN the long running worker is cancelled and pruned
         workInfo = WorkManager.getInstance(mContext).getWorkInfoById(
                 workRequest.getId()).get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        assertThat(workInfo.getState()).isEqualTo(WorkInfo.State.CANCELLED);
+        assertThat(workInfo).isNull();
     }
 
     @Test
@@ -311,10 +311,10 @@ public final class FinalizationControllerImplTest {
                 mFinalizationController.notifyFinalizationReportResult(successResponse);
         Futures.getChecked(reportedFuture, Exception.class, TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
-        // THEN the long running worker is cancelled
+        // THEN the long running worker is cancelled and pruned
         workInfo = WorkManager.getInstance(mContext).getWorkInfoById(
                 workRequest.getId()).get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        assertThat(workInfo.getState()).isEqualTo(WorkInfo.State.CANCELLED);
+        assertThat(workInfo).isNull();
     }
 
     @Test

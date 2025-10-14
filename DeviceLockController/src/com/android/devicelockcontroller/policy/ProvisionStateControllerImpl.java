@@ -156,25 +156,35 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
                                         event,
                                         Futures.getDone(provisioningTypeFuture),
                                         mFeatureFlagProvider.isRecolEnabled());
-                                UserParameters.setProvisionState(mContext, newState);
-                                handleNewState(newState);
-                                // We treat when the event is PROVISION_READY as the start of the
-                                // provisioning time.
-                                if (PROVISION_READY == event) {
-                                    UserParameters.setProvisioningStartTimeMillis(
-                                            mContext, SystemClock.elapsedRealtime());
-                                    ReviewDeviceProvisionStateWorker.scheduleDailyReview(
-                                            WorkManager.getInstance(mContext));
-                                }
+                        UserParameters.setProvisionState(mContext, newState);
+                        handleNewState(newState);
+                        // We treat when the event is PROVISION_READY as the start of the
+                        // provisioning time.
+                        if (PROVISION_READY == event) {
+                            // Keeping hold of a previous FINALIZED state in memory causes
+                            // problems when repeating provisioning attempts in the event of
+                            // recol provisioning failures.
+                            ListenableFuture<Void> finalizationDiskStateFuture =
+                                    mFinalizationController.enforceDiskState(/* force=
+                                     */ true);
+                            var unused = Futures.transform(finalizationDiskStateFuture,
+                                    unusedResult -> {
+                                        UserParameters.setProvisioningStartTimeMillis(
+                                                mContext, SystemClock.elapsedRealtime());
+                                        ReviewDeviceProvisionStateWorker.scheduleDailyReview(
+                                                WorkManager.getInstance(mContext));
+                                        return null;
+                                    }, mBgExecutor);
+                        }
 
-                                if (PROVISION_SUCCESS == event) {
-                                    ((StatsLoggerProvider) mContext.getApplicationContext())
-                                            .getStatsLogger()
-                                            .logProvisionStateEvent(SUCCESSFUL_PROVISIONING);
-                                }
-                                return newState;
-                            },
-                            mBgExecutor);
+                        if (PROVISION_SUCCESS == event) {
+                            ((StatsLoggerProvider) mContext.getApplicationContext())
+                                    .getStatsLogger()
+                                    .logProvisionStateEvent(SUCCESSFUL_PROVISIONING);
+                        }
+                        return newState;
+                    },
+                    mBgExecutor);
             // To prevent exception propagate to future state transitions, catch any exceptions
             // that might happen during the execution and fallback to previous state if exception
             // happens.
@@ -303,8 +313,6 @@ public final class ProvisionStateControllerImpl implements ProvisionStateControl
                 throw new StateTransitionException(state, event);
             case ProvisionEvent.PROVISION_RETRY:
                 if (state == PROVISION_FAILED) {
-                    return PROVISION_IN_PROGRESS;
-                } else if (recolEnabled && state == PROVISION_IN_PROGRESS) {
                     return PROVISION_IN_PROGRESS;
                 }
                 throw new StateTransitionException(state, event);
