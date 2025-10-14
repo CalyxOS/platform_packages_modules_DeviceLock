@@ -123,6 +123,7 @@ public final class ProvisioningProgressViewModel extends AndroidViewModel implem
 
         mIsRecolFailed = Transformations.map(workInfos, infoList -> {
             if (infoList == null || infoList.isEmpty()) {
+                LogUtil.d(TAG, "No work info found");
                 return false;
             }
 
@@ -135,6 +136,7 @@ public final class ProvisioningProgressViewModel extends AndroidViewModel implem
             }
 
             // If not succeeded or still running, return false.
+            LogUtil.d(TAG, "Work info is not succeeded or still running");
             return false;
         });
 

@@ -115,10 +115,12 @@ public final class FinalizationControllerImpl implements FinalizationController 
     @Override
     public ListenableFuture<Void> enforceDiskState(boolean force) {
         if (force) {
+            LogUtil.i(TAG, "Forcing disk state reset");
             ListenableFuture<Void> resetStateFuture =
                     mDispatchQueue.enqueueStateChange(UNINITIALIZED);
             return Futures.transformAsync(resetStateFuture,
                     unused -> {
+                        LogUtil.i(TAG, "State successfully set to UNINITIALIZED");
                         synchronized (mLock) {
                             mStateInitializedFuture = null;
                         }
@@ -298,10 +300,26 @@ public final class FinalizationControllerImpl implements FinalizationController 
     private ListenableFuture<Void> cancelAllWorkersAndAlarms() {
         LogUtil.i(TAG, "Cancelling all workers and alarms.");
         WorkManager workManager = WorkManager.getInstance(mContext);
-        workManager.cancelAllWork();
-        AlarmManager alarmManager = mContext.getSystemService(AlarmManager.class);
-        alarmManager.cancelAll();
-        return Futures.immediateVoidFuture();
+
+        ListenableFuture<Operation.State.SUCCESS> cancelFuture =
+                workManager.cancelAllWork().getResult();
+
+        // After cancelling, chain the prune operation.
+        ListenableFuture<Operation.State.SUCCESS> pruneFuture = Futures.transformAsync(cancelFuture,
+                unused -> {
+                    LogUtil.d(TAG, "Pruning work.");
+                    return workManager.pruneWork().getResult();
+                }, mBgExecutor);
+
+        return Futures.transform(pruneFuture,
+                unused -> {
+                    LogUtil.d(TAG, "Cancelling all alarms.");
+                    AlarmManager alarmManager = mContext.getSystemService(AlarmManager.class);
+                    alarmManager.cancelAll();
+                    LogUtil.i(TAG, "Finished cancelling workers, pruning, and cancelling alarms.");
+                    return null;
+                }, mBgExecutor);
+
     }
 
     /**
@@ -320,31 +338,29 @@ public final class FinalizationControllerImpl implements FinalizationController 
     @Override
     public ListenableFuture<Void> disableApplication() {
         // This kills and disables the app
-        ListenableFuture<Void> disableApplicationFuture =
-                CallbackToFutureAdapter.getFuture(
-                        completer -> {
-                            mSystemDeviceLockManager.setDeviceFinalized(
-                                    true,
-                                    mBgExecutor,
-                                    new OutcomeReceiver<>() {
-                                        @Override
-                                        public void onResult(Void result) {
-                                            completer.set(null);
-                                        }
+        return CallbackToFutureAdapter.getFuture(
+                completer -> {
+                    mSystemDeviceLockManager.setDeviceFinalized(
+                            true,
+                            mBgExecutor,
+                            new OutcomeReceiver<>() {
+                                @Override
+                                public void onResult(Void result) {
+                                    completer.set(null);
+                                }
 
-                                        @Override
-                                        public void onError(@NonNull Exception error) {
-                                            LogUtil.e(
-                                                    TAG,
-                                                    "Failed to set device finalized in"
-                                                            + "system service.",
-                                                    error);
-                                            completer.setException(error);
-                                        }
-                                    });
-                            return "Disable application future";
-                        });
-        return disableApplicationFuture;
+                                @Override
+                                public void onError(@NonNull Exception error) {
+                                    LogUtil.e(
+                                            TAG,
+                                            "Failed to set device finalized in"
+                                                    + "system service.",
+                                            error);
+                                    completer.setException(error);
+                                }
+                            });
+                    return "Disable application future";
+                });
     }
 
     @Target(ElementType.TYPE_USE)

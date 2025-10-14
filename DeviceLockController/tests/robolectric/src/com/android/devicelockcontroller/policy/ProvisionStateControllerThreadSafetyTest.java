@@ -54,24 +54,27 @@ import java.util.concurrent.Executors;
 @RunWith(RobolectricTestRunner.class)
 public class ProvisionStateControllerThreadSafetyTest {
     private ProvisionStateController mProvisionStateController;
+
     private static final int NUMBER_OF_THREADS = 100;
+
+    private TestDeviceLockControllerApplication mTestApplication =
+            ApplicationProvider.getApplicationContext();
 
     @Before
     public void setUp() {
-        TestDeviceLockControllerApplication testApplication =
-                ApplicationProvider.getApplicationContext();
-        UserParameters.setProvisionState(testApplication, UNPROVISIONED);
-        DevicePolicyController policyController = testApplication.getPolicyController();
-        FeatureFlagProvider featureFlagProvider = testApplication.getFeatureFlagProvider();
-        FinalizationController finalizationController = testApplication.getFinalizationController();
+        UserParameters.setProvisionState(mTestApplication, UNPROVISIONED);
+        DevicePolicyController policyController = mTestApplication.getPolicyController();
+        FeatureFlagProvider featureFlagProvider = mTestApplication.getFeatureFlagProvider();
+        FinalizationController finalizationController = mTestApplication
+                .getFinalizationController();
         WorkManagerTestInitHelper.initializeTestWorkManager(
-                testApplication,
+                mTestApplication,
                 new Configuration.Builder()
                         .setMinimumLoggingLevel(android.util.Log.DEBUG)
                         .setExecutor(new SynchronousExecutor())
                         .build());
-        mProvisionStateController = new ProvisionStateControllerImpl(testApplication,
-                policyController, testApplication.getDeviceStateController(), featureFlagProvider,
+        mProvisionStateController = new ProvisionStateControllerImpl(mTestApplication,
+                policyController, mTestApplication.getDeviceStateController(), featureFlagProvider,
                 finalizationController,
                 Executors.newCachedThreadPool());
         when(policyController.enforceCurrentPolicies()).thenReturn(Futures.immediateVoidFuture());
@@ -80,6 +83,8 @@ public class ProvisionStateControllerThreadSafetyTest {
 
     @Test
     public void setNextStateForEvent_shouldSetStateOnlyOnce_whenMultithreading() {
+        when(mTestApplication.getFinalizationController().enforceDiskState(true)).thenReturn(
+                Futures.immediateVoidFuture());
         ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
         Collection<ListenableFuture<Void>> results = Collections.synchronizedCollection(
                 new ArrayList<>());

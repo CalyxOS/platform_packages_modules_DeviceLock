@@ -105,6 +105,8 @@ public final class ProvisionStateControllerImplTest {
             throws ExecutionException, InterruptedException {
         when(mMockPolicyController.enforceCurrentPolicies()).thenReturn(
                 Futures.immediateVoidFuture());
+        when(mMockFinalizationController.enforceDiskState(true))
+                .thenReturn(Futures.immediateVoidFuture());
 
         mProvisionStateController.postSetNextStateForEventRequest(ProvisionEvent.PROVISION_READY);
 
@@ -118,6 +120,8 @@ public final class ProvisionStateControllerImplTest {
             throws ExecutionException, InterruptedException {
         when(mMockPolicyController.enforceCurrentPolicies()).thenReturn(
                 Futures.immediateVoidFuture());
+        when(mMockFinalizationController.enforceDiskState(true))
+                .thenReturn(Futures.immediateVoidFuture());
 
         ComponentName lockedBootCompletedReceiver =
                 new ComponentName(mTestApp, LockedBootCompletedReceiver.class);
@@ -153,6 +157,8 @@ public final class ProvisionStateControllerImplTest {
             throws ExecutionException, InterruptedException {
         when(mMockPolicyController.enforceCurrentPolicies()).thenReturn(
                 Futures.immediateVoidFuture());
+        when(mMockFinalizationController.enforceDiskState(true))
+                .thenReturn(Futures.immediateVoidFuture());
 
         mProvisionStateController.setNextStateForEvent(ProvisionEvent.PROVISION_READY).get();
 
@@ -201,6 +207,8 @@ public final class ProvisionStateControllerImplTest {
                 Futures.immediateVoidFuture());
         when(mMockPolicyController.enforceCurrentPoliciesForCriticalFailure()).thenReturn(
                 Futures.immediateVoidFuture());
+        when(mMockFinalizationController.enforceDiskState(true))
+                .thenReturn(Futures.immediateVoidFuture());
 
         mProvisionStateController.setNextStateForEvent(ProvisionEvent.PROVISION_READY).get();
         assertThat(mProvisionStateController.getState().get()).isEqualTo(
@@ -240,6 +248,8 @@ public final class ProvisionStateControllerImplTest {
             throws ExecutionException, InterruptedException {
         when(mMockPolicyController.enforceCurrentPolicies()).thenReturn(
                 Futures.immediateVoidFuture());
+        when(mMockFinalizationController.enforceDiskState(true))
+                .thenReturn(Futures.immediateVoidFuture());
         // Device setup is complete
         ContentResolver contentResolver = mTestApp.getContentResolver();
         Settings.Secure.putInt(contentResolver, Settings.Secure.USER_SETUP_COMPLETE, 1);
@@ -269,6 +279,8 @@ public final class ProvisionStateControllerImplTest {
             throws ExecutionException, InterruptedException {
         when(mMockPolicyController.enforceCurrentPolicies()).thenReturn(
                 Futures.immediateVoidFuture());
+        when(mMockFinalizationController.enforceDiskState(true))
+                .thenReturn(Futures.immediateVoidFuture());
 
         GlobalParametersClient.getInstance().setProvisionReady(true).get();
         ContentResolver contentResolver = mTestApp.getContentResolver();
@@ -300,6 +312,8 @@ public final class ProvisionStateControllerImplTest {
             throws ExecutionException, InterruptedException {
         when(mMockPolicyController.enforceCurrentPolicies()).thenReturn(
                 Futures.immediateVoidFuture());
+        when(mMockFinalizationController.enforceDiskState(true))
+                .thenReturn(Futures.immediateVoidFuture());
         GlobalParametersClient.getInstance().setProvisionReady(true).get();
         // Device setup is complete
         ContentResolver contentResolver = mTestApp.getContentResolver();
