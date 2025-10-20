@@ -25,7 +25,6 @@ import static com.android.devicelockcontroller.provision.worker.ReportDeviceProv
 
 import static com.google.common.truth.Truth.assertThat;
 
-import static org.robolectric.annotation.LooperMode.Mode.LEGACY;
 
 import android.content.Intent;
 import android.os.Handler;
@@ -55,7 +54,7 @@ import org.robolectric.shadows.ShadowLooper;
 
 import java.util.List;
 
-@LooperMode(LEGACY)
+@LooperMode(LooperMode.Mode.PAUSED)
 @RunWith(RobolectricTestRunner.class)
 public class NextProvisionFailedStepReceiverTest {
 

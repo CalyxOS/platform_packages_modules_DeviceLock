@@ -18,7 +18,6 @@ package com.android.devicelockcontroller.activities;
 
 import static com.android.devicelockcontroller.common.DeviceLockConstants.MANDATORY_PROVISION_DEVICE_RESET_COUNTDOWN_MINUTE;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_FAILURE;
-import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionEvent.PROVISION_RETRY;
 import static com.android.devicelockcontroller.policy.ProvisionStateController.ProvisionState.PROVISION_FAILED;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -50,12 +49,15 @@ import com.android.devicelockcontroller.policy.ProvisionHelperImpl;
 import com.android.devicelockcontroller.policy.ProvisionStateController;
 import com.android.devicelockcontroller.provision.worker.ReportDeviceProvisionStateWorker;
 import com.android.devicelockcontroller.provision.worker.ReviewDeviceProvisionStateWorker;
+import com.android.devicelockcontroller.schedule.DeviceLockControllerScheduler;
+import com.android.devicelockcontroller.schedule.DeviceLockControllerSchedulerProvider;
 import com.android.devicelockcontroller.util.LogUtil;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -149,78 +151,18 @@ public final class ProgressFragment extends Fragment {
                                     provisionStateController);
                         }
 
-                        Boolean isRecolFailed =
-                                provisioningProgressViewModel.getIsRecolFailed().getValue();
-                        if (Boolean.TRUE.equals(isRecolFailed)) {
-                            // Set up listeners for recol-failed case.
-                            retryButton.setOnClickListener(
-                                    view -> {
-                                        provisionStateController.postSetNextStateForEventRequest(
-                                                PROVISION_RETRY);
-                                    });
-                            exitButton.setOnClickListener(
-                                    view -> {
-                                        exitButton.setEnabled(false);
-                                        retryButton.setEnabled(false);
-                                        // Ensure the device is in a clean and unlocked state
-                                        // before exiting.
-                                        ListenableFuture<Void> unlockFuture =
-                                                provisionStateController.unlockAndFinalizeDevice();
-                                        Futures.addCallback(unlockFuture,
-                                                new FutureCallback<>() {
-                                                    @Override
-                                                    public void onSuccess(Void unused) {
-                                                        if (getActivity() != null) {
-                                                            getActivity().finish();
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onFailure(@NonNull Throwable t) {
-                                                        LogUtil.e(TAG, "Failed to unlock device",
-                                                                t);
-                                                        exitButton.setEnabled(true);
-                                                        retryButton.setEnabled(true);
-                                                    }
-                                                }, requireContext().getMainExecutor());
-                                    });
-
-                        } else {
-                            // Set up listeners for default case.
-                            retryButton.setOnClickListener(
-                                    view -> mProvisionHelper.scheduleKioskAppInstallation(
-                                            requireActivity(),
-                                            provisioningProgressViewModel,
-                                            /* isProvisionMandatory= */ false));
-
-                            FutureCallback<Integer> getProvisionStateCallback =
-                                new FutureCallback<>() {
-                                    @Override
-                                    public void onSuccess(Integer result) {
-                                        if (result == PROVISION_FAILED) {
-                                            // Already reported set up failure. Finish normally
-                                            getActivity().finish();
-                                            return;
-                                        }
-                                        ReviewDeviceProvisionStateWorker.cancelJobs(
-                                                WorkManager.getInstance(requireContext()));
-                                        ReportDeviceProvisionStateWorker.reportSetupFailed(
-                                                WorkManager.getInstance(requireContext()),
-                                                provisioningProgress.mFailureReason);
-                                        provisionStateController.postSetNextStateForEventRequest(
-                                                PROVISION_FAILURE);
+                        provisioningProgressViewModel.getIsRecolFailed().observe(
+                                getViewLifecycleOwner(), isRecolFailed -> {
+                                    if (Boolean.TRUE.equals(isRecolFailed)) {
+                                        setupRecolFailedListeners(retryButton, exitButton,
+                                                provisionStateController, context);
+                                    } else {
+                                        setupDefaultListeners(retryButton, exitButton,
+                                                provisioningProgressViewModel,
+                                                provisionStateController,
+                                                provisioningProgress);
                                     }
-
-                                    @Override
-                                    public void onFailure(Throwable t) {
-                                        LogUtil.e(TAG, "Failed to get provision state", t);
-                                    }
-                                };
-                            exitButton.setOnClickListener(
-                                    view -> Futures.addCallback(provisionStateController.getState(),
-                                            getProvisionStateCallback,
-                                            context.getMainExecutor()));
-                        }
+                                });
                     } else {
                         bottomView.setVisibility(View.GONE);
                     }
@@ -236,5 +178,123 @@ public final class ProgressFragment extends Fragment {
                 });
 
         return v;
+    }
+
+    private void setupRecolFailedListeners(Button retryButton, Button exitButton,
+            ProvisionStateController provisionStateController, Context context) {
+        retryButton.setOnClickListener(
+                view -> {
+                    exitButton.setEnabled(false);
+                    retryButton.setEnabled(false);
+                    // Ensure the device is in a clean and unlocked state before retrying.
+                    ListenableFuture<Void> unlockFuture =
+                            provisionStateController.unlockAndFinalizeDevice();
+                    Futures.addCallback(unlockFuture,
+                            new FutureCallback<>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    DeviceLockControllerSchedulerProvider
+                                            schedulerProvider =
+                                            (DeviceLockControllerSchedulerProvider)
+                                                    context.getApplicationContext();
+                                    DeviceLockControllerScheduler
+                                            scheduler =
+                                            schedulerProvider.getDeviceLockControllerScheduler();
+                                    // Retry by immediately scheduling another check-in.
+                                    scheduler.scheduleRetryCheckInWork(Duration.ZERO);
+                                    if (getActivity() != null) {
+                                        getActivity().finish();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(
+                                        @NonNull Throwable t) {
+                                    LogUtil.e(TAG,
+                                            "Failed to unlock device",
+                                            t);
+                                    exitButton.setEnabled(true);
+                                    retryButton.setEnabled(true);
+                                }
+                            }, requireContext().getMainExecutor());
+                });
+
+        exitButton.setOnClickListener(
+                view -> {
+                    exitButton.setEnabled(false);
+                    retryButton.setEnabled(false);
+                    // Ensure the device is in a clean and unlocked state
+                    // before exiting.
+                    ListenableFuture<Void> unlockFuture =
+                            provisionStateController.unlockAndFinalizeDevice();
+                    Futures.addCallback(unlockFuture,
+                            new FutureCallback<>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    if (getActivity() != null) {
+                                        getActivity().finish();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(
+                                        @NonNull Throwable t) {
+                                    LogUtil.e(TAG,
+                                            "Failed to unlock device",
+                                            t);
+                                    exitButton.setEnabled(true);
+                                    retryButton.setEnabled(true);
+                                }
+                            }, requireContext().getMainExecutor());
+                });
+    }
+
+    private void setupDefaultListeners(Button retryButton, Button exitButton,
+            ProvisioningProgressViewModel provisioningProgressViewModel,
+            ProvisionStateController provisionStateController,
+            ProvisioningProgress provisioningProgress) {
+        retryButton.setOnClickListener(
+                view -> mProvisionHelper.scheduleKioskAppInstallation(
+                        requireActivity(),
+                        provisioningProgressViewModel,
+                        /* isProvisionMandatory= */ false));
+
+        FutureCallback<Integer> getProvisionStateCallback =
+                new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(Integer result) {
+                        if (result == PROVISION_FAILED) {
+                            // Already reported set up failure. Finish normally
+                            if (getActivity() != null) {
+                                getActivity().finish();
+                            }
+                            return;
+                        }
+                        ReviewDeviceProvisionStateWorker.cancelJobs(
+                                WorkManager.getInstance(
+                                        requireContext()));
+                        ReportDeviceProvisionStateWorker.reportSetupFailed(
+                                WorkManager.getInstance(
+                                        requireContext()),
+                                provisioningProgress.mFailureReason);
+                        provisionStateController.postSetNextStateForEventRequest(
+                                PROVISION_FAILURE);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        LogUtil.e(TAG,
+                                "Failed to get provision state", t);
+                    }
+                };
+        exitButton.setOnClickListener(
+                view -> {
+                    LogUtil.d(TAG,
+                            "Setting the default onClick listener on Exit button");
+                    Futures.addCallback(
+                            provisionStateController.getState(),
+                            getProvisionStateCallback,
+                            requireContext().getMainExecutor());
+                });
     }
 }

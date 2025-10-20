@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Licencias de software libre"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Las funciones de gestión que aparecen en la sección del dispositivo financiado de los ajustes de Seguridad no se aplican a este dispositivo."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Este dispositivo lo proporciona <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"Este dispositivo se está configurando como garantía de un préstamo de <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>."</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"La aplicación de kiosko se descargará e instalará automáticamente."</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"La aplicación de kiosko se instalará para este usuario"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> puede restringir este dispositivo si no cumples con un pago. Para ver más detalles, consulta los <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>términos y condiciones<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -90,7 +89,7 @@
     <string name="settings_intro_preference_key" msgid="6610461073400554162">"settings_intro_preference_key"</string>
     <string name="settings_restrictions_category" msgid="5746868117342406677">"Hasta que hayas pagado tu dispositivo, no podrás:"</string>
     <string name="settings_restrictions_category_preference_key" msgid="88318147152676512">"settings_restrictions_category_preference_key"</string>
-    <string name="settings_install_apps" msgid="3634279771448183713">"Instalar aplicaciones de fuentes externas a Play Store"</string>
+    <string name="settings_install_apps" msgid="3634279771448183713">"Instalar apps de fuentes externas a Play Store"</string>
     <string name="settings_install_apps_preference_key" msgid="27542314345238427">"settings_install_apps_preference_key"</string>
     <string name="settings_safe_mode" msgid="3035228015586375153">"Reiniciar tu dispositivo en modo Seguro"</string>
     <string name="settings_safe_mode_preference_key" msgid="2106617747358027424">"settings_safe_mode_preference_key"</string>
@@ -112,7 +111,7 @@
     <string name="settings_turn_on_off_device_preference_key" msgid="5981163790552677734">"settings_turn_on_off_device_preference_key"</string>
     <string name="settings_notifications" msgid="63348993899505034">"Consultar notificaciones y mensajes de texto"</string>
     <string name="settings_notifications_preference_key" msgid="4527872342061056462">"settings_notifications_preference_key"</string>
-    <string name="settings_allowlisted_apps" msgid="5531810497056091097">"Acceder a las aplicaciones permitidas por <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
+    <string name="settings_allowlisted_apps" msgid="5531810497056091097">"Acceder a las apps permitidas por <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="settings_allowlisted_apps_preference_key" msgid="8662705531235468080">"settings_allowlisted_apps_preference_key"</string>
     <string name="settings_fully_paid_category" msgid="2459776591689824433">"Una vez que hayas pagado el importe completo:"</string>
     <string name="settings_fully_paid_category_preference_key" msgid="1759690898170600559">"settings_fully_paid_category_preference_key"</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"El dispositivo se restablecerá en <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Se eliminarán todos los datos del dispositivo. Para obtener ayuda con el registro de tu dispositivo, contacta con <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>."</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"No se ha podido aprovisionar la financiación"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"No se ha podido aprovisionar"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Para obtener ayuda con el registro de tu dispositivo, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>contacta con <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Salir"</string>
     <string name="retry" msgid="7497287909193345356">"Reintentar"</string>

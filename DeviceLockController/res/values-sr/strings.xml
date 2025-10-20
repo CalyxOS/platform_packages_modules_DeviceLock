@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Лиценце отвореног кода"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Могућности управљања у одељку финансираног уређаја у подешавањима безбедности не примењују се на овај уређај."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Овај уређај пружа <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"Овај уређај се подешава као залог за зајам који даје <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Киоск апликација ће се аутоматски преузети и инсталирати"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Киоск апликација ће бити инсталирана за овог корисника"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> може да постави ограничење за уређај ако пропустите плаћање. Детаље потражите у <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>условима и одредбама<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Уређај ће се ресетовати за <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Сви подаци са уређаја ће бити избрисани. За помоћ при регистровању уређаја, обратите се: <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Додељивање финансирања није успело"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Додела није успела"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Помоћ при регистровању уређаја потражите од <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>добављача <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Изађи"</string>
     <string name="retry" msgid="7497287909193345356">"Пробај поново"</string>

@@ -27,25 +27,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Interface for the policy controller that is responsible for applying policies based
- * on state.
- */
+/** Interface for the policy controller that is responsible for applying policies based on state. */
 public interface DevicePolicyController {
 
     /**
-     * Factory resets the device when the setup has failed and cannot continue.
-     * Returns true if action was successful.
-     * <p>
-     * Using the new {@code DevicePolicyManager#wipeDevice()} introduced in Android U to
-     * reset the device. This is because the {@code DevicePolicyManager#wipeData()} no longer resets
-     * the device when called as the device owner, as it used to do in earlier Android versions.
+     * Factory resets the device when the setup has failed and cannot continue. Returns true if
+     * action was successful.
+     *
+     * <p>Using the new {@code DevicePolicyManager#wipeDevice()} introduced in Android U to reset
+     * the device. This is because the {@code DevicePolicyManager#wipeData()} no longer resets the
+     * device when called as the device owner, as it used to do in earlier Android versions.
      */
     boolean wipeDevice();
 
-    /**
-     * Enforce current policies.
-     */
+    /** Enforce current policies. */
     ListenableFuture<Void> enforceCurrentPolicies();
 
     /**
@@ -54,9 +49,7 @@ public interface DevicePolicyController {
      */
     ListenableFuture<Void> enforceCurrentPoliciesForCriticalFailure();
 
-    /**
-     * Get the launch intent for current enforced state.
-     */
+    /** Get the launch intent for current enforced state. */
     ListenableFuture<Intent> getLaunchIntentForCurrentState();
 
     /**
@@ -65,9 +58,7 @@ public interface DevicePolicyController {
      */
     ListenableFuture<Void> onUserUnlocked();
 
-    /**
-     * Called when a user has completed set-up wizard.
-     */
+    /** Called when a user has completed set-up wizard. */
     ListenableFuture<Void> onUserSetupCompleted();
 
     /**
@@ -76,15 +67,36 @@ public interface DevicePolicyController {
      */
     ListenableFuture<Void> onAppCrashed(boolean isKiosk);
 
+    /**
+     * Disable user control for a package required for check-in.
+     *
+     * <p>Called by {@link com.android.devicelockcontroller.provision.worker.DeviceCheckInHelper}
+     * when a package required for check-in to read the device identifiers is disabled by the user
+     * before the check-in.
+     *
+     * @param packageName The name of the package to disable user control for.
+     */
+    void disableUserControlForCheckInRequiredPackage(String packageName);
+
+    /**
+     * Enables user control for a package required for check-in.
+     *
+     * <p>Called by {@link com.android.devicelockcontroller.provision.worker.DeviceCheckInWorker}
+     * after reading device-identifiers to enable a successful check-in.
+     *
+     * @param packageName The name of the package to enable user control for.
+     */
+    void enableUserControlForCheckInRequiredPackage(String packageName);
+
     @Target(ElementType.TYPE_USE)
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({
-            LockTaskType.UNDEFINED,
-            LockTaskType.NOT_IN_LOCK_TASK,
-            LockTaskType.LANDING_ACTIVITY,
-            LockTaskType.CRITICAL_ERROR,
-            LockTaskType.KIOSK_SETUP_ACTIVITY,
-            LockTaskType.KIOSK_LOCK_ACTIVITY
+        LockTaskType.UNDEFINED,
+        LockTaskType.NOT_IN_LOCK_TASK,
+        LockTaskType.LANDING_ACTIVITY,
+        LockTaskType.CRITICAL_ERROR,
+        LockTaskType.KIOSK_SETUP_ACTIVITY,
+        LockTaskType.KIOSK_LOCK_ACTIVITY
     })
     @interface LockTaskType {
 

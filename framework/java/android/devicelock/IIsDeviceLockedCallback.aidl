@@ -20,7 +20,7 @@ import android.devicelock.ParcelableException;
 
 /**
   * Callback for a isDeviceLocked() request.
-  * {@hide}
+  * @hide
   */
 oneway interface IIsDeviceLockedCallback {
 

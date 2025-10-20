@@ -18,7 +18,7 @@ package com.android.devicelockcontroller.storage;
 
 /**
  * Binder interface to access global parameters.
- * {@hide}
+ * @hide
  */
 interface IGlobalParametersService {
     void clear();

@@ -18,7 +18,7 @@ package com.android.devicelockcontroller.storage;
 
 /**
  * Binder interface to access provisioning information.
- * {@hide}
+ * @hide
  */
 interface ISetupParametersService {
     void overridePrefs(in Bundle bundle);

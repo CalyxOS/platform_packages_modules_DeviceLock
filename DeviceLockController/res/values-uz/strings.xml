@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Ochiq kodli dastur litsenziyalari"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Xavfsizlik sozlamalarida moliyalashtirilgan qurilma boʻlimidagi boshqaruv imkoniyatlari bu qurilmaga tatbiq qilinmaydi."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Bu qurilma <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> tomonidan taqdim etilgan"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"Bu qurilma <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> tomonidan qarz garovi sifatida ishlatilmoqda"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Kiosk ilovasi avtomatik ravishda yuklab olinadi va oʻrnatiladi"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Kiosk ilovasi bu foydalanuvchi uchun oʻrnatiladi"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Agar toʻlov qilmasangiz, <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> qurilmani cheklashi mumkin. Tafsilotlar uchun <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Foydalanish shartlari<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g> bilan tanishing."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Qurilma <xliff:g id="TIMER">%s</xliff:g>dan keyin asliga qaytariladi"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Barcha qurilma maʼlumotlari oʻchirib tashlanadi. Qurilmangizni qayd qilish uchun <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> bilan bogʻlaning"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Moliyaviy taʼminot amalga oshmadi"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Taʼminot bajarilmadi"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Qurilmani qayd qilish uchun <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g><xliff:g id="PROVIDER_NAME">%1$s</xliff:g> bilan bogʻlaning<xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Chiqish"</string>
     <string name="retry" msgid="7497287909193345356">"Qayta urinish"</string>

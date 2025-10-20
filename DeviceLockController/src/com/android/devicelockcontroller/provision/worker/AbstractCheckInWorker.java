@@ -38,9 +38,7 @@ import io.grpc.ClientInterceptor;
 
 import java.time.Duration;
 
-/**
- * A base class for workers that execute gRPC requests with DeviceLock backend server.
- */
+/** A base class for workers that execute gRPC requests with DeviceLock backend server. */
 public abstract class AbstractCheckInWorker extends ListenableWorker {
 
     public static final Duration BACKOFF_DELAY = Duration.ofMinutes(1);
@@ -49,8 +47,10 @@ public abstract class AbstractCheckInWorker extends ListenableWorker {
     final ListeningExecutorService mExecutorService;
     final Context mContext;
 
-    AbstractCheckInWorker(@NonNull Context context,
-            @NonNull WorkerParameters workerParameters, @Nullable DeviceCheckInClient client,
+    AbstractCheckInWorker(
+            @NonNull Context context,
+            @NonNull WorkerParameters workerParameters,
+            @Nullable DeviceCheckInClient client,
             ListeningExecutorService executorService) {
         super(context, workerParameters);
         if (client != null) {
@@ -62,11 +62,17 @@ public abstract class AbstractCheckInWorker extends ListenableWorker {
             ClientInterceptorProvider clientInterceptorProvider =
                     (ClientInterceptorProvider) context.getApplicationContext();
             ClientInterceptor clientInterceptor = clientInterceptorProvider.getClientInterceptor();
-            mClient = Futures.transform(
-                    GlobalParametersClient.getInstance().getRegisteredDeviceId(),
-                    registeredId -> DeviceCheckInClient.getInstance(
-                            context, hostName, portNumber, clientInterceptor, registeredId),
-                    MoreExecutors.directExecutor());
+            mClient =
+                    Futures.transform(
+                            GlobalParametersClient.getInstance().getRegisteredDeviceId(),
+                            registeredId ->
+                                    DeviceCheckInClient.getInstance(
+                                            context,
+                                            hostName,
+                                            portNumber,
+                                            clientInterceptor,
+                                            registeredId),
+                            MoreExecutors.directExecutor());
         }
         mContext = context;
         mExecutorService = executorService;

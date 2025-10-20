@@ -221,6 +221,32 @@ public final class ProvisionHelperImplTest {
     }
 
     @Test
+    public void checkGeoEligibility_workTimeoutAndWorkInfoIsNull_doesNotCrash() throws Exception {
+        // WHEN Installation is initiated
+        mProvisionHelper.scheduleKioskAppInstallation(mMockLifecycleOwner,
+                mProgressController, /* isProvisionMandatory= */ false);
+        shadowOf(Looper.getMainLooper()).idle();
+
+        // GIVEN the work is pruned (e.g. by re-initializing work manager)
+        // This simulates a scenario where the WorkInfo is no longer available when the timeout
+        // check runs.
+        Executor executor = TestingExecutors.sameThreadScheduledExecutor();
+        WorkManagerTestInitHelper.initializeTestWorkManager(mTestApp,
+                new Configuration.Builder().setExecutor(executor).setWorkerFactory(
+                        mTestWorkerFactory).build());
+
+        // WHEN the timeout check runs
+        ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
+
+        // THEN it should not crash due to a null WorkInfo, and no further progress is made.
+        // The only progress update should be the initial one.
+        verify(mProgressController, times(1)).setProvisioningProgress(
+                mProvisioningProgressArgumentCaptor.capture());
+        assertThat(mProvisioningProgressArgumentCaptor.getValue()).isEqualTo(
+                ProvisioningProgress.GETTING_DEVICE_READY);
+    }
+
+    @Test
     public void checkGeoEligibility_inApprovedCountry_thenProceedToInstalling() throws Exception {
         // GIVEN Country is approved
         mTestWorkerFactory.setWorkResult(COUNTRY_WORKER_CLASS_NAME,

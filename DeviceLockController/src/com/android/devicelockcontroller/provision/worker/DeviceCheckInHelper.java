@@ -16,6 +16,10 @@
 
 package com.android.devicelockcontroller.provision.worker;
 
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+import static android.content.pm.PackageManager.DONT_KILL_APP;
+import static android.content.pm.PackageManager.INSTALL_REASON_UNKNOWN;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_VPN;
@@ -64,6 +68,7 @@ import androidx.work.WorkManager;
 import com.android.devicelockcontroller.FeatureFlagProvider;
 import com.android.devicelockcontroller.R;
 import com.android.devicelockcontroller.common.DeviceId;
+import com.android.devicelockcontroller.policy.DevicePolicyController;
 import com.android.devicelockcontroller.policy.FinalizationController;
 import com.android.devicelockcontroller.policy.FinalizationControllerImpl;
 import com.android.devicelockcontroller.policy.PolicyObjectsProvider;
@@ -86,9 +91,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.time.DateTimeException;
 import java.time.Duration;
 
-/**
- * Helper class to perform the device check-in process with device lock backend server
- */
+/** Helper class to perform the device check-in process with device lock backend server */
 public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
     private static final String TAG = "DeviceCheckInHelper";
     private final Context mAppContext;
@@ -104,14 +107,15 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
     }
 
     private boolean hasCdma() {
-        return mAppContext.getPackageManager().hasSystemFeature(
-                PackageManager.FEATURE_TELEPHONY_CDMA);
+        return mAppContext
+                .getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_TELEPHONY_CDMA);
     }
 
     @Override
     ArraySet<DeviceId> getDeviceUniqueIds() {
-        final int deviceIdTypeBitmap = mAppContext.getResources().getInteger(
-                R.integer.device_id_type_bitmap);
+        final int deviceIdTypeBitmap =
+                mAppContext.getResources().getInteger(R.integer.device_id_type_bitmap);
         if (deviceIdTypeBitmap < 0) {
             LogUtil.e(TAG, "getDeviceId: Cannot get device_id_type_bitmap");
             return new ArraySet<>();
@@ -160,8 +164,9 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
             GetDeviceCheckInStatusGrpcResponse response,
             DeviceLockControllerScheduler scheduler,
             @Nullable String fcmRegistrationToken) {
-        Futures.getUnchecked(GlobalParametersClient.getInstance().setRegisteredDeviceId(
-                response.getRegisteredDeviceIdentifier()));
+        Futures.getUnchecked(
+                GlobalParametersClient.getInstance()
+                        .setRegisteredDeviceId(response.getRegisteredDeviceIdentifier()));
         LogUtil.d(TAG, "check in response: " + response.getDeviceCheckInStatus());
         switch (response.getDeviceCheckInStatus()) {
             case READY_FOR_PROVISION:
@@ -171,9 +176,10 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
                 return result;
             case RETRY_CHECK_IN:
                 try {
-                    Duration delay = Duration.between(
-                            SystemClock.currentNetworkTimeClock().instant(),
-                            response.getNextCheckInTime());
+                    Duration delay =
+                            Duration.between(
+                                    SystemClock.currentNetworkTimeClock().instant(),
+                                    response.getNextCheckInTime());
                     // Retry immediately if next check in time is in the past.
                     delay = delay.isNegative() ? Duration.ZERO : delay;
                     scheduler.scheduleRetryCheckInWork(delay);
@@ -189,7 +195,8 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
                         ((PolicyObjectsProvider) mAppContext).getFinalizationController();
                 final ListenableFuture<Void> finalizeDeviceFuture =
                         finalizationController.finalizeNotEnrolledDevice();
-                Futures.addCallback(finalizeDeviceFuture,
+                Futures.addCallback(
+                        finalizeDeviceFuture,
                         new FutureCallback<>() {
                             @Override
                             public void onSuccess(Void result) {
@@ -200,8 +207,8 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
                             public void onFailure(Throwable t) {
                                 LogUtil.e(TAG, "Failed to finalize device", t);
                             }
-                        }, MoreExecutors.directExecutor()
-                );
+                        },
+                        MoreExecutors.directExecutor());
                 return true;
             case STATUS_UNSPECIFIED:
             default:
@@ -219,30 +226,33 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
     private void maybeEnqueueFcmRegistrationTokenRetrievalWork(
             @Nullable String fcmRegistrationToken) {
         if (Strings.isNullOrEmpty(fcmRegistrationToken) || fcmRegistrationToken.isBlank()) {
-            NetworkRequest request = new NetworkRequest.Builder()
-                    .addCapability(NET_CAPABILITY_NOT_RESTRICTED)
-                    .addCapability(NET_CAPABILITY_TRUSTED)
-                    .addCapability(NET_CAPABILITY_INTERNET)
-                    .addCapability(NET_CAPABILITY_NOT_VPN)
-                    .build();
+            NetworkRequest request =
+                    new NetworkRequest.Builder()
+                            .addCapability(NET_CAPABILITY_NOT_RESTRICTED)
+                            .addCapability(NET_CAPABILITY_TRUSTED)
+                            .addCapability(NET_CAPABILITY_INTERNET)
+                            .addCapability(NET_CAPABILITY_NOT_VPN)
+                            .build();
             OneTimeWorkRequest.Builder builder =
                     new OneTimeWorkRequest.Builder(GetFcmTokenWorker.class)
                             .setConstraints(
-                                    new Constraints.Builder().setRequiredNetworkRequest(request,
-                                            NetworkType.CONNECTED).build())
+                                    new Constraints.Builder()
+                                            .setRequiredNetworkRequest(
+                                                    request, NetworkType.CONNECTED)
+                                            .build())
                             .setInitialDelay(FCM_TOKEN_WORKER_INITIAL_DELAY)
                             .setBackoffCriteria(
                                     BackoffPolicy.EXPONENTIAL, FCM_TOKEN_WORKER_BACKOFF_DELAY);
 
-            WorkManager.getInstance(mAppContext).enqueueUniqueWork(FCM_TOKEN_WORK_NAME,
-                    ExistingWorkPolicy.REPLACE, builder.build());
+            WorkManager.getInstance(mAppContext)
+                    .enqueueUniqueWork(
+                            FCM_TOKEN_WORK_NAME, ExistingWorkPolicy.REPLACE, builder.build());
         }
     }
 
     @VisibleForTesting
     @WorkerThread
-    boolean handleProvisionReadyResponse(
-            @NonNull GetDeviceCheckInStatusGrpcResponse response) {
+    boolean handleProvisionReadyResponse(@NonNull GetDeviceCheckInStatusGrpcResponse response) {
         GlobalParametersClient globalParametersClient = GlobalParametersClient.getInstance();
         final FinalizationController finalizationController =
                 ((PolicyObjectsProvider) mAppContext).getFinalizationController();
@@ -250,14 +260,16 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
         if (mFeatureFlagProvider.isRecolEnabled()) {
             // Devices that were previously finalized need to have their finalization state reset
             // back to UNFINALIZED at this point.
-            Futures.getUnchecked(GlobalParametersClient.getInstance().setFinalizationState(
-                    FinalizationControllerImpl.FinalizationState.UNFINALIZED));
+            Futures.getUnchecked(
+                    GlobalParametersClient.getInstance()
+                            .setFinalizationState(
+                                    FinalizationControllerImpl.FinalizationState.UNFINALIZED));
             // Now, force the FinalizationController to reload its state from disk.
             Futures.getUnchecked(finalizationController.enforceDiskState(/* force= */ true));
         }
 
-        Futures.getUnchecked(globalParametersClient.setProvisionForced(
-                response.isProvisionForced()));
+        Futures.getUnchecked(
+                globalParametersClient.setProvisionForced(response.isProvisionForced()));
         final ProvisioningConfiguration configuration = response.getProvisioningConfig();
         if (configuration == null) {
             LogUtil.e(TAG, "Provisioning Configuration is not provided by server!");
@@ -266,15 +278,12 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
         }
         final Bundle provisionBundle = configuration.toBundle();
         provisionBundle.putInt(EXTRA_PROVISIONING_TYPE, response.getProvisioningType());
-        provisionBundle.putBoolean(EXTRA_MANDATORY_PROVISION,
-                response.isProvisioningMandatory());
+        provisionBundle.putBoolean(EXTRA_MANDATORY_PROVISION, response.isProvisioningMandatory());
         provisionBundle.putBoolean(EXTRA_ALLOW_DEBUGGING, response.isDebuggingAllowed());
-        Futures.getUnchecked(
-                SetupParametersClient.getInstance().createPrefs(provisionBundle));
+        Futures.getUnchecked(SetupParametersClient.getInstance().createPrefs(provisionBundle));
         Futures.getUnchecked(globalParametersClient.setProvisionReady(true));
         mAppContext.sendBroadcastAsUser(
-                new Intent(mAppContext, ProvisionReadyReceiver.class),
-                UserHandle.ALL);
+                new Intent(mAppContext, ProvisionReadyReceiver.class), UserHandle.ALL);
         return true;
     }
 
@@ -294,5 +303,80 @@ public final class DeviceCheckInHelper extends AbstractDeviceCheckInHelper {
             LogUtil.e(TAG, "Failed to get device lock apex version", e);
         }
         return 0;
+    }
+
+    @Override
+    void enableCheckInRequiredPackage(String packageName, @CheckInRequiredPackageState int state) {
+        DevicePolicyController devicePolicyController =
+                ((PolicyObjectsProvider) mAppContext).getPolicyController();
+        switch (state) {
+            case CheckInRequiredPackageState.DISABLED ->
+                    enablePackageForUser(packageName, devicePolicyController);
+            case CheckInRequiredPackageState.UNINSTALLED ->
+                    initiateExistingPackageInstallForUser(packageName, devicePolicyController);
+            default -> {
+                /* No-op */
+            }
+        }
+    }
+
+    private void enablePackageForUser(
+            String packageName, DevicePolicyController devicePolicyController) {
+        try {
+            PackageManager mPackageManager =
+                    mAppContext.createContextAsUser(UserHandle.SYSTEM, 0).getPackageManager();
+            mPackageManager.setApplicationEnabledSetting(
+                    packageName, COMPONENT_ENABLED_STATE_DEFAULT, DONT_KILL_APP);
+
+            // Enable the package protection for the required package
+            // Once the check-in worker retrieves the device identifiers, this restriction is
+            // removed
+            devicePolicyController.disableUserControlForCheckInRequiredPackage(packageName);
+        } catch (SecurityException ex) {
+            // Not expected to happen as the controller has the correct permissions
+            LogUtil.e(TAG, "Exception thrown while enabling package", ex);
+        }
+    }
+
+    private void initiateExistingPackageInstallForUser(
+            String packageName, DevicePolicyController devicePolicyController) {
+        try {
+            // We won't register a status receiver as the check-in will be retried later
+            mAppContext
+                    .getPackageManager()
+                    .getPackageInstaller()
+                    .installExistingPackage(
+                            packageName, INSTALL_REASON_UNKNOWN, null /* statusReceiver */);
+            LogUtil.d(TAG, "Initiated existing package install for " + packageName);
+        } catch (Exception e) {
+            LogUtil.e(TAG, "Failed to initiate install for existing package: Exception", e);
+        }
+        // Disable user control for the required package
+        // Once the check-in worker retrieves the device identifiers, this restriction is removed
+        devicePolicyController.disableUserControlForCheckInRequiredPackage(packageName);
+    }
+
+    @Override
+    int getCheckInRequiredPackageState(String packageName) {
+        try {
+            Context packageContext =
+                    mAppContext.createPackageContextAsUser(
+                            packageName, 0 /* flags */, UserHandle.SYSTEM);
+            int checkInRequiredPackageState =
+                    packageContext.getPackageManager().getApplicationEnabledSetting(packageName);
+            // We return `DISABLED` if the state is neither `ENABLED` nor `DEFAULT`
+            if (checkInRequiredPackageState == COMPONENT_ENABLED_STATE_DEFAULT
+                    || checkInRequiredPackageState == COMPONENT_ENABLED_STATE_ENABLED) {
+                return CheckInRequiredPackageState.ENABLED;
+            }
+            return CheckInRequiredPackageState.DISABLED;
+        } catch (PackageManager.NameNotFoundException e) {
+            return CheckInRequiredPackageState.UNINSTALLED;
+        }
+    }
+
+    @Override
+    public boolean hasTelephonyFeature() {
+        return mAppContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
     }
 }

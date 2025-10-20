@@ -46,8 +46,7 @@
     <string name="open_source_licenses" msgid="6464389386262455443">"Άδειες λογισμικού ανοικτού κώδικα"</string>
     <string name="footer_notice_content_description" msgid="2160540400079419440">"Οι δυνατότητες διαχείρισης στην ενότητα χρηματοδοτούμενης συσκευής δεν ισχύουν για αυτήν τη συσκευή."</string>
     <string name="device_provided_by_provider" msgid="290593329676291991">"Αυτή η συσκευή παρέχεται από <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
-    <!-- no translation found for device_used_as_collateral (3798654034884640393) -->
-    <skip />
+    <string name="device_used_as_collateral" msgid="3798654034884640393">"Αυτή η συσκευή ρυθμίζεται ως διασφάλιση για ένα δάνειο από τον πάροχο <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="download_kiosk_app" msgid="1845089944897502656">"Θα γίνει αυτόματα λήψη και εγκατάσταση της εφαρμογής kiosk"</string>
     <string name="install_kiosk_app_secondary_user" msgid="49911908012320834">"Η εφαρμογή kiosk θα εγκατασταθεί για αυτόν τον χρήστη"</string>
     <string name="restrict_device_if_missing_payment" msgid="8883980285859496904">"Αν δεν καταβάλετε μια πληρωμή, ο πάροχος <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> μπορεί να εφαρμόσει περιορισμούς στη συσκευή. Για λεπτομέρειες, ανατρέξτε στην ενότητα <xliff:g id="TERMS_AND_CONDITIONS_LINK_START">&lt;a href=%2$s&gt;</xliff:g>Όροι και Προϋποθέσεις<xliff:g id="TERMS_AND_CONDITIONS_LINK_END">&lt;/a&gt;</xliff:g>."</string>
@@ -129,8 +128,7 @@
     <string name="device_reset_timer_notification_title" msgid="301978346002711614">"Θα γίνει επαναφορά της συσκευής σε <xliff:g id="TIMER">%s</xliff:g>"</string>
     <string name="device_reset_notification_content" msgid="7642367488663440437">"Θα διαγραφούν όλα τα δεδομένα της συσκευής. Για βοήθεια με την εγγραφή της συσκευής, επικοινωνήστε με τον πάροχο <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
     <string name="provisioning_failed" msgid="5350252817004028300">"Η χρηματοοικονομική παροχή απέτυχε"</string>
-    <!-- no translation found for provisioning_failed_generic (2165937375591501360) -->
-    <skip />
+    <string name="provisioning_failed_generic" msgid="2165937375591501360">"Η παροχή απέτυχε"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Για βοήθεια με την εγγραφή της συσκευής, <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>επικοινωνήστε με τον πάροχο <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Έξοδος"</string>
     <string name="retry" msgid="7497287909193345356">"Επανάληψη"</string>
