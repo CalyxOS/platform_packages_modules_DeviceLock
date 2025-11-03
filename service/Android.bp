@@ -44,4 +44,7 @@ java_library {
         "com.android.devicelock",
     ],
     installable: true,
+    lint: {
+        baseline_filename: "lint-baseline.xml",
+    },
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.4.0-alpha08" type="baseline" client="" dependencies="true" name="" variant="all" version="8.4.0-alpha08">
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 35 (current min is 34): `java.lang.CharSequence#isEmpty`"
+        errorLine1="                } else if (!deviceSerialNumber.isEmpty()) {"
+        errorLine2="                                               ~~~~~~~">
+        <location
+            file="packages/modules/DeviceLock/service/java/com/android/server/devicelock/DeviceLockServiceImpl.java"
+            line="716"
+            column="48"/>
+    </issue>
+
+</issues>
