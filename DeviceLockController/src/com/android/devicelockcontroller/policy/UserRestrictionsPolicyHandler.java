@@ -16,14 +16,24 @@
 
 package com.android.devicelockcontroller.policy;
 
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+
+import android.annotation.Nullable;
+import android.app.ActivityManager;
 import android.app.admin.DevicePolicyManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.ArraySet;
 
 import com.android.devicelockcontroller.storage.SetupParametersClient;
 import com.android.devicelockcontroller.util.LogUtil;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -40,6 +50,7 @@ final class UserRestrictionsPolicyHandler implements PolicyHandler {
     private static final String TAG = "UserRestrictionsPolicyHandler";
 
     private final ArraySet<String> mAlwaysOnRestrictions = new ArraySet<>();
+    private final Context mContext;
     private final Executor mBgExecutor;
 
     /**
@@ -54,8 +65,9 @@ final class UserRestrictionsPolicyHandler implements PolicyHandler {
     private final UserManager mUserManager;
     private final boolean mIsDebug;
 
-    UserRestrictionsPolicyHandler(DevicePolicyManager dpm, UserManager userManager,
+    UserRestrictionsPolicyHandler(Context context, DevicePolicyManager dpm, UserManager userManager,
             boolean isDebug, Executor bgExecutor) {
+        mContext = context;
         mDpm = dpm;
         mUserManager = userManager;
         mIsDebug = isDebug;
@@ -69,6 +81,13 @@ final class UserRestrictionsPolicyHandler implements PolicyHandler {
     @Override
     public ListenableFuture<Boolean> onProvisionInProgress() {
         setupRestrictions(mAlwaysOnRestrictions, true);
+        String packageName = findOriginalSystemDialer(mContext);
+        if (packageName != null) {
+            // In case the system dialer was disabled via adb, enable it
+            enablePackageForCurrentUser(packageName);
+        } else {
+            LogUtil.w(TAG, "System dialer package not found, skipping enablement.");
+        }
         return Futures.whenAllSucceed(
                         setupRestrictions(retrieveOptionalAlwaysOnRestrictions(), true),
                         setupRestrictions(retrieveLockModeRestrictions(), false))
@@ -181,5 +200,36 @@ final class UserRestrictionsPolicyHandler implements PolicyHandler {
         return Futures.transform(restrictionsFuture,
                 restrictions -> setupRestrictions(restrictions, enable),
                 mBgExecutor);
+    }
+
+    private @Nullable String findOriginalSystemDialer(Context context) {
+        PackageManager packageManager = context.getPackageManager();
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        ImmutableList<ResolveInfo> candidates = ImmutableList.copyOf(
+                packageManager.queryIntentActivities(
+                        intent,
+                        PackageManager.MATCH_SYSTEM_ONLY
+                                | PackageManager.MATCH_DISABLED_COMPONENTS
+                ));
+        if (candidates.isEmpty()) {
+            return null;
+        }
+
+        return candidates.get(0).activityInfo.packageName;
+    }
+
+    private void enablePackageForCurrentUser(
+            String packageName) {
+        try {
+            int currentUserId = ActivityManager.getCurrentUser();
+            PackageManager mPackageManager =
+                    mContext.createContextAsUser(UserHandle.of(currentUserId), 0)
+                            .getPackageManager();
+            mPackageManager.setApplicationEnabledSetting(
+                    packageName, COMPONENT_ENABLED_STATE_ENABLED, 0);
+        } catch (SecurityException ex) {
+            // Not expected to happen as the controller has the correct permissions
+            LogUtil.w(TAG, "Encountered exception while enabling required package: " + ex);
+        }
     }
 }

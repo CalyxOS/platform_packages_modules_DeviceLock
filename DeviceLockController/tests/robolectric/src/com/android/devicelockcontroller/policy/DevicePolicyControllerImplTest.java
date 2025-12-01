@@ -51,6 +51,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.os.Looper;
@@ -58,6 +59,8 @@ import android.os.OutcomeReceiver;
 import android.os.UserManager;
 
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.core.content.pm.ApplicationInfoBuilder;
+import androidx.test.core.content.pm.PackageInfoBuilder;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.testing.WorkManagerTestInitHelper;
@@ -100,17 +103,26 @@ import java.util.concurrent.Executors;
 public final class DevicePolicyControllerImplTest {
     private static final String TEST_KIOSK_PACKAGE = "test.package1";
     private static final String TEST_KIOSK_ACTIVITY = "TestActivity";
-    @Rule public MockitoRule mMockitoRule = MockitoJUnit.rule();
+    private static final String DIALER_PACKAGE = "test.dialer";
+    private static final String TEST_DIALER_ACTIVITY = "TestDialerActivity";
+    @Rule
+    public MockitoRule mMockitoRule = MockitoJUnit.rule();
 
-    @Mock private ProvisionStateController mMockProvisionStateController;
-    @Mock private SystemDeviceLockManager mMockSystemDeviceLockManager;
-    @Mock private DevicePolicyManager mMockDpm;
-    @Mock private UserManager mMockUserManager;
-    @Captor private ArgumentCaptor<Integer> mAllowedFlags;
+    @Mock
+    private ProvisionStateController mMockProvisionStateController;
+    @Mock
+    private SystemDeviceLockManager mMockSystemDeviceLockManager;
+    @Mock
+    private DevicePolicyManager mMockDpm;
+    @Mock
+    private UserManager mMockUserManager;
+    @Captor
+    private ArgumentCaptor<Integer> mAllowedFlags;
 
     private DevicePolicyController mDevicePolicyController;
     private TestDeviceLockControllerApplication mTestApp;
     private FeatureFlagProvider mFeatureFlagProvider;
+    private ShadowPackageManager mShadowPackageManager;
 
     @Before
     public void setUp() {
@@ -121,7 +133,7 @@ public final class DevicePolicyControllerImplTest {
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
 
         UserRestrictionsPolicyHandler userRestrictionsPolicyHandler =
-                new UserRestrictionsPolicyHandler(
+                new UserRestrictionsPolicyHandler(mTestApp,
                         mMockDpm, mMockUserManager, /* isDebug= */ false, bgExecutor);
         AppOpsPolicyHandler appOpsPolicyHandler =
                 new AppOpsPolicyHandler(mMockSystemDeviceLockManager, bgExecutor);
@@ -153,6 +165,8 @@ public final class DevicePolicyControllerImplTest {
                         mMockProvisionStateController,
                         bgExecutor);
         mFeatureFlagProvider = mTestApp.getFeatureFlagProvider();
+        mShadowPackageManager = Shadows.shadowOf(mTestApp.getPackageManager());
+        installSystemDialer();
     }
 
     @Test
@@ -446,7 +460,7 @@ public final class DevicePolicyControllerImplTest {
     @Test
     public void
             getLaunchIntent_withProvisionSucceededSt_forCriticalFailure_shouldHaveExpectedIntent()
-                    throws Exception {
+                throws Exception {
         when(mMockUserManager.isUserUnlocked()).thenReturn(true);
 
         mDevicePolicyController.enforceCurrentPoliciesForCriticalFailure().get();
@@ -467,7 +481,7 @@ public final class DevicePolicyControllerImplTest {
     @Test
     public void
             getLaunchIntent_withKioskProvisionedState_forCriticalFailure_shouldHaveExpectedIntent()
-                    throws Exception {
+                throws Exception {
         when(mMockUserManager.isUserUnlocked()).thenReturn(true);
 
         mDevicePolicyController.enforceCurrentPoliciesForCriticalFailure().get();
@@ -488,7 +502,7 @@ public final class DevicePolicyControllerImplTest {
     @Test
     public void
             getLaunchIntent_withProvisionFailedState_forCriticalFailure_shouldHaveExpectedIntent()
-                    throws Exception {
+                throws Exception {
         when(mMockUserManager.isUserUnlocked()).thenReturn(true);
 
         mDevicePolicyController.enforceCurrentPoliciesForCriticalFailure().get();
@@ -509,7 +523,7 @@ public final class DevicePolicyControllerImplTest {
     @Test
     public void
             getLaunchIntent_withProvisionInProgressSt_forCriticalFailure_shouldHaveExpectedIntent()
-                    throws Exception {
+                throws Exception {
         when(mMockUserManager.isUserUnlocked()).thenReturn(true);
         setExpectationsOnEnableControllerKeepAlive();
 
@@ -571,7 +585,7 @@ public final class DevicePolicyControllerImplTest {
     @Test
     public void
             getLaunchIntentForCurrentState_withProvisionSucceededState_withoutKioskAppInstalled()
-                    throws ExecutionException, InterruptedException {
+            throws ExecutionException, InterruptedException {
         setupSetupParameters();
         setupAppOpsPolicyHandlerExpectations();
         setExpectationsOnDisableControllerKeepAlive();
@@ -612,7 +626,7 @@ public final class DevicePolicyControllerImplTest {
     @Test
     public void
             getLaunchIntentForCurrentState_withProvisionSucceededStateAndKioskAppWithoutHomeCateg()
-                    throws ExecutionException, InterruptedException {
+                throws ExecutionException, InterruptedException {
         setupSetupParameters();
         setupAppOpsPolicyHandlerExpectations();
         setExpectationsOnEnableKioskKeepAlive();
@@ -858,7 +872,7 @@ public final class DevicePolicyControllerImplTest {
     @Test
     public void
             getLaunchIntentForCurrentStateRecolEnabled_withProvisionTypeRecol_shouldReturnIntent()
-                    throws ExecutionException, InterruptedException {
+                throws ExecutionException, InterruptedException {
         when(mFeatureFlagProvider.isRecolEnabled()).thenReturn(true);
         Bundle preferences = new Bundle();
         preferences.putString(EXTRA_KIOSK_PACKAGE, TEST_KIOSK_PACKAGE);
@@ -1265,10 +1279,9 @@ public final class DevicePolicyControllerImplTest {
     }
 
     private void installKioskAppWithoutCategoryHomeIntentFilter() {
-        ShadowPackageManager shadowPackageManager = Shadows.shadowOf(mTestApp.getPackageManager());
         PackageInfo kioskPackageInfo = new PackageInfo();
         kioskPackageInfo.packageName = TEST_KIOSK_PACKAGE;
-        shadowPackageManager.installPackage(kioskPackageInfo);
+        mShadowPackageManager.installPackage(kioskPackageInfo);
 
         IntentFilter kioskAppIntentFilter = new IntentFilter(Intent.ACTION_MAIN);
         kioskAppIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
@@ -1276,15 +1289,14 @@ public final class DevicePolicyControllerImplTest {
         ComponentName kioskAppComponent =
                 new ComponentName(TEST_KIOSK_PACKAGE, TEST_KIOSK_ACTIVITY);
 
-        shadowPackageManager.addActivityIfNotPresent(kioskAppComponent);
-        shadowPackageManager.addIntentFilterForActivity(kioskAppComponent, kioskAppIntentFilter);
+        mShadowPackageManager.addActivityIfNotPresent(kioskAppComponent);
+        mShadowPackageManager.addIntentFilterForActivity(kioskAppComponent, kioskAppIntentFilter);
     }
 
     private void installKioskAppWithLockScreenIntentFilter() {
-        ShadowPackageManager shadowPackageManager = Shadows.shadowOf(mTestApp.getPackageManager());
         PackageInfo kioskPackageInfo = new PackageInfo();
         kioskPackageInfo.packageName = TEST_KIOSK_PACKAGE;
-        shadowPackageManager.installPackage(kioskPackageInfo);
+        mShadowPackageManager.installPackage(kioskPackageInfo);
 
         IntentFilter kioskAppIntentFilter = new IntentFilter(Intent.ACTION_MAIN);
         kioskAppIntentFilter.addCategory(Intent.CATEGORY_HOME);
@@ -1292,23 +1304,22 @@ public final class DevicePolicyControllerImplTest {
         ComponentName kioskAppComponent =
                 new ComponentName(TEST_KIOSK_PACKAGE, TEST_KIOSK_ACTIVITY);
 
-        shadowPackageManager.addActivityIfNotPresent(kioskAppComponent);
-        shadowPackageManager.addIntentFilterForActivity(kioskAppComponent, kioskAppIntentFilter);
+        mShadowPackageManager.addActivityIfNotPresent(kioskAppComponent);
+        mShadowPackageManager.addIntentFilterForActivity(kioskAppComponent, kioskAppIntentFilter);
     }
 
     private void installKioskAppWithSetupIntentFilter() {
-        ShadowPackageManager shadowPackageManager = Shadows.shadowOf(mTestApp.getPackageManager());
         PackageInfo kioskPackageInfo = new PackageInfo();
         kioskPackageInfo.packageName = TEST_KIOSK_PACKAGE;
-        shadowPackageManager.installPackage(kioskPackageInfo);
+        mShadowPackageManager.installPackage(kioskPackageInfo);
 
         IntentFilter kioskAppIntentFilter = new IntentFilter(ACTION_DEVICE_LOCK_KIOSK_SETUP);
         kioskAppIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         ComponentName kioskAppComponent =
                 new ComponentName(TEST_KIOSK_PACKAGE, TEST_KIOSK_ACTIVITY);
 
-        shadowPackageManager.addActivityIfNotPresent(kioskAppComponent);
-        shadowPackageManager.addIntentFilterForActivity(kioskAppComponent, kioskAppIntentFilter);
+        mShadowPackageManager.addActivityIfNotPresent(kioskAppComponent);
+        mShadowPackageManager.addIntentFilterForActivity(kioskAppComponent, kioskAppIntentFilter);
     }
 
     private static void setupSetupParameters() throws ExecutionException, InterruptedException {
@@ -1319,117 +1330,117 @@ public final class DevicePolicyControllerImplTest {
 
     private void setExpectationsOnAddFinancedDeviceKioskRole() {
         doAnswer(
-                        (Answer<Object>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(/* callback= */ 2);
-                                    callback.onResult(/* result= */ null);
-                                    return null;
-                                })
+                (Answer<Object>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(/* callback= */ 2);
+                            callback.onResult(/* result= */ null);
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .addFinancedDeviceKioskRole(anyString(), any(Executor.class), any());
     }
 
     private void setExpectationsOnRemoveFinancedDeviceKioskRole() {
         doAnswer(
-                        (Answer<Object>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(/* callback= */ 2);
-                                    callback.onResult(/* result= */ null);
-                                    return null;
-                                })
+                (Answer<Object>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(/* callback= */ 2);
+                            callback.onResult(/* result= */ null);
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .removeFinancedDeviceKioskRole(anyString(), any(Executor.class), any());
     }
 
     private void setExpectationsOnEnableKioskKeepAlive() {
         doAnswer(
-                        (Answer<Object>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(/* callback= */ 2);
-                                    callback.onResult(/* result= */ null);
-                                    return null;
-                                })
+                (Answer<Object>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(/* callback= */ 2);
+                            callback.onResult(/* result= */ null);
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .enableKioskKeepalive(anyString(), any(Executor.class), any());
     }
 
     private void setExpectationsOnDisableKioskKeepAlive() {
         doAnswer(
-                        (Answer<Object>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(/* callback= */ 1);
-                                    callback.onResult(/* result= */ null);
-                                    return null;
-                                })
+                (Answer<Object>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(/* callback= */ 1);
+                            callback.onResult(/* result= */ null);
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .disableKioskKeepalive(any(Executor.class), any());
     }
 
     private void setExpectationsOnEnableControllerKeepAlive() {
         doAnswer(
-                        (Answer<Object>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(/* callback= */ 1);
-                                    callback.onResult(/* result= */ null);
-                                    return null;
-                                })
+                (Answer<Object>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(/* callback= */ 1);
+                            callback.onResult(/* result= */ null);
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .enableControllerKeepalive(any(Executor.class), any());
     }
 
     private void setExpectationsOnDisableControllerKeepAlive() {
         doAnswer(
-                        (Answer<Object>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(/* callback= */ 1);
-                                    callback.onResult(/* result= */ null);
-                                    return null;
-                                })
+                (Answer<Object>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(/* callback= */ 1);
+                            callback.onResult(/* result= */ null);
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .disableControllerKeepalive(any(Executor.class), any());
     }
 
     private void setupAppOpsPolicyHandlerExpectations() {
         doAnswer(
-                        (Answer<Boolean>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(2 /* callback */);
-                                    callback.onResult(null /* result */);
+                (Answer<Boolean>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(2 /* callback */);
+                            callback.onResult(null /* result */);
 
-                                    return null;
-                                })
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .setDlcExemptFromActivityBgStartRestrictionState(
                         anyBoolean(), any(Executor.class), any());
         doAnswer(
-                        (Answer<Boolean>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(2 /* callback */);
-                                    callback.onResult(null /* result */);
+                (Answer<Boolean>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(2 /* callback */);
+                            callback.onResult(null /* result */);
 
-                                    return null;
-                                })
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .setDlcAllowedToSendUndismissibleNotifications(
                         anyBoolean(), any(Executor.class), any());
 
         doAnswer(
-                        (Answer<Boolean>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(3 /* callback */);
-                                    callback.onResult(null /* result */);
+                (Answer<Boolean>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(3 /* callback */);
+                            callback.onResult(null /* result */);
 
-                                    return null;
-                                })
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .setKioskAppExemptFromRestrictionsState(
                         anyString(), anyBoolean(), any(Executor.class), any());
@@ -1437,29 +1448,48 @@ public final class DevicePolicyControllerImplTest {
 
     private void setupFinalizationControllerExpectations() {
         doAnswer(
-                        (Answer<Boolean>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(2 /* callback */);
-                                    callback.onResult(null /* result */);
+                (Answer<Boolean>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(2 /* callback */);
+                            callback.onResult(null /* result */);
 
-                                    return null;
-                                })
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .setDeviceFinalized(anyBoolean(), any(Executor.class), any());
     }
 
     private void setExpectationsOnSetPostNotificationsSystemFixed() {
         doAnswer(
-                        (Answer<Boolean>)
-                                invocation -> {
-                                    OutcomeReceiver<Void, Exception> callback =
-                                            invocation.getArgument(2 /* callback */);
-                                    callback.onResult(null /* result */);
+                (Answer<Boolean>)
+                        invocation -> {
+                            OutcomeReceiver<Void, Exception> callback =
+                                    invocation.getArgument(2 /* callback */);
+                            callback.onResult(null /* result */);
 
-                                    return null;
-                                })
+                            return null;
+                        })
                 .when(mMockSystemDeviceLockManager)
                 .setPostNotificationsSystemFixed(anyBoolean(), any(Executor.class), any());
+    }
+
+    private void installSystemDialer() {
+        PackageInfo dialerPackage =
+                PackageInfoBuilder.newBuilder()
+                        .setPackageName(DIALER_PACKAGE)
+                        .setApplicationInfo(
+                                ApplicationInfoBuilder.newBuilder()
+                                        .setName(DIALER_PACKAGE)
+                                        .setPackageName(DIALER_PACKAGE)
+                                        .build())
+                        .build();
+        dialerPackage.applicationInfo.flags |= ApplicationInfo.FLAG_SYSTEM;
+        mShadowPackageManager.installPackage(dialerPackage);
+        IntentFilter dialerIntent = new IntentFilter(Intent.ACTION_DIAL);
+        dialerIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        ComponentName dialerComponent = new ComponentName(DIALER_PACKAGE, TEST_DIALER_ACTIVITY);
+        mShadowPackageManager.addActivityIfNotPresent(dialerComponent);
+        mShadowPackageManager.addIntentFilterForActivity(dialerComponent, dialerIntent);
     }
 }
