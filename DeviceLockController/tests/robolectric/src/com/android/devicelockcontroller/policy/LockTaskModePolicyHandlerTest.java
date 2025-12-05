@@ -111,23 +111,29 @@ public final class LockTaskModePolicyHandlerTest {
         mPackageManager = mContext.getPackageManager();
         mHandler = new LockTaskModePolicyHandler(mContext, mMockDpm,
                 Executors.newSingleThreadExecutor());
+        ShadowPackageManager shadowPackageManager = shadowOf(mPackageManager);
+        PackageInfo dialerPackage =
+                PackageInfoBuilder.newBuilder()
+                        .setPackageName(DIALER_PACKAGE)
+                        .setApplicationInfo(
+                                ApplicationInfoBuilder.newBuilder()
+                                        .setName(DIALER_PACKAGE)
+                                        .setPackageName(DIALER_PACKAGE)
+                                        .build())
+                        .build();
+        dialerPackage.applicationInfo.flags |= ApplicationInfo.FLAG_SYSTEM;
+        shadowPackageManager.installPackage(dialerPackage);
+        IntentFilter dialerIntent = new IntentFilter(Intent.ACTION_DIAL);
+        dialerIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        ComponentName dialerComponent = new ComponentName(DIALER_PACKAGE, TEST_ACTIVITY);
+        shadowPackageManager.addActivityIfNotPresent(dialerComponent);
+        shadowPackageManager.addIntentFilterForActivity(dialerComponent, dialerIntent);
     }
 
     @Test
     public void onProvisionInProgress_shouldHaveExpectedLockTaskFeaturesAndPackages()
             throws ExecutionException, InterruptedException {
-        final String[] expectedAllowlistPackages = {DEVICELOCK_CONTROLLER_PACKAGE};
-        mHandler.onProvisionInProgress().get();
-        shadowOf(Looper.getMainLooper()).idle();
-        assertLockTaskMode(LockTaskModePolicyHandler.DEFAULT_LOCK_TASK_FEATURES_FOR_DLC,
-                expectedAllowlistPackages);
-    }
-
-    @Test
-    public void onProvisionInProgress_shouldHaveDefaultDialerInExpectedLockTaskPackages()
-            throws ExecutionException, InterruptedException {
         final String[] expectedAllowlistPackages = {DIALER_PACKAGE, DEVICELOCK_CONTROLLER_PACKAGE};
-        mTelecomManager.setDefaultDialer(DIALER_PACKAGE);
         mHandler.onProvisionInProgress().get();
         shadowOf(Looper.getMainLooper()).idle();
         assertLockTaskMode(LockTaskModePolicyHandler.DEFAULT_LOCK_TASK_FEATURES_FOR_DLC,
@@ -198,7 +204,7 @@ public final class LockTaskModePolicyHandlerTest {
                 eq(DEVICELOCK_CONTROLLER_PACKAGE));
         assertThat(mPackageManager.getComponentEnabledSetting(
                 new ComponentName(mContext, LockedHomeActivity.class))).isEqualTo(
-                        COMPONENT_ENABLED_STATE_DISABLED);
+                COMPONENT_ENABLED_STATE_DISABLED);
     }
 
     @Test
@@ -211,7 +217,7 @@ public final class LockTaskModePolicyHandlerTest {
                 eq(DEVICELOCK_CONTROLLER_PACKAGE));
         assertThat(mPackageManager.getComponentEnabledSetting(
                 new ComponentName(mContext, LockedHomeActivity.class))).isEqualTo(
-                        COMPONENT_ENABLED_STATE_DISABLED);
+                COMPONENT_ENABLED_STATE_DISABLED);
     }
 
     private void setupDefaultSystemPackages() {

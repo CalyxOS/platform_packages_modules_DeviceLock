@@ -16,6 +16,8 @@
 
 package com.android.devicelockcontroller.policy;
 
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+
 import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_ALLOW_DEBUGGING;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_DISALLOW_INSTALLING_FROM_UNKNOWN_SOURCES;
 import static com.android.devicelockcontroller.common.DeviceLockConstants.EXTRA_KIOSK_DISABLE_OUTGOING_CALLS;
@@ -25,6 +27,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -34,11 +37,19 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.admin.DevicePolicyManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.os.UserHandle;
 import android.os.UserManager;
 
 import com.android.devicelockcontroller.storage.SetupParametersClient;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +60,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -56,23 +68,71 @@ import java.util.concurrent.Executors;
 @RunWith(RobolectricTestRunner.class)
 public final class UserRestrictionsPolicyHandlerTest {
     private static final String TEST_PACKAGE = "test.package1";
+    private static final String DIALER_PACKAGE_NAME = "com.android.dialer";
+
     @Rule
     public MockitoRule mMockitoRule = MockitoJUnit.rule();
     @Mock
     private DevicePolicyManager mMockDpm;
     @Mock
     private UserManager mMockUserManager;
+    @Mock
+    private Context mMockContext;
+    @Mock
+    private PackageManager mMockPackageManager;
     @Captor
     private ArgumentCaptor<String> mSetUserRestrictionCaptor;
     @Captor
     private ArgumentCaptor<String> mClearUserRestrictionCaptor;
+
+    @Before
+    public void setUp() {
+        when(mMockContext.getPackageManager()).thenReturn(mMockPackageManager);
+
+        ResolveInfo resolveInfo = new ResolveInfo();
+        resolveInfo.activityInfo = new ActivityInfo();
+        resolveInfo.activityInfo.packageName = DIALER_PACKAGE_NAME;
+        resolveInfo.activityInfo.applicationInfo = new ApplicationInfo();
+        resolveInfo.activityInfo.applicationInfo.flags |= ApplicationInfo.FLAG_SYSTEM;
+        when(mMockContext.createContextAsUser(any(UserHandle.class), anyInt())).thenReturn(
+                mMockContext);
+        when(mMockPackageManager.queryIntentActivities(any(Intent.class),
+                anyInt()))
+                .thenReturn(Collections.singletonList(resolveInfo));
+    }
+
+    @Test
+    public void onProvisionInProgress_findsAndEnablesSystemDialer()
+            throws ExecutionException, InterruptedException {
+        Bundle preferences = new Bundle();
+        preferences.putString(EXTRA_KIOSK_PACKAGE, TEST_PACKAGE);
+        SetupParametersClient.getInstance().createPrefs(preferences).get();
+
+        Bundle userRestrictions = new Bundle();
+        when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
+                mMockUserManager,
+                /* isDebug =*/ false,
+                Executors.newSingleThreadExecutor());
+
+        when(mMockContext.createContextAsUser(any(UserHandle.class), anyInt())).thenReturn(
+                mMockContext);
+
+        handler.onProvisionInProgress().get();
+
+        verify(mMockPackageManager).queryIntentActivities(any(Intent.class), anyInt());
+        verify(mMockPackageManager).setApplicationEnabledSetting(DIALER_PACKAGE_NAME,
+                COMPONENT_ENABLED_STATE_ENABLED, 0);
+    }
 
     @Test
     public void onProvisionInProgressDebug_withoutKioskPackageName_shouldThrowException() {
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
 
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ true,
                 Executors.newSingleThreadExecutor());
@@ -88,7 +148,8 @@ public final class UserRestrictionsPolicyHandlerTest {
     public void onProvisionInProgress_withoutKioskPackageName_shouldThrowException() {
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -109,7 +170,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ true,
                 Executors.newSingleThreadExecutor());
@@ -133,7 +195,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -158,7 +221,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -183,7 +247,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -209,7 +274,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -230,7 +296,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ true,
                 Executors.newSingleThreadExecutor());
@@ -257,7 +324,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -280,7 +348,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -307,7 +376,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -325,7 +395,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -366,7 +437,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ true,
                 Executors.newSingleThreadExecutor());
@@ -408,7 +480,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ true,
                 Executors.newSingleThreadExecutor());
@@ -434,7 +507,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -456,7 +530,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -482,7 +557,8 @@ public final class UserRestrictionsPolicyHandlerTest {
 
         Bundle userRestrictions = new Bundle();
         when(mMockUserManager.getUserRestrictions()).thenReturn(userRestrictions);
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -496,7 +572,8 @@ public final class UserRestrictionsPolicyHandlerTest {
     @Test
     public void onProvisionPaused_shouldDoNothing()
             throws ExecutionException, InterruptedException {
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
@@ -510,7 +587,8 @@ public final class UserRestrictionsPolicyHandlerTest {
     @Test
     public void onProvisionFailed_shouldDoNothing()
             throws ExecutionException, InterruptedException {
-        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockDpm,
+        UserRestrictionsPolicyHandler handler = new UserRestrictionsPolicyHandler(mMockContext,
+                mMockDpm,
                 mMockUserManager,
                 /* isDebug =*/ false,
                 Executors.newSingleThreadExecutor());
