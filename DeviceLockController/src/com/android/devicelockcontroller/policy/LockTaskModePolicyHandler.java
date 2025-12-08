@@ -29,7 +29,6 @@ import android.content.pm.ResolveInfo;
 import android.os.UserManager;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
-import android.telecom.TelecomManager;
 import android.util.ArraySet;
 
 import androidx.work.WorkManager;
@@ -114,15 +113,6 @@ final class LockTaskModePolicyHandler implements PolicyHandler {
     private ListenableFuture<Void> updateAllowlist(boolean includeKiosk) {
         return Futures.transform(composeAllowlist(includeKiosk),
                 allowlist -> {
-                    TelecomManager telecomManager = mContext.getSystemService(
-                            TelecomManager.class);
-                    String defaultDialer = telecomManager.getDefaultDialerPackage();
-                    if (defaultDialer != null && !allowlist.contains(defaultDialer)) {
-                        LogUtil.i(TAG,
-                                String.format(Locale.US, "Adding default dialer %s to allowlist",
-                                        defaultDialer));
-                        allowlist.add(defaultDialer);
-                    }
                     String[] allowlistPackages = allowlist.toArray(new String[0]);
                     mDpm.setLockTaskPackages(null /* admin */, allowlistPackages);
                     LogUtil.i(TAG, String.format(Locale.US, "Update Lock task allowlist %s",

@@ -120,7 +120,7 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
                 context,
                 devicePolicyManager,
                 userManager,
-                new UserRestrictionsPolicyHandler(
+                new UserRestrictionsPolicyHandler(context,
                         devicePolicyManager, userManager, Build.isDebuggable(), bgExecutor),
                 new AppOpsPolicyHandler(systemDeviceLockManager, bgExecutor),
                 new LockTaskModePolicyHandler(context, devicePolicyManager, bgExecutor),
