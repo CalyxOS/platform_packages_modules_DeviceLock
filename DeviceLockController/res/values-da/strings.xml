@@ -58,7 +58,7 @@
     <string name="ok" msgid="3568398726528719749">"OK"</string>
     <string name="done" msgid="4507782734740410307">"Udfør"</string>
     <string name="do_it_in_one_hour" msgid="2727777340568739453">"Gør det om 1 time"</string>
-    <string name="header_icon_content_description" msgid="6069602031334473195">"Oplysninger"</string>
+    <string name="header_icon_content_description" msgid="6069602031334473195">"Info"</string>
     <string name="provision_info_item_icon_content_description" msgid="2306298178610632507">"Provisioneringsinfo"</string>
     <string name="enroll_your_device_header" msgid="2226305405591945098">"Tilmeld din enhed"</string>
     <string name="enroll_your_device_financing_subheader" msgid="8810608106273097451">"Din enhed kan nu tilmeldes finansieringsprogrammet fra <xliff:g id="PROVIDER_NAME">%1$s</xliff:g>"</string>
