@@ -81,7 +81,7 @@
     <string name="opening_kiosk_app" msgid="2021888641430165654">"<xliff:g id="CREDITOR_APP">%1$s</xliff:g> యాప్‌ను తెరుస్తోంది…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"పరికరం <xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ద్వారా అందించబడుతుంది"</string>
     <string name="settings_banner_title_recol" msgid="7269978656496777466">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ద్వారా పూచీకత్తు చేయబడిన డివైజ్"</string>
-    <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ఈ పరికరంలోని సెట్టింగ్‌లను మార్చగలరు"</string>
+    <string name="settings_banner_body" msgid="5814902066260202824">"<xliff:g id="PROVIDER_NAME">%1$s</xliff:g> ఈ డివైజ్‌లోని సెట్టింగ్‌లను మార్చగలరు"</string>
     <string name="settings_banner_button" msgid="1831020849782670907">"మరింత తెలుసుకోండి"</string>
     <string name="settings_screen_title" msgid="721470080648091035">"ఫైనాన్స్ చేసిన పరికర సమాచారం"</string>
     <string name="settings_intro_device_financing" msgid="2548476558131048133">"<xliff:g id="PROVIDER_NAME_0">%1$s</xliff:g> సెట్టింగ్‌లను మార్చి, పరికరంలో కియోస్క్ యాప్‌ను ఇన్‌స్టాల్ చేయగలరు.\n\nమీరు పేమెంట్ చేయడం మిస్ అయితే, <xliff:g id="PROVIDER_NAME_1">%1$s</xliff:g> మీ పరికరాన్ని పరిమితం చేయవచ్చు.\n\nమరింత తెలుసుకోవడానికి, <xliff:g id="PROVIDER_NAME_2">%1$s</xliff:g>‌ను కాంటాక్ట్ చేయండి."</string>

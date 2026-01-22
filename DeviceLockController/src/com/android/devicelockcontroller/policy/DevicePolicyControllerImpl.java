@@ -423,10 +423,6 @@ public final class DevicePolicyControllerImpl implements DevicePolicyController 
                     Intent resultIntent = new Intent(mContext, LandingActivity.class);
                     switch (type) {
                         case ProvisioningType.TYPE_FINANCED:
-                            // TODO(b/288923554) this used to return an intent with action
-                            // ACTION_START_DEVICE_FINANCING_SECONDARY_USER_PROVISIONING
-                            // for secondary users. Rework once a decision has been made about
-                            // what to show to users.
                             return resultIntent.setAction(
                                     ACTION_START_DEVICE_FINANCING_PROVISIONING);
                         case ProvisioningType.TYPE_SUBSIDY:
