@@ -76,7 +76,7 @@
     <string name="restrictions_lifted" msgid="5785586265984319396">"针对设备的所有限制均已解除"</string>
     <string name="uninstall_kiosk_app" msgid="3459557395024053988">"您可以从设备上卸载自助服务终端应用"</string>
     <string name="getting_device_ready" msgid="2829009584599871699">"正在设置设备…"</string>
-    <string name="this_may_take_a_few_minutes" msgid="2482876246874429351">"这可能需要几分钟的时间"</string>
+    <string name="this_may_take_a_few_minutes" msgid="2482876246874429351">"可能需要几分钟时间"</string>
     <string name="installing_kiosk_app" msgid="324208168205545860">"正在安装“<xliff:g id="CREDITOR_APP">%1$s</xliff:g>”应用…"</string>
     <string name="opening_kiosk_app" msgid="2021888641430165654">"正在打开“<xliff:g id="CREDITOR_APP">%1$s</xliff:g>”应用…"</string>
     <string name="settings_banner_title" msgid="527041021011279252">"设备由<xliff:g id="PROVIDER_NAME">%1$s</xliff:g>提供"</string>
