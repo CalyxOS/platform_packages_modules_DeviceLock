@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.0-alpha08" type="baseline" client="" dependencies="true" name="" variant="all" version="8.4.0-alpha08">
-
+<issues
+    format="6"
+    by="lint 8.4.0-alpha08"
+    type="baseline"
+    client=""
+    dependencies="true"
+    name=""
+    variant="all"
+    version="8.4.0-alpha08">
     <issue
         id="NewApi"
         message="Call requires API level 35 (current min is 34): `java.util.SequencedCollection#getFirst`"
+        errorLine1="            WorkInfo workInfo = infoList.getFirst();"
+        errorLine2="                                         ~~~~~~~~">
+        <location
+            file="packages/modules/DeviceLock/DeviceLockController/src/com/android/devicelockcontroller/activities/ProvisioningProgressViewModel.java"
+            line="130"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 35 (current min is 34): `java.util.List#getFirst`"
         errorLine1="            WorkInfo workInfo = infoList.getFirst();"
         errorLine2="                                         ~~~~~~~~">
         <location
