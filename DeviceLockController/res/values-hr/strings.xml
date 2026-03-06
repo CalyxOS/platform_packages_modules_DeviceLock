@@ -131,5 +131,5 @@
     <string name="provisioning_failed_generic" msgid="2165937375591501360">"Davanje pristupa nije uspjelo"</string>
     <string name="click_to_contact_financier" msgid="5932768971588112528">"Za pomoć pri prijavi uređaja <xliff:g id="SUPPORT_LINK_START">&lt;a href=%2$s&gt;</xliff:g>kontaktirajte davatelja usluga <xliff:g id="PROVIDER_NAME">%1$s</xliff:g><xliff:g id="SUPPORT_LINK_END">&lt;/a&gt;</xliff:g>."</string>
     <string name="exit" msgid="645084771882733921">"Izlaz"</string>
-    <string name="retry" msgid="7497287909193345356">"Pokušaj ponovo"</string>
+    <string name="retry" msgid="7497287909193345356">"Pokušaj ponovno"</string>
 </resources>
