@@ -1,11 +1,9 @@
 // Signature format: 6.0
 // - style=java
-// - strip-java-lang-prefix=legacy
-// - type-argument-spacing=legacy
 package android.devicelock {
 
   public final class DeviceLockManager {
-    method @FlaggedApi("com.android.devicelock.flags.get_enrollment_type") @RequiresPermission(android.Manifest.permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE) public void getEnrollmentType(@NonNull java.util.concurrent.Executor, @NonNull android.os.OutcomeReceiver<java.lang.Integer,java.lang.Exception>);
+    method @FlaggedApi("com.android.devicelock.flags.get_enrollment_type") @RequiresPermission(android.Manifest.permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE) public void getEnrollmentType(@NonNull java.util.concurrent.Executor, @NonNull android.os.OutcomeReceiver<Integer, Exception>);
     field @FlaggedApi("com.android.devicelock.flags.get_enrollment_type") public static final int ENROLLMENT_TYPE_FINANCE = 1; // 0x1
     field @FlaggedApi("com.android.devicelock.flags.get_enrollment_type") public static final int ENROLLMENT_TYPE_NONE = 0; // 0x0
     field @FlaggedApi("com.android.devicelock.flags.get_enrollment_type") public static final int ENROLLMENT_TYPE_SUBSIDY = 2; // 0x2
