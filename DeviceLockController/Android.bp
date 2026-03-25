@@ -189,6 +189,7 @@ android_app {
     updatable: true,
     privileged: true,
     privapp_allowlist: ":privapp_allowlist_com.android.devicelockcontroller.xml",
+    preinstall_allowlist: ":preinstalled-packages-com.android.devicelockcontroller.xml",
     certificate: "platform",
     rename_resources_package: false,
 
@@ -216,6 +217,7 @@ android_app {
     updatable: true,
     privileged: true,
     privapp_allowlist: ":privapp_allowlist_com.android.devicelockcontroller.xml",
+    preinstall_allowlist: ":preinstalled-packages-com.android.devicelockcontroller.xml",
     certificate: "platform",
     rename_resources_package: false,
 
@@ -233,5 +235,12 @@ android_app {
     apex_available: [
         "//apex_available:platform",
         "com.android.devicelock",
+    ],
+}
+
+filegroup {
+    name: "preinstalled-packages-com.android.devicelockcontroller.xml",
+    srcs: [
+        "sysconfig/preinstalled-packages-com.android.devicelockcontroller.xml",
     ],
 }
