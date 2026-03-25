@@ -127,7 +127,7 @@ public final class ProvisioningProgressViewModel extends AndroidViewModel implem
                 return false;
             }
 
-            WorkInfo workInfo = infoList.getFirst();
+            WorkInfo workInfo = infoList.get(0);
 
             if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
                 Data outputData = workInfo.getOutputData();
