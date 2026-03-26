@@ -333,7 +333,6 @@ public final class DeviceLockManagerTest {
     }
 
     @Test
-    @RequiresFlagsEnabled(Flags.FLAG_GET_ENROLLMENT_TYPE)
     @ApiTest(apis = {"android.devicelock.DeviceLockManager#getEnrollmentType"})
     public void getEnrollmentTypePermissionCheck() {
         ListenableFuture</* EnrollmentType */ Integer> getEnrollmentTypeFuture =
@@ -522,7 +521,6 @@ public final class DeviceLockManagerTest {
     }
 
     @Test
-    @RequiresFlagsEnabled(Flags.FLAG_GET_ENROLLMENT_TYPE)
     @ApiTest(apis = {"android.devicelock.DeviceLockManager#getEnrollmentType"})
     public void getEnrollmentTypeShouldReturnNone()
             throws ExecutionException, InterruptedException, TimeoutException {

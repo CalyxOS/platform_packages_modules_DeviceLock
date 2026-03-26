@@ -18,7 +18,6 @@ package android.devicelock;
 
 import static com.android.devicelock.flags.Flags.FLAG_CLEAR_DEVICE_RESTRICTIONS;
 import static com.android.devicelock.flags.Flags.FLAG_EXTRA_DEVICE_LOCK_VERSION;
-import static com.android.devicelock.flags.Flags.FLAG_GET_ENROLLMENT_TYPE;
 import static com.android.devicelock.flags.Flags.FLAG_NOTIFY_KIOSK_SETUP_FINISHED;
 
 import android.Manifest.permission;
@@ -107,7 +106,6 @@ public final class DeviceLockManager {
      * @hide
      */
     @SystemApi
-    @FlaggedApi(FLAG_GET_ENROLLMENT_TYPE)
     public static final int ENROLLMENT_TYPE_NONE = 0;
 
     /**
@@ -115,7 +113,6 @@ public final class DeviceLockManager {
      * @hide
      */
     @SystemApi
-    @FlaggedApi(FLAG_GET_ENROLLMENT_TYPE)
     public static final int ENROLLMENT_TYPE_FINANCE = 1;
 
     /**
@@ -123,7 +120,6 @@ public final class DeviceLockManager {
      * @hide
      */
     @SystemApi
-    @FlaggedApi(FLAG_GET_ENROLLMENT_TYPE)
     public static final int ENROLLMENT_TYPE_SUBSIDY = 2;
 
     /**
@@ -458,7 +454,6 @@ public final class DeviceLockManager {
      * @hide
      */
     @SystemApi
-    @FlaggedApi(FLAG_GET_ENROLLMENT_TYPE)
     @RequiresPermission(permission.GET_DEVICE_LOCK_ENROLLMENT_TYPE)
     public void getEnrollmentType(
             @NonNull @CallbackExecutor Executor executor,
